@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Booking.Application.Auth.Interfaces;
+using Booking.Application.Availability.Interfaces;
 using Booking.Application.Business.Interfaces;
 using Booking.Application.Services.Interfaces;
 using Booking.Application.Staff.Interfaces;
@@ -83,6 +84,10 @@ public static class DependencyInjection
         services.AddScoped<IServiceRepository, ServiceRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();
         services.AddScoped<IBusinessRepository, BusinessRepository>();
+        services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
+
+        // Caching for availability engine
+        services.AddMemoryCache();
 
         return services;
     }

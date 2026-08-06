@@ -57,7 +57,11 @@ public static class AvailabilityEngine
                 if (staff.Bookings.Any(b => slotStart < b.EndUtc && slotEnd > b.StartUtc))
                     continue;
 
-                result.Add(new AvailableSlot(staff.StaffId, staff.StaffName, slotStart, slotEnd));
+                result.Add(new AvailableSlot(
+                    staff.StaffId,
+                    staff.StaffName,
+                    DateTime.SpecifyKind(slotStart, DateTimeKind.Utc),
+                    DateTime.SpecifyKind(slotEnd, DateTimeKind.Utc)));
             }
         }
 
