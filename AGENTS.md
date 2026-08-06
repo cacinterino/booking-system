@@ -41,6 +41,13 @@ booking-system/
 - **Entities**: PascalCase classes in `Booking.Domain` (no EF attributes)
 - **Interfaces**: `I` prefix in Application (e.g., `IEmailService`, `IDateTimeProvider`)
 
+## Branching Strategy (ALWAYS branch — never commit directly to main)
+- `main` — **STAGING**. Merged `feat/*` / `bugfix/*` work lands here for testing.
+- `feat/<name>` — feature branches, branched from `main`, merged back to `main` via PR.
+- `bugfix/<name>` — fix branches, branched from `main`, merged back to `main` via PR.
+- `release/<version>` — **PRODUCTION**. Cut from `main` when staging is stable; deploys to prod; hotfixes applied here and merged back to `main`.
+- Rules: never commit directly to `main` or `release/*`; open a PR and merge. One feature slice per session.
+
 ## Critical Rules
 1. **Always write a test for the availability engine when touching it** — this is the core algorithm
 2. **Domain has ZERO dependencies** — no EF, no MediatR, no external packages

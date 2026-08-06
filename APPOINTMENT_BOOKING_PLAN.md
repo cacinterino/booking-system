@@ -208,11 +208,10 @@ gh repo create booking-system --private --source=. --push
 ```
 
 **Branch Strategy:**
-- `main` — production-ready, protected
-- `develop` — integration branch
-- `feature/*` — feature branches from `develop`
-- `fix/*` — bug fixes
-- `release/*` — release preparation
+- `main` — **STAGING** (merged `feat/*` / `bugfix/*` work; for testing)
+- `feat/*` — feature branches from `main`
+- `bugfix/*` — bug fixes from `main`
+- `release/*` — **PRODUCTION** (cut from `main`; deploys to prod; hotfixes merged back to `main`)
 
 ---
 
