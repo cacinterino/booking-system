@@ -19,8 +19,8 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Domain.Customer>
             .WithMany()
             .HasForeignKey(c => c.BusinessId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.HasIndex(c => new { c.BusinessId, c.Email }).IsUnique().HasFilter("[IsDeleted] = 0");
-        builder.HasIndex(c => c.UserId).IsUnique().HasFilter("[UserId] IS NOT NULL");
+        builder.HasIndex(c => new { c.BusinessId, c.Email }).IsUnique().HasFilter("\"IsDeleted\" = false");
+        builder.HasIndex(c => c.UserId).IsUnique().HasFilter("\"UserId\" IS NOT NULL");
     }
 }
 
@@ -56,9 +56,9 @@ public class BookingConfiguration : IEntityTypeConfiguration<Domain.Booking>
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(b => new { b.BusinessId, b.StartTime });
         builder.HasIndex(b => new { b.StaffId, b.StartTime });
-        builder.HasIndex(b => b.IdempotencyKey).IsUnique().HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(b => b.IdempotencyKey).IsUnique().HasFilter("\"IsDeleted\" = false");
         builder.HasIndex(b => new { b.StaffId, b.StartTime, b.Status })
-            .HasFilter("[Status] IN (1,2)");
+            .HasFilter("\"Status\" IN (1,2)");
     }
 }
 
