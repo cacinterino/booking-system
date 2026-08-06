@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking System — Project Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14213D;
+    --ink-soft:#233258;
+    --paper:#F5F0E4;
+    --paper-white:#FFFDF8;
+    --brass:#B8862B;
+    --brass-soft:#D8AE5F;
+    --sage:#4F7860;
+    --slate:#5B6270;
+    --line: rgba(20,33,61,0.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Fraunces', serif;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 32px; max-width:1080px; margin:0 auto;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; letter-spacing:.04em;
+    color:var(--slate);
+  }
+  .topbar .mark{color:var(--ink); font-weight:500;}
+  .topbar .mark span{color:var(--brass);}
+
+  /* ---- hero ---- */
+  .hero{ padding: 28px 0 70px; }
+  .hero-grid{ display:grid; grid-template-columns: 1.15fr 0.85fr; gap:56px; align-items:center; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--brass); margin:0 0 18px;
+  }
+  h1.display{
+    font-size:52px; line-height:1.05; font-weight:600; margin:0 0 22px; letter-spacing:-.01em;
+  }
+  h1.display em{ font-style:italic; font-weight:500; color:var(--ink-soft); }
+  .hero p.lede{ font-size:17px; line-height:1.6; color:var(--slate); max-width:46ch; margin:0 0 28px; }
+  .hero-meta{ display:flex; gap:28px; flex-wrap:wrap; }
+  .hero-meta div{ font-size:13px; color:var(--slate); }
+  .hero-meta strong{ display:block; font-family:'Fraunces', serif; font-size:20px; color:var(--ink); font-weight:600; }
+
+  /* ---- ticket stub, the signature element ---- */
+  .ticket{
+    background:var(--paper-white);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow: 0 24px 48px -24px rgba(20,33,61,0.28);
+    position:relative;
+    padding:26px 26px 22px;
+    transform: rotate(1.4deg);
+  }
+  .ticket:before, .ticket:after{
+    content:""; position:absolute; width:22px; height:22px; background:var(--paper);
+    border-radius:50%; top:50%; transform:translateY(-50%);
+  }
+  .ticket:before{ left:-11px; } .ticket:after{ right:-11px; }
+  .perf{
+    border-top:1.5px dashed var(--line); margin: 18px 0; position:relative;
+  }
+  .ticket .row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .ticket .row .k{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.06em; color:var(--slate); text-transform:uppercase; }
+  .ticket .row .v{ font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink); }
+  .ticket-num{ font-family:'Fraunces', serif; font-size:34px; font-weight:600; margin:2px 0 2px; }
+  .ticket-biz{ font-size:13px; color:var(--slate); margin-bottom:14px; }
+  .stamp{
+    position:absolute; right:22px; bottom:20px;
+    border:2.5px solid var(--sage); color:var(--sage);
+    border-radius:50%; width:76px; height:76px;
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-14deg);
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:600; letter-spacing:.06em;
+    text-align:center; line-height:1.25; opacity:.9;
+  }
+
+  /* ---- section shell ---- */
+  section{ padding:64px 0; border-top:1px solid var(--line); }
+  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:38px; gap:24px; flex-wrap:wrap; }
+  .section-head h2{ font-size:30px; margin:0; font-weight:600; }
+  .section-head p{ margin:8px 0 0; color:var(--slate); font-size:14.5px; max-width:52ch; }
+  .kicker{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--brass); }
+
+  /* ---- stack strip ---- */
+  .stack-strip{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .stack-cell{ background:var(--paper-white); padding:22px 20px; }
+  .stack-cell .label{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--slate); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+  .stack-cell .val{ font-family:'Fraunces', serif; font-size:19px; font-weight:600; }
+
+  /* ---- architecture ---- */
+  .arch{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .arch .layer{
+    background:var(--paper-white); border:1px solid var(--line); border-radius:8px;
+    padding:20px 18px; position:relative;
+  }
+  .arch .layer .n{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--brass); margin-bottom:10px; }
+  .arch .layer h3{ margin:0 0 10px; font-size:16px; font-family:'Fraunces', serif; font-weight:600; }
+  .arch .layer ul{ margin:0; padding-left:16px; font-size:12.5px; color:var(--slate); line-height:1.7; }
+  .arch-arrow{ display:flex; align-items:center; justify-content:center; color:var(--brass); font-size:15px; }
+
+  /* ---- roadmap ---- */
+  .roadmap{ position:relative; padding-left:2px; }
+  .phase{ display:grid; grid-template-columns:64px 1fr; gap:20px; padding:20px 0; border-top:1px solid var(--line); }
+  .phase:first-child{ border-top:none; }
+  .phase .num{ font-family:'Fraunces', serif; font-size:26px; font-weight:600; color:var(--brass); }
+  .phase h3{ margin:0 0 6px; font-size:17px; font-weight:600; }
+  .phase p{ margin:0; color:var(--slate); font-size:14px; line-height:1.6; }
+  .tag{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10.5px; padding:3px 8px; border-radius:20px; margin-left:8px; vertical-align:2px; letter-spacing:.03em;}
+  .tag.new{ background:rgba(184,134,43,.15); color:var(--brass); }
+
+  /* ---- ai/mcp cards ---- */
+  .ai-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .ai-card{ background:var(--ink); color:var(--paper-white); border-radius:8px; padding:22px 20px; }
+  .ai-card .k{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--brass-soft); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; }
+  .ai-card h3{ margin:0 0 8px; font-family:'Fraunces', serif; font-size:17px; font-weight:600; }
+  .ai-card p{ margin:0; font-size:13px; line-height:1.6; color:rgba(255,253,248,.72); }
+
+  /* ---- trello preview ---- */
+  .board{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; overflow-x:auto; }
+  .board .col{ background:var(--paper-white); border:1px solid var(--line); border-radius:8px; padding:14px; min-width:150px; }
+  .board .col h4{ font-size:12px; margin:0 0 10px; font-family:'IBM Plex Mono', monospace; letter-spacing:.04em; color:var(--ink-soft); text-transform:uppercase; }
+  .board .card{ background:var(--paper); border:1px solid var(--line); border-radius:5px; padding:8px 10px; font-size:12px; margin-bottom:8px; color:var(--ink-soft); }
+
+  /* ---- footer ---- */
+  footer{ padding:50px 0 60px; }
+  footer .inner{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  footer .left h3{ font-family:'Fraunces', serif; font-size:22px; margin:0 0 4px; }
+  footer .left p{ margin:0; color:var(--slate); font-size:13.5px; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:.03em;
+    background:var(--ink); color:var(--paper-white); padding:12px 20px; border-radius:6px;
+    text-decoration:none; display:inline-block;
+  }
+
+  @media (max-width: 860px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .stack-strip{ grid-template-columns:repeat(2,1fr); }
+    .arch{ grid-template-columns:1fr; }
+    .arch-arrow{ transform:rotate(90deg); padding:2px 0; }
+    .ai-grid{ grid-template-columns:1fr; }
+    .board{ grid-template-columns:repeat(2,1fr); }
+    h1.display{ font-size:36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="mark">LEDGER<span>&nbsp;/</span> booking-system</div>
+  <div>Project build plan · Aug 2026</div>
+</div>
+
+<div class="wrap hero">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">Full-stack portfolio build</p>
+      <h1 class="display">An appointment book, <em>rebuilt</em> for PH service businesses.</h1>
+      <p class="lede">A booking platform for clinics, salons, barbershops, and spas — built to show
+      production-grade architecture end to end: clean domain boundaries, a real-time calendar,
+      and a booking flow tuned for how people actually book here, GCash and all.</p>
+      <div class="hero-meta">
+        <div><strong>9+1</strong>build phases</div>
+        <div><strong>14</strong>day timeline</div>
+        <div><strong>ASP.NET&nbsp;9</strong>+ React 18</div>
+        <div><strong>PH</strong>market-fit</div>
+      </div>
+    </div>
+    <div class="ticket">
+      <div class="row"><span class="k">Business</span><span class="v">Manila Skin Studio</span></div>
+      <div class="ticket-biz">Facial · Dr. Reyes · 45 min</div>
+      <div class="ticket-num mono">No. 000143</div>
+      <div class="perf"></div>
+      <div class="row"><span class="k">Date</span><span class="v">Aug 12, 2026</span></div>
+      <div class="row"><span class="k">Time</span><span class="v">2:30 PM</span></div>
+      <div class="row"><span class="k">Deposit</span><span class="v">₱100 via GCash</span></div>
+      <div class="stamp">CONFIRMED<br>· ✓ ·</div>
+    </div>
+  </div>
+</div>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <p class="kicker">Stack</p>
+      <h2 class="display">Built on boring, provable technology.</h2>
+    </div>
+    <p>Every choice here is one you can defend in an interview — nothing exotic, nothing that
+    needs a footnote.</p>
+  </div>
+  <div class="stack-strip">
+    <div class="stack-cell"><div class="label">API</div><div class="val">ASP.NET Core 9</div></div>
+    <div class="stack-cell"><div class="label">Client</div><div class="val">React 18 + Vite</div></div>
+    <div class="stack-cell"><div class="label">Database</div><div class="val">PostgreSQL</div></div>
+    <div class="stack-cell"><div class="label">Real-time</div><div class="val">SignalR</div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <p class="kicker">Architecture</p>
+      <h2 class="display">Four layers, one direction of dependency.</h2>
+    </div>
+    <p>Clean Architecture with CQRS via MediatR — Domain has no idea Infrastructure exists.</p>
+  </div>
+  <div class="arch">
+    <div class="layer"><div class="n">01</div><h3>Domain</h3><ul><li>Entities & value objects</li><li>Booking status rules</li><li>Zero dependencies</li></ul></div>
+    <div class="arch-arrow">→</div>
+    <div class="layer"><div class="n">02</div><h3>Application</h3><ul><li>Commands / queries</li><li>Validators</li><li>DTOs & interfaces</li></ul></div>
+    <div class="arch-arrow">→</div>
+    <div class="layer"><div class="n">03</div><h3>Infrastructure</h3><ul><li>EF Core + Postgres</li><li>Email / SMS / payments</li><li>Identity + JWT</li></ul></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <p class="kicker">Roadmap</p>
+      <h2 class="display">Fourteen days, phase by phase.</h2>
+    </div>
+    <p>A genuine build order — each phase unblocks the next, so the numbering here means something.</p>
+  </div>
+  <div class="roadmap">
+    <div class="phase"><div class="num mono">00</div><div><h3>AI-Accelerated Setup <span class="tag new">added</span></h3><p>OpenCode, AGENTS.md, GitHub + Postgres MCP, and the Impeccable design skill connected before a line of app code is written.</p></div></div>
+    <div class="phase"><div class="num mono">01</div><div><h3>Foundation</h3><p>Solution + client scaffolding, Docker Compose, repo and branch protection live.</p></div></div>
+    <div class="phase"><div class="num mono">02</div><div><h3>Data & Auth</h3><p>Domain model, EF Core migrations, JWT auth, Asia/Manila timezone decision locked in.</p></div></div>
+    <div class="phase"><div class="num mono">03</div><div><h3>Core Features</h3><p>Availability engine, booking flow, and GCash/Maya deposit via PayMongo <span class="tag new">added</span>.</p></div></div>
+    <div class="phase"><div class="num mono">04</div><div><h3>Frontend</h3><p>Booking wizard, staff calendar with live SignalR updates, customer dashboard.</p></div></div>
+    <div class="phase"><div class="num mono">05</div><div><h3>Notifications & Polish</h3><p>Email/SMS reminders, rate limiting, seed data for a convincing demo.</p></div></div>
+    <div class="phase"><div class="num mono">06</div><div><h3>Deploy & Document</h3><p>CI/CD, live deploy, README with a Data Privacy Act note, case study, demo reel.</p></div></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <p class="kicker">AI tooling</p>
+      <h2 class="display">Where OpenCode and MCP actually save days.</h2>
+    </div>
+    <p>Agentic tooling connected to real project context, not just autocomplete.</p>
+  </div>
+  <div class="ai-grid">
+    <div class="ai-card"><div class="k">Agent</div><h3>OpenCode + AGENTS.md</h3><p>Model-agnostic agent driving Nemotron 3 / DeepSeek; AGENTS.md carries plan, conventions, and structure into every session.</p></div>
+    <div class="ai-card"><div class="k">MCP</div><h3>GitHub + Postgres servers</h3><p>Reads real schema and repo state instead of guessing column names or PR status.</p></div>
+    <div class="ai-card"><div class="k">Skill</div><h3>Impeccable design skill</h3><p>Open-source, 23-command design system that audits the React client against real design tokens before calling Phase 4 "done."</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <p class="kicker">Tracking</p>
+      <h2 class="display">The Trello board, at a glance.</h2>
+    </div>
+    <p>Full paste-ready card lists are in <span class="mono">TRELLO_BOARD_PLAN.md</span>.</p>
+  </div>
+  <div class="board">
+    <div class="col"><h4>Phase 0 · AI Setup</h4><div class="card">Connect GitHub MCP</div><div class="card">Write CLAUDE.md</div></div>
+    <div class="col"><h4>Phase 1 · Foundation</h4><div class="card">Scaffold .NET solution</div><div class="card">Docker Compose up</div></div>
+    <div class="col"><h4>Phase 3 · Core</h4><div class="card">Availability engine</div><div class="card">PayMongo integration</div></div>
+    <div class="col"><h4>Phase 4 · Frontend</h4><div class="card">Booking wizard</div><div class="card">Staff calendar</div></div>
+    <div class="col"><h4>Done</h4><div class="card" style="opacity:.5">—</div></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="inner">
+    <div class="left">
+      <h3 class="display">Ready for Phase 0.</h3>
+      <p>Plan, review notes, AI setup guide, and Trello board all live alongside this page.</p>
+    </div>
+    <a class="btn" href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+</body>
+</html>
