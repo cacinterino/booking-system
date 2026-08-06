@@ -1,1 +1,145 @@
 @import "tailwindcss";
+
+@theme {
+  /* Colors from design system */
+  --color-ink: #14213D;
+  --color-ink-soft: #233258;
+  --color-paper: #F5F0E4;
+  --color-paper-white: #FFFDF8;
+  --color-brass: #B8862B;
+  --color-brass-soft: #D8AE5F;
+  --color-sage: #4F7860;
+  --color-slate: #5B6270;
+  --color-line: rgba(20,33,61,0.14);
+
+  /* Font families */
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .ticket {
+    @apply relative bg-paper-white border border-line rounded-xl p-6 md:p-8 rotate-1 transition-transform hover:rotate-0 hover:shadow-xl;
+  }
+  
+  .ticket::before {
+    @apply content-[''] absolute top-4 right-4 w-10 h-10 rounded-full bg-brass/10 border border-brass/30;
+  }
+
+  .ticket-plain {
+    @apply relative bg-paper-white border border-line rounded-xl p-6;
+  }
+
+  .ticket-plain::before {
+    display: none;
+  }
+  
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg bg-brass text-paper-white hover:bg-brass-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-paper-white;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg border border-line bg-paper-white text-ink hover:bg-ink/5 transition-colors focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2 focus:ring-offset-paper-white;
+  }
+  
+  .btn-danger {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-paper-white;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-line bg-paper-white text-ink placeholder-slate rounded-lg focus:outline-none focus:ring-2 focus:ring-brass focus:border-brass transition-all;
+  }
+  
+  .label-field {
+    @apply block text-sm font-medium text-ink-soft mb-2;
+  }
+  
+  .card {
+    @apply bg-paper-white border border-line rounded-xl p-6 md:p-8 shadow-sm;
+  }
+  
+  .stack-strip {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8;
+  }
+  
+  .stack-strip-item {
+    @apply text-center p-4 md:p-6;
+  }
+  
+  .stack-strip-value {
+    @apply text-3xl md:text-4xl font-bold text-ink font-display;
+  }
+  
+  .stack-strip-label {
+    @apply text-sm text-slate mt-1 font-medium;
+  }
+
+  .btn-on-dark {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg bg-brass text-ink hover:bg-brass-soft hover:text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-brass-soft focus:ring-offset-2 focus:ring-offset-ink;
+  }
+
+  .btn-outline-on-dark {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg border border-paper-white/30 text-paper-white hover:bg-paper-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-paper-white focus:ring-offset-2 focus:ring-offset-ink;
+  }
+
+  .animate-float {
+    animation: float 7s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 11s ease-in-out infinite;
+  }
+
+  .animate-marquee {
+    animation: marquee 28s linear infinite;
+  }
+
+  .text-gradient-brass {
+    background: linear-gradient(120deg, #D8AE5F, #B8862B, #F2D5A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-grid-faint {
+    background-image:
+      linear-gradient(rgba(245, 240, 228, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 240, 228, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-22px) rotate(3deg); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-float-slow, .animate-marquee {
+    animation: none;
+  }
+}

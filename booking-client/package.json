@@ -30,6 +30,7 @@
     "@tanstack/react-query-devtools": "^5.101.4",
     "axios": "^1.19.0",
     "date-fns": "^4.4.0",
+    "framer-motion": "^13.0.0",
     "lucide-react": "^1.28.0",
     "react-hook-form": "^7.84.0",
     "react-router-dom": "^7.18.2",

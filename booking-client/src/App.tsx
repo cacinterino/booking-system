@@ -1,14 +1,38 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './shared/context/AuthContext';
+import { ProtectedRoute, PublicRoute } from './shared/components/ProtectedRoute';
+import { queryClient } from './shared/api/queryClient';
+import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './features/auth/pages/LoginPage';
+import { RegisterPage } from './features/auth/pages/RegisterPage';
+import { ProfilePage } from './features/auth/pages/ProfilePage';
+import { DashboardPage } from './pages/DashboardPage';
+import './style.css';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Appointment Booking System</h1>
-        <div className="bg-white rounded-lg shadow p-8">
-          <p className="text-gray-600">React + TypeScript + Vite + Tailwind v4 is working!</p>
-        </div>
-      </div>
-    </div>
-  )
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes */}
+            <Route element={<PublicRoute />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
+
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;

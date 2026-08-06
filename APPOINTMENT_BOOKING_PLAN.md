@@ -433,6 +433,19 @@ export const queryClient = new QueryClient({
 
 ## 🚀 Phase 8: CI/CD & Deployment (Week 3)
 
+### 8.0 Deployment Stack (Free-tier)
+
+| Layer | Choice | Notes |
+|-------|--------|-------|
+| **DB** | **Neon** (Postgres 16) | ⚠️ NOT Render's free Postgres (it expires after 30 days). Neon/Supabase are permanent. Use Neon for branching + a healthy free tier. |
+| **API** | **Render** free web service | Sleeps after ~15 min idle (cold start 10–20s). Acceptable for portfolio/staging. Requires a `/health` endpoint for Render's deploy check. |
+| **Client** | **Vercel** | Free, with automatic preview deploys per PR (free staging). |
+| **Backups** | **GitHub Actions nightly `pg_dump`** | Free tiers don't include DB backups. Scheduled Action → dump → private repo/bucket. See §8.3. |
+| **Staging (API)** | Second Render service on `develop` branch | Free preview instance mirrors prod without redeploy cost. |
+| **Staging (Client)** | Vercel preview deploys | Automatic per PR/branch — no setup. |
+
+**Deploy order:** build Phase 4 features → seed + health + CORS (see §8.4 checklist) → then run the workflows below.
+
 ### 8.1 GitHub Actions Workflows
 
 #### `.github/workflows/ci.yml`
@@ -520,14 +533,59 @@ jobs:
 ```
 
 ### 8.2 Environment Variables (Production)
-| Variable | Render (API) | Vercel (Client) | Supabase/Neon (DB) |
-|----------|--------------|-----------------|-------------------|
+| Variable | Render (API) | Vercel (Client) | Neon (DB) |
+|----------|--------------|-----------------|-----------|
 | `ConnectionStrings__DefaultConnection` | ✅ | | ✅ |
 | `Jwt__Key`, `Jwt__Issuer`, `Jwt__Audience` | ✅ | | |
 | `Email__ApiKey`, `Email__From` | ✅ | | |
 | `Sms__Provider`, `Sms__ApiKey`, `Sms__From` | ✅ | | |
+| `PayMongo__SecretKey` | ✅ | | |
 | `AllowedOrigins` | ✅ | | |
 | `VITE_API_URL` | | ✅ | |
+
+> Neon connection string format: `Host=ep-xxxx-xxxx.us-east-1.aws.neon.tech;Database=booking;Username=neondb_owner;Password=...;SSL Mode=Require`
+
+### 8.3 Database Backups (GitHub Actions nightly)
+
+```yaml
+# .github/workflows/db-backup.yml
+name: Nightly DB Backup
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 3am UTC = 11am Manila
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dump database
+        run: |
+          PGPASSWORD="${{ secrets.DB_PASSWORD }}" pg_dump \
+            -h "${{ secrets.DB_HOST }}" \
+            -U "${{ secrets.DB_USER }}" \
+            -d "${{ secrets.DB_NAME }}" \
+            -Fc -f backup.dump
+      - name: Upload to artifact (private repo)
+        uses: actions/upload-artifact@v4
+        with:
+          name: booking-backup-$(date +%F)
+          path: backup.dump
+          retention-days: 14
+```
+
+### 8.4 Pre-Deploy Checklist
+
+Do this **before** first production deploy — an empty app looks broken to visitors:
+
+- [ ] `GET /api/health` endpoint + PostgreSQL health check (Render deploy verification)
+- [ ] Auto-run EF migrations on startup **or** a Render release command (`dotnet ef database update`)
+- [ ] **Seed script** (`dotnet run --seed`): services, service categories, staff, schedules, demo admin account — critical so the calendar isn't empty
+- [ ] CORS `AllowedOrigins` points at the real Vercel domain (not localhost)
+- [ ] Rate limiting on `/api/auth/login` and `POST /api/bookings`
+- [ ] Confirm Neon connection string uses `SSL Mode=Require`
+- [ ] GitHub Actions secrets set: `RENDER_API_SERVICE_ID`, `RENDER_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
 
 ---
 
@@ -591,13 +649,16 @@ jobs:
 23. ✅ Responsive UI, loading states, error handling
 
 ### **Day 13-14: Deploy & Document**
-24. ✅ Create Render account → PostgreSQL + Web Service
-25. ✅ Create Vercel account → Import React repo
-26. ✅ Configure GitHub Actions secrets
-27. ✅ Push to `main` → watch deployments
-28. ✅ Write README + case study
-29. ✅ Record demo video/GIF
-30. ✅ Add to portfolio
+24. ✅ Create Neon (Postgres) → free tier, permanent
+25. ✅ Create Render account → Web Service (API) on `main`
+26. ✅ Create Vercel account → Import React repo (client)
+27. ✅ Run through §8.4 Pre-Deploy Checklist (health, seed, CORS, rate limiting)
+28. ✅ Configure GitHub Actions secrets
+29. ✅ Push to `main` → watch deployments + verify staging previews
+30. ✅ Set up nightly DB backup (§8.3)
+31. ✅ Write README + case study
+32. ✅ Record demo video/GIF
+33. ✅ Add to portfolio
 
 ---
 
