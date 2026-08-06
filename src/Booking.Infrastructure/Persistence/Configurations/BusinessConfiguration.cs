@@ -21,12 +21,13 @@ public class BusinessConfiguration : IEntityTypeConfiguration<Business>
         builder.OwnsOne(b => b.Settings, sb =>
         {
             sb.ToJson();
-            sb.Property(s => s.SlotIntervalMinutes).HasDefaultValue(15);
-            sb.Property(s => s.AdvanceBookingDays).HasDefaultValue(30);
-            sb.Property(s => s.CancellationWindowHours).HasDefaultValue(24);
-            sb.Property(s => s.RequireDeposit).HasDefaultValue(true);
-            sb.Property(s => s.DepositAmount).HasDefaultValue(100);
-            sb.Property(s => s.Currency).HasMaxLength(3).HasDefaultValue("PHP");
+            sb.Property(s => s.SlotIntervalMinutes);
+            sb.Property(s => s.AdvanceBookingDays);
+            sb.Property(s => s.CancellationWindowHours);
+            sb.Property(s => s.RequireDeposit);
+            sb.Property(s => s.DepositAmount);
+            sb.Property(s => s.Currency).HasMaxLength(3);
+            sb.Ignore(s => s.CustomFields);
         });
     }
 }

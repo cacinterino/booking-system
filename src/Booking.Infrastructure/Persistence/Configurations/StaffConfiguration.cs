@@ -22,7 +22,7 @@ public class StaffConfiguration : IEntityTypeConfiguration<Staff>
             .HasForeignKey(s => s.BusinessId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasIndex(s => new { s.BusinessId, s.IsActive });
-        builder.HasIndex(s => s.UserId).IsUnique().HasFilter("[UserId] IS NOT NULL");
+        builder.HasIndex(s => s.UserId).IsUnique().HasFilter("\"UserId\" IS NOT NULL");
     }
 }
 
