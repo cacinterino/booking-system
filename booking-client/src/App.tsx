@@ -8,6 +8,7 @@ import { LoginPage } from './features/auth/pages/LoginPage';
 import { RegisterPage } from './features/auth/pages/RegisterPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
+import { AdminServicesPage } from './features/services/AdminServicesPage';
 import './style.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/admin/services" element={<AdminServicesPage />} />
             </Route>
           </Routes>
         </BrowserRouter>
