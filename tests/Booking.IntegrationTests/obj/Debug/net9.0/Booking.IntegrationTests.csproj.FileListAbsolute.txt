@@ -460,3 +460,8 @@ C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.Integr
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Text.Encodings.Web.dll
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\obj\Debug\net9.0\MvcTestingAppManifest.json
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\tests\Booking.IntegrationTests\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

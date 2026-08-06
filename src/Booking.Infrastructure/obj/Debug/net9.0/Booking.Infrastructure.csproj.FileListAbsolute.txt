@@ -16,3 +16,5 @@ C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastr
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastructure\obj\Debug\net9.0\refint\Booking.Infrastructure.dll
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastructure\obj\Debug\net9.0\Booking.Infrastructure.pdb
 C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastructure\obj\Debug\net9.0\ref\Booking.Infrastructure.dll
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastructure\bin\Debug\net9.0\Booking.Infrastructure.runtimeconfig.json
+C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking\src\Booking.Infrastructure\obj\Debug\net9.0\Booking.Infrastructure.genruntimeconfig.cache
