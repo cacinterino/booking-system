@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Booking.Application.Business.Queries;
 using Booking.Application.Staff.Commands;
 using Booking.Application.Staff.DTOs;
 using Booking.Application.Staff.Queries;
@@ -17,6 +18,16 @@ public class StaffController : ControllerBase
     public StaffController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [HttpGet("me")]
+    [Authorize(Policy = "StaffOrAdmin")]
+    public async Task<ActionResult<WorkspaceResponse>> GetMyWorkspace()
+    {
+        var userId = GetUserId();
+        var query = new GetMyWorkspaceQuery(userId);
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     [HttpGet]
@@ -124,5 +135,13 @@ public class StaffController : ControllerBase
         if (string.IsNullOrEmpty(businessIdClaim) || !Guid.TryParse(businessIdClaim, out var businessId))
             throw new UnauthorizedAccessException("User is not associated with a business");
         return businessId;
+    }
+
+    private Guid GetUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            throw new UnauthorizedAccessException("Invalid token");
+        return userId;
     }
 }

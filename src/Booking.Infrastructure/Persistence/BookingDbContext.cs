@@ -22,6 +22,7 @@ public class BookingDbContext : IdentityDbContext<ApplicationUser, ApplicationRo
     public DbSet<Domain.Payment> Payments => Set<Domain.Payment>();
     public DbSet<Domain.Notification> Notifications => Set<Domain.Notification>();
     public DbSet<Domain.RefreshToken> RefreshTokens => Set<Domain.RefreshToken>();
+    public DbSet<Domain.BusinessInvitation> BusinessInvitations => Set<Domain.BusinessInvitation>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

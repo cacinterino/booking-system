@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Booking.Application.Auth.Interfaces;
+using Booking.Application.Business.Interfaces;
 using Booking.Application.Services.Interfaces;
 using Booking.Application.Staff.Interfaces;
 using Booking.Infrastructure.Auth;
@@ -81,6 +82,7 @@ public static class DependencyInjection
         // Repositories
         services.AddScoped<IServiceRepository, ServiceRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();
+        services.AddScoped<IBusinessRepository, BusinessRepository>();
 
         return services;
     }

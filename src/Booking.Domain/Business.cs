@@ -61,7 +61,7 @@ public class BusinessSettings
     public int SlotIntervalMinutes { get; set; } = 15;
     public int AdvanceBookingDays { get; set; } = 30;
     public int CancellationWindowHours { get; set; } = 24;
-    public bool RequireDeposit { get; set; } = true;
+    public bool RequireDeposit { get; set; } = false;
     public decimal DepositAmount { get; set; } = 100;
     public string Currency { get; set; } = "PHP";
     public Dictionary<string, object> CustomFields { get; set; } = new();
