@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Booking.Application.Auth.Interfaces;
+using Booking.Application.Availability;
 using Booking.Application.Availability.Interfaces;
 using Booking.Application.Bookings.Commands;
 using Booking.Application.Bookings.DTOs;
@@ -128,7 +129,6 @@ public class CreateBookingCommandHandlerTests
     {
         SetupEngineBasics();
         _bookingRepo.Setup(r => r.GetByIdempotencyKeyAsync(_businessId, _idempotencyKey, It.IsAny<CancellationToken>())).ReturnsAsync((BookingEntity?)null);
-        // Business already has a customer for that email -> should REUSE, not create
         var existingCustomer = new Customer(_businessId, "Juana", "Dela Cruz", "juana@example.com");
         _bookingRepo.Setup(r => r.GetCustomerByEmailAsync(_businessId, "juana@example.com", It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingCustomer);
@@ -140,5 +140,190 @@ public class CreateBookingCommandHandlerTests
 
         _bookingRepo.Verify(r => r.CreateCustomerAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
         result.Booking.CustomerId.Should().Be(existingCustomer.Id);
+    }
+}
+
+public class CancelBookingCommandHandlerTests
+{
+    private readonly Mock<IBookingRepository> _bookingRepo = new();
+    private readonly Mock<IAvailabilityCache> _cache = new();
+    private readonly Guid _businessId = Guid.NewGuid();
+    private readonly Guid _customerId = Guid.NewGuid();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Guid _serviceId = Guid.NewGuid();
+    private readonly Guid _staffId = Guid.NewGuid();
+
+    private CancelBookingCommandHandler CreateHandler() =>
+        new(_bookingRepo.Object, _cache.Object, NullLogger<CancelBookingCommandHandler>.Instance);
+
+    private BookingEntity ConfirmedBooking()
+    {
+        var booking = new BookingEntity(_businessId, _serviceId, _staffId, _customerId,
+            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
+            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, "key-1");
+        booking.Confirm();
+        return booking;
+    }
+
+    private void SetupOwner()
+    {
+        var customer = new Customer(_businessId, "Jane", "Doe", "jane@example.com");
+        _bookingRepo.Setup(r => r.GetCustomerByUserIdAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(customer);
+        _ownerCustomerId = customer.Id;
+    }
+
+    private Guid _ownerCustomerId;
+
+    private BookingEntity BookingForOwner() =>
+        new(_businessId, _serviceId, _staffId, _ownerCustomerId,
+            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
+            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, "key-1");
+
+    [Fact]
+    public async Task Handle_OwnerCancel_InvalidatesCacheAndSaves()
+    {
+        SetupOwner();
+        var booking = BookingForOwner();
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var handler = CreateHandler();
+        var command = new CancelBookingCommand(booking.Id, "Changed my mind", _userId);
+
+        await handler.Handle(command, CancellationToken.None);
+
+        booking.Status.Should().Be(BookingStatus.Cancelled);
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _cache.Verify(r => r.Invalidate(_businessId, _serviceId, _staffId, It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_AlreadyCancelled_ThrowsConflict()
+    {
+        SetupOwner();
+        var booking = BookingForOwner();
+        booking.Cancel("first");
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var handler = CreateHandler();
+        var command = new CancelBookingCommand(booking.Id, "again", _userId);
+
+        var act = async () => await handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<BookingConflictException>();
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_NotOwner_ThrowsUnauthorized()
+    {
+        SetupOwner();
+        var booking = BookingForOwner();
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var handler = CreateHandler();
+        var command = new CancelBookingCommand(booking.Id, "takeover", Guid.NewGuid());
+
+        var act = async () => await handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+}
+
+public class RescheduleBookingCommandHandlerTests
+{
+    private readonly Mock<IBookingRepository> _bookingRepo = new();
+    private readonly Mock<IAvailabilityRepository> _availabilityRepo = new();
+    private readonly Mock<IAvailabilityCache> _cache = new();
+    private readonly Mock<IDateTimeProvider> _clock = new();
+    private readonly Guid _businessId = Guid.NewGuid();
+    private readonly Guid _customerId = Guid.NewGuid();
+    private readonly Guid _userId = Guid.NewGuid();
+    private readonly Guid _serviceId = Guid.NewGuid();
+    private Guid _staffId;
+    private Customer? _owner;
+
+    private RescheduleBookingCommandHandler CreateHandler() =>
+        new(_bookingRepo.Object, _availabilityRepo.Object, _cache.Object, _clock.Object, NullLogger<RescheduleBookingCommandHandler>.Instance);
+
+    private BookingEntity Booking(DateTime start, DateTime end, bool confirmed = true)
+    {
+        var booking = new BookingEntity(_businessId, _serviceId, _staffId, _owner?.Id ?? _customerId, start, end, 500, 0, "key-1");
+        if (confirmed) booking.Confirm();
+        return booking;
+    }
+
+    private void SetupEngineFor(DateTime dateStartUtc, IReadOnlyList<BookingEntity>? bookings = null)
+    {
+        _clock.Setup(c => c.UtcNow).Returns(DateTime.UtcNow);
+
+        var service = new Service(_businessId, "Haircut", 60, 500m);
+        var staff = new StaffEntity(_businessId, "Juan Dela Cruz", "juan@example.com", "09171112222");
+        _staffId = staff.Id;
+        var local = dateStartUtc.AddHours(8);
+        var schedule = new StaffSchedule(_staffId, local.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(17, 0, 0));
+
+        _availabilityRepo.Setup(r => r.GetServiceAsync(_businessId, _serviceId, It.IsAny<CancellationToken>())).ReturnsAsync(service);
+        _availabilityRepo.Setup(r => r.GetBusinessSettingsAsync(_businessId, It.IsAny<CancellationToken>())).ReturnsAsync(new BusinessSettings());
+        _availabilityRepo.Setup(r => r.GetStaffForServiceAsync(service.BusinessId, service.Id, It.IsAny<CancellationToken>())).ReturnsAsync(new[] { staff });
+        _availabilityRepo.Setup(r => r.GetSchedulesForStaffAsync(_staffId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<StaffSchedule> { schedule });
+        _availabilityRepo.Setup(r => r.GetOverridesForStaffAsync(_staffId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ScheduleOverride>());
+        _availabilityRepo.Setup(r => r.GetBookingsAsync(_staffId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(bookings ?? new List<BookingEntity>());
+    }
+
+    private void SetupOwner()
+    {
+        _owner = new Customer(_businessId, "Jane", "Doe", "jane@example.com");
+        _bookingRepo.Setup(r => r.GetCustomerByUserIdAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_owner);
+    }
+
+    [Fact]
+    public async Task Handle_NewSlotTaken_Throws409_OriginalUntouched()
+    {
+        var originalStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
+        var targetStart = new DateTime(2026, 8, 15, 2, 0, 0, DateTimeKind.Utc);
+        var conflicting = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
+            targetStart, targetStart.AddHours(1), 500, 0, "other");
+
+        SetupOwner();
+        SetupEngineFor(targetStart, new[] { conflicting });
+        var booking = Booking(originalStart, originalStart.AddHours(1));
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var handler = CreateHandler();
+        var command = new RescheduleBookingCommand(booking.Id, targetStart, _userId);
+
+        var act = async () => await handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<BookingConflictException>();
+        booking.StartTime.Should().Be(originalStart);
+        booking.EndTime.Should().Be(originalStart.AddHours(1));
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_SlotFree_ReschedulesAndInvalidates()
+    {
+        var originalStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
+        var targetStart = new DateTime(2026, 8, 15, 2, 0, 0, DateTimeKind.Utc);
+        SetupOwner();
+        SetupEngineFor(targetStart, null);
+        var booking = Booking(originalStart, originalStart.AddHours(1));
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var handler = CreateHandler();
+        var command = new RescheduleBookingCommand(booking.Id, targetStart, _userId);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        booking.StartTime.Should().Be(targetStart);
+        booking.EndTime.Should().Be(targetStart.AddHours(1));
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _cache.Verify(r => r.Invalidate(_businessId, _serviceId, _staffId, It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Exactly(2));
     }
 }
