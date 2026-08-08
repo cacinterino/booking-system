@@ -141,7 +141,17 @@ public class BookingRepository : IBookingRepository
     public async Task<Guid> CreateCustomerAsync(Customer customer, CancellationToken cancellationToken)
     {
         _context.Customers.Add(customer);
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await SaveChangesAsync(cancellationToken);
+        }
+        catch (IdempotencyConflictException)
+        {
+            // Detach the failed insert so the race-winner's row is used next
+            // (and the failed entity is not re-saved on the follow-up SaveChanges).
+            _context.Entry(customer).State = EntityState.Detached;
+            throw;
+        }
         return customer.Id;
     }
 
@@ -176,13 +186,27 @@ public class BookingRepository : IBookingRepository
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23P01")
+        catch (DbUpdateException ex) when (TryGetSqlState(ex, out var sqlState) && sqlState == "23P01")
         {
             throw new BookingConflictException("The chosen slot is no longer available");
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23505")
+        catch (DbUpdateException ex) when (TryGetSqlState(ex, out var sqlState) && sqlState == "23505")
         {
             throw new IdempotencyConflictException("A booking with this idempotency key already exists");
         }
+    }
+
+    private static bool TryGetSqlState(DbUpdateException exception, out string? sqlState)
+    {
+        sqlState = null;
+        for (var inner = exception.InnerException; inner != null; inner = inner.InnerException)
+        {
+            if (inner is PostgresException pg)
+            {
+                sqlState = pg.SqlState;
+                return true;
+            }
+        }
+        return false;
     }
 }

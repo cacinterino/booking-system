@@ -159,7 +159,20 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
             email!,
             request.GuestContact?.Phone,
             userId: null);
-        await _bookingRepo.CreateCustomerAsync(created, cancellationToken);
+
+        try
+        {
+            await _bookingRepo.CreateCustomerAsync(created, cancellationToken);
+        }
+        catch (IdempotencyConflictException)
+        {
+            // A concurrent request created this email first; reuse their row.
+            var raced = await _bookingRepo.GetCustomerByEmailAsync(request.BusinessId, email!, cancellationToken);
+            if (raced != null)
+                return raced;
+            throw;
+        }
+
         return created;
     }
 

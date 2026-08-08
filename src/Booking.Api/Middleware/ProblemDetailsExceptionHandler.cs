@@ -15,9 +15,9 @@ public static class ProblemDetailsExceptionExtensions
     {
         return app.UseExceptionHandler(errorApp =>
         {
-            errorApp.Run(async context =>
-            {
-                var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+errorApp.Run(async context =>
+                {
+                    var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
                 var (status, title, detail) = exception switch
                 {

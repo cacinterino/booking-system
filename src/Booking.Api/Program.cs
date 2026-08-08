@@ -32,12 +32,12 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Pipeline
-app.UseProblemDetailsExceptionHandler();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+
+app.UseProblemDetailsExceptionHandler();
 
 app.UseCors("Default");
 
@@ -48,3 +48,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
