@@ -327,3 +327,104 @@ public class RescheduleBookingCommandHandlerTests
         _cache.Verify(r => r.Invalidate(_businessId, _serviceId, _staffId, It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Exactly(2));
     }
 }
+
+public class SetBookingStatusCommandHandlerTests
+{
+    private readonly Mock<IBookingRepository> _bookingRepo = new();
+    private readonly Mock<IAvailabilityCache> _cache = new();
+    private readonly Guid _businessId = Guid.NewGuid();
+    private readonly Guid _serviceId = Guid.NewGuid();
+    private readonly Guid _staffId = Guid.NewGuid();
+    private readonly Guid _staffUserId = Guid.NewGuid();
+    private readonly Guid _customerId = Guid.NewGuid();
+
+    private SetBookingStatusCommandHandler CreateHandler() =>
+        new(_bookingRepo.Object, _cache.Object, NullLogger<SetBookingStatusCommandHandler>.Instance);
+
+    private BookingEntity Booking(BookingStatus status)
+    {
+        var booking = new BookingEntity(_businessId, _serviceId, _staffId, _customerId,
+            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
+            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, "key-1");
+        if (status == BookingStatus.Confirmed) booking.Confirm();
+        return booking;
+    }
+
+    private void SetupStaff()
+    {
+        var staff = new StaffEntity(_businessId, "Sina", "Staff", "sina@example.com");
+        _bookingRepo.Setup(r => r.GetStaffByBusinessAndUserIdAsync(_businessId, _staffUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(staff);
+    }
+
+    [Fact]
+    public async Task Handle_ConfirmPending_Succeeds()
+    {
+        var booking = Booking(BookingStatus.Pending);
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+        SetupStaff();
+
+        var handler = CreateHandler();
+        var command = new SetBookingStatusCommand(booking.Id, BookingStatus.Confirmed, _staffUserId, IsAdmin: false);
+
+        await handler.Handle(command, CancellationToken.None);
+
+        booking.Status.Should().Be(BookingStatus.Confirmed);
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_CompleteConfirmed_Succeeds()
+    {
+        var booking = Booking(BookingStatus.Confirmed);
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+        SetupStaff();
+
+        var handler = CreateHandler();
+        var command = new SetBookingStatusCommand(booking.Id, BookingStatus.Completed, _staffUserId, IsAdmin: false);
+
+        await handler.Handle(command, CancellationToken.None);
+
+        booking.Status.Should().Be(BookingStatus.Completed);
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_PendingToCompleted_ThrowsConflict()
+    {
+        var booking = Booking(BookingStatus.Pending);
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+        SetupStaff();
+
+        var handler = CreateHandler();
+        var command = new SetBookingStatusCommand(booking.Id, BookingStatus.Completed, _staffUserId, IsAdmin: false);
+
+        var act = async () => await handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<BookingConflictException>();
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+        booking.Status.Should().Be(BookingStatus.Pending);
+    }
+
+    [Fact]
+    public async Task Handle_StaffOfAnotherBusiness_ThrowsForbidden()
+    {
+        var booking = Booking(BookingStatus.Pending);
+        _bookingRepo.Setup(r => r.GetByIdAsync(booking.Id, It.IsAny<CancellationToken>())).ReturnsAsync(booking);
+
+        var otherBusinessId = Guid.NewGuid();
+        var otherStaff = new StaffEntity(otherBusinessId, "Outsider", "Staff", "outsider@example.com");
+        _bookingRepo.Setup(r => r.GetStaffByBusinessAndUserIdAsync(otherBusinessId, _staffUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(otherStaff);
+        _bookingRepo.Setup(r => r.GetStaffByBusinessAndUserIdAsync(It.Is<Guid>(g => g == otherBusinessId), _staffUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(otherStaff);
+
+        var handler = CreateHandler();
+        var command = new SetBookingStatusCommand(booking.Id, BookingStatus.Confirmed, _staffUserId, IsAdmin: false);
+
+        var act = async () => await handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+        _bookingRepo.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+}

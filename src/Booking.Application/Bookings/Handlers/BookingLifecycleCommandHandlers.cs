@@ -14,6 +14,71 @@ using StaffEntity = Booking.Domain.Staff;
 
 namespace Booking.Application.Bookings.Handlers;
 
+public class SetBookingStatusCommandHandler : IRequestHandler<SetBookingStatusCommand, Unit>
+{
+    private readonly IBookingRepository _bookingRepo;
+    private readonly IAvailabilityCache _cache;
+    private readonly ILogger<SetBookingStatusCommandHandler> _logger;
+
+    public SetBookingStatusCommandHandler(
+        IBookingRepository bookingRepo,
+        IAvailabilityCache cache,
+        ILogger<SetBookingStatusCommandHandler> logger)
+    {
+        _bookingRepo = bookingRepo;
+        _cache = cache;
+        _logger = logger;
+    }
+
+    public async Task<Unit> Handle(SetBookingStatusCommand command, CancellationToken cancellationToken)
+    {
+        var booking = await _bookingRepo.GetByIdAsync(command.BookingId, cancellationToken)
+            ?? throw new KeyNotFoundException("Booking not found");
+
+        await EnsureAuthorizedAsync(booking, command, cancellationToken);
+
+        try
+        {
+            switch (command.Status)
+            {
+                case BookingStatus.Confirmed:
+                    booking.Confirm();
+                    break;
+                case BookingStatus.Completed:
+                    booking.Complete();
+                    break;
+                case BookingStatus.NoShow:
+                    booking.MarkNoShow();
+                    break;
+                default:
+                    throw new BookingConflictException($"Transition to {command.Status} is not supported");
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new BookingConflictException($"Cannot set status to {command.Status}: {ex.Message}");
+        }
+
+        await _bookingRepo.SaveChangesAsync(cancellationToken);
+
+        if (command.Status == BookingStatus.Confirmed)
+            _cache.Invalidate(booking.BusinessId, booking.ServiceId, booking.StaffId, booking.StartTime, booking.EndTime);
+
+        _logger.LogInformation("Booking {BookingId} status set to {Status}", booking.Id, booking.Status);
+        return Unit.Value;
+    }
+
+    private async Task EnsureAuthorizedAsync(BookingEntity booking, SetBookingStatusCommand command, CancellationToken cancellationToken)
+    {
+        if (command.IsAdmin)
+            return;
+
+        var staff = await _bookingRepo.GetStaffByBusinessAndUserIdAsync(booking.BusinessId, command.AuthenticatedUserId, cancellationToken);
+        if (staff is null)
+            throw new UnauthorizedAccessException("Only staff of this business may change booking status");
+    }
+}
+
 public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand, Unit>
 {
     private readonly IBookingRepository _bookingRepo;
@@ -140,9 +205,14 @@ public class RescheduleBookingCommandHandler : IRequestHandler<RescheduleBooking
         if (authenticatedUserId is not null)
         {
             var owner = await _bookingRepo.GetCustomerByUserIdAsync(authenticatedUserId.Value, cancellationToken);
-            if (owner == null || owner.Id != booking.CustomerId)
-                throw new UnauthorizedAccessException("You do not own this booking");
-            return;
+            if (owner is not null && owner.Id == booking.CustomerId)
+                return;
+
+            var staff = await _bookingRepo.GetStaffByBusinessAndUserIdAsync(booking.BusinessId, authenticatedUserId.Value, cancellationToken);
+            if (staff is not null)
+                return;
+
+            throw new UnauthorizedAccessException("Only the booking owner or a staff member of this business may reschedule");
         }
 
         if (!string.IsNullOrEmpty(accessCode) && booking.AccessCode == accessCode)
