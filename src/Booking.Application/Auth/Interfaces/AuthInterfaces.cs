@@ -62,6 +62,8 @@ public interface IEmailService
 {
     Task SendPasswordResetEmailAsync(string email, string resetLink);
     Task SendWelcomeEmailAsync(string email, string firstName);
+    Task SendInvitationEmailAsync(string email, string inviteLink, string businessName);
+    string GetBaseUrl();
 }
 
 public interface ICurrentUserService

@@ -9,6 +9,8 @@ COPY ["src/Booking.Domain/Booking.Domain.csproj", "src/Booking.Domain/"]
 COPY ["src/Booking.Application/Booking.Application.csproj", "src/Booking.Application/"]
 COPY ["src/Booking.Infrastructure/Booking.Infrastructure.csproj", "src/Booking.Infrastructure/"]
 COPY ["src/Booking.Api/Booking.Api.csproj", "src/Booking.Api/"]
+COPY ["tests/Booking.UnitTests/Booking.UnitTests.csproj", "tests/Booking.UnitTests/"]
+COPY ["tests/Booking.IntegrationTests/Booking.IntegrationTests.csproj", "tests/Booking.IntegrationTests/"]
 RUN dotnet restore "Booking.sln"
 
 COPY . .

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Booking.Application.Auth.Commands;
 using Booking.Application.Auth.DTOs;
 using Booking.Application.Auth.Queries;
+using Booking.Application.Business.Commands;
+using Booking.Application.Business.DTOs;
 
 namespace Booking.Api.Controllers;
 
@@ -23,6 +25,22 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
         var command = new RegisterCommand(request);
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpPost("register-business")]
+    public async Task<ActionResult<AuthResponse>> RegisterBusiness([FromBody] RegisterBusinessRequest request)
+    {
+        var command = new RegisterBusinessCommand(request);
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpPost("accept-invitation")]
+    public async Task<ActionResult<AuthResponse>> AcceptInvitation([FromBody] AcceptInvitationRequest request)
+    {
+        var command = new AcceptInvitationCommand(request);
         var result = await _mediator.Send(command);
         return Ok(result);
     }

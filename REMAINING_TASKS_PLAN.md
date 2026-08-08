@@ -1,8 +1,10 @@
 # Remaining Tasks Plan - Appointment Booking System
 
-**Generated:** 2026-08-06  
-**Status:** Phases 1-3 (Auth API + Frontend Auth) ✅ Complete  
-**Next:** Phase 3 Frontend Polish → Phase 4 Core Features
+**Updated:** 2026-08-07  
+**Status:** Phases 1-3 (Auth API + Frontend) ✅ · Phase 4 backend core ✅ (4.1/4.2/4.3) · **Next:** 4.4 Booking Flow  
+**Important decisions** (from working session):
+- **PayMongo (4.5) is SKIPPED** for now — deposits are optional (`BusinessSettings.RequireDeposit = false`) so bookings work without a payment gateway. Plan section kept for future.
+- Only **1 commit is not pushed** (`feat/4.1-services` is **2 commits ahead** of origin: 4.3 + navbar were committed locally, push is pending).
 
 ---
 
@@ -10,238 +12,110 @@
 
 | Phase | Task | Status |
 |-------|------|--------|
-| 1 | .NET Solution (4-layer Clean Architecture) | ✅ |
-| 1 | React + Vite + TypeScript + Tailwind | ✅ |
-| 1 | Docker Compose (Postgres + API + Client) | ✅ |
+| 1 | .NET 4-layer Clean Architecture solution | ✅ |
+| 1 | React + Vite + TypeScript + Tailwind v4 | ✅ |
+| 1 | Docker Compose (Postgres + API on :5000 + pgAdmin :5050) | ✅ |
 | 1 | GitHub repo + branch protection | ✅ |
-| 2 | Domain Entities (10 entities) | ✅ |
-| 2 | EF Core Configurations + Migration | ✅ |
-| 2 | PostgreSQL database (21 tables) | ✅ |
-| 3 | Auth Application Layer (DTOs, Commands, Queries, Validators, Handlers) | ✅ |
-| 3 | Auth Infrastructure (JWT, Identity, Email, DI) | ✅ |
-| 3 | Auth API (Register, Login, Me, Refresh, Revoke, Forgot/Reset Password) | ✅ |
-| 3 | React Auth Frontend (Login, Register, Profile, Dashboard, Protected Routes) | ✅ |
-| 3 | Design System (Fonts, Tailwind Config from project-showcase.html) | 🔄 In Progress |
+| 2 | Domain entities + EF configs + initial migration (21 tables) | ✅ |
+| 3 | Auth API (Register, Login, Me, Refresh, Revoke, Forgot/Reset) | ✅ |
+| 3 | React auth (Login, Register, Profile, Dashboard, Protected Routes, AuthContext) | ✅ |
+| 3 | Landing page design system (Fraunces/IBM Plex, brass/paper tokens) | ✅ |
+| 4.1 | Service + ServiceCategory CRUD API, validators | ✅ |
+| 4.1 | Admin Services page (`AdminServicesPage.tsx`) | ✅ |
+| 4.2 | Staff CRUD, Staff-Service M2M, StaffSchedule weekly, ScheduleOverride | ✅ |
+| 4.3 | **Availability Engine** (pure algorithm + Manila timezone boundary + IMemoryCache TTL) | ✅ |
+| 4.3 | `/api/availability?serviceId=&date=&staffId=` endpoint | ✅ |
+| Ax | Onboarding: owner registration, staff invites, accept flow, `/api/staff/me` workspace | ✅ |
+| Ax | Dashboard navbar with role-based links | ✅ |
+| Ax | CORS + Docker fixes (API container on :5000) | ✅ |
+| 7.1 | Unit tests: **45 passing** (services, staff, business, availability engine, auth) | ✅ |
+
+**Current branch:** `feat/4.1-services` (working branch; NOT merged to `main`). Repo is **clean** except un-pushed commits.
 
 ---
 
 ## 🔄 IN PROGRESS
 
-### Phase 3: Frontend Auth Polish
-- [ ] Fix remaining TypeScript warnings (ProfilePage `reset` unused)
-- [ ] Apply design system to LandingPage (use design tokens)
-- [ ] Apply design system to LoginPage
-- [ ] Apply design system to RegisterPage  
-- [ ] Apply design system to ProfilePage
-- [ ] Apply design system to DashboardPage
-- [ ] Test full auth flow in browser (Register → Login → Dashboard → Profile → Logout)
+- **Pushing pending commits** — `feat/4.1-services` is 2 commits ahead of origin (4.3 Availability Engine + dashboard navbar). Push is low-risk but PR #8 already covers 4.1; assess whether to keep stacking on this branch or cut `feat/4.4-booking`.
 
 ---
 
-## 📋 PHASE 4: CORE FEATURES (Week 1-2)
+## 📋 PHASE 4: CORE FEATURES — REMAINING
 
-### 4.1 Services Management (Admin/Staff)
-- [ ] ServiceCategory CRUD API + Frontend
-- [ ] Service CRUD API + Frontend
-- [ ] Service-ServiceCategory relationship
-- [ ] Admin Service List/Create/Edit/Delete pages
+### 4.4 Booking Flow  ⭐ HIGHEST PRIORITY (the app's core value)
+- [ ] `POST /api/bookings` — Create booking (guest + authenticated), from an availability slot.
+- [ ] **Double-booking protection**: exactly one of two simultaneous creates wins, other gets clean **409, not 500**.
+       Option A: postgres EXCLUDE constraint `EXCLUDE USING gist (StaffId WITH =, tsrange("StartTime","EndTime") WITH &&)` + `CREATE EXTENSION btree_gist` (needs a raw-SQL EF migration).
+       Option B (lighter, shippable now): unique index + application-level reservation check in a single transaction with serializable isolation.
+- [ ] Idempotency key header (`Idempotency-Key`) → reuse existing unique index `IX_bookings_IdempotencyKey`. ✍️ *already in schema*.
+- [ ] `GET /api/bookings/my-bookings` — customer's bookings.
+- [ ] `POST /api/bookings/{id}/cancel` — customer cancel (soft delete / status=Cancelled).
+- [ ] `POST /api/bookings/{id}/reschedule` — customer reschedule (needs availability re-check).
+- [ ] `GET /api/bookings` — admin/staff list (filterable by status/staff/date).
+- [ ] `GET /api/bookings/calendar` — staff calendar view events.
+- [ ] `PUT /api/bookings/{id}/status` — staff confirm/complete/no-show.
+- Test availability invalidation on booking write (IMemoryCache).
 
-### 4.2 Staff & Schedules
-- [ ] Staff CRUD API + Frontend
-- [ ] Staff-Service many-to-many
-- [ ] StaffSchedule (weekly recurring) CRUD
-- [ ] ScheduleOverride (date-specific) CRUD
-- [ ] Staff Calendar API endpoint
-
-### 4.3 Availability Engine (CORE ALGORITHM ⚠️)
-- [ ] **Algorithm**: Combine staff schedules + overrides + existing bookings + service duration
-- [ ] **Edge cases**: No bookings, fully booked, overrides adding/removing availability, timezone edge cases near midnight
-- [ ] **Concurrency test**: Two simultaneous bookings for same slot → exactly one succeeds, other gets 409
-- [ ] **Caching**: IMemoryCache with TTL + invalidation on booking write
-- [ ] Unit tests (no bookings, fully booked, override removes, override adds)
-- [ ] Integration test for double-booking prevention
-
-### 4.4 Booking Flow
-- [ ] `GET /api/availability?serviceId=&date=&staffId=` - Public availability
-- [ ] `POST /api/bookings` - Create booking (guest + authenticated)
-- [ ] Idempotency key header on booking creation
-- [ ] `GET /api/bookings/my-bookings` - Customer bookings
-- [ ] `POST /api/bookings/{id}/cancel` - Customer cancel (soft delete)
-- [ ] `POST /api/bookings/{id}/reschedule` - Customer reschedule
-- [ ] `GET /api/bookings` - Admin/Staff list (filterable)
-- [ ] `GET /api/bookings/calendar` - Staff calendar view
-- [ ] `PUT /api/bookings/{id}/status` - Staff confirm/complete/no-show
-- [ ] `POST /api/bookings/{id}/reschedule` - Staff-initiated
-
-### 4.5 PayMongo Integration
-- [ ] Payment entity + EF config
-- [ ] `POST /api/bookings/{id}/payment-intent` - Create PayMongo payment intent
-- [ ] Webhook handler for PayMongo callbacks
-- [ ] GCash/Maya deposit flow in booking wizard
+### 4.5 PayMongo Integration — **SKIPPED** (decision: deposits optional; revisit later)
+- [ ] Payment entity + EF config *(deferred)*
+- [ ] PayMongo payment intent + GCash/Maya deposit *(deferred)*
 
 ---
 
-## 📋 PHASE 5: NOTIFICATIONS & POLISH (Week 2)
+## 📋 PHASE 6: FRONTEND FEATURES — REMAINING (depends on 4.4 backend)
 
-### 5.1 Email (SendGrid/Resend)
-- [ ] Booking confirmation
-- [ ] 24hr reminder
-- [ ] 1hr reminder
-- [ ] Cancellation notice
-- [ ] Staff assignment notification
-
-### 5.2 SMS (Semaphore PH)
-- [ ] Same triggers as email
-- [ ] Template: "Hi {Name}, your {Service} appointment is on {Date} at {Time}. Reply STOP to opt out."
-
-### 5.3 SignalR Real-time
-- [ ] `BookingHub` - Real-time calendar updates for staff/admin
-- [ ] `NotificationHub` - Toast notifications for customers
-- [ ] Groups: `business-{businessId}`, `staff-{staffId}`, `customer-{customerId}`
-
-### 5.4 Background Jobs
-- [ ] Reminder job (24hr / 1hr) - Hangfire or BackgroundService
-- [ ] Idempotent reminder sending (don't send twice)
-
-### 5.5 Polish
-- [ ] Rate limiting on `/api/auth/login` and `POST /api/bookings`
-- [ ] Soft delete on Booking/Customer (already in EF config)
-- [ ] Seed script for demo data (`dotnet run --seed`)
-- [ ] Responsive UI pass + loading skeletons + error states
+- [ ] **Public booking wizard** `/book/:businessSlug` (Service → Staff → Date/Time via `/api/availability` → Confirm).
+- [ ] **Customer dashboard** `/my-bookings` (upcoming/past, cancel/reschedule).
+- [ ] **Staff dashboard** calendar view + today's bookings.
+- [ ] **Admin** staff + schedules CRUD screens (services page already done).
+- [ ] Business registration / accept-invitation screens (backend + API done; UI pending).
+- [ ] Responsive polish, loading skeletons, error states.
 
 ---
 
-## 📋 PHASE 6: FRONTEND FEATURES (Week 2-3)
+## SKIPPED / DEFERRED (recorded for future, NOT blocking)
 
-### 6.1 Public Booking Wizard (`/book/:businessSlug`)
-- [ ] Step 1: Service selection
-- [ ] Step 2: Staff selection
-- [ ] Step 3: Date/Time from availability API
-- [ ] Step 4: Confirmation + Payment (GCash/Maya)
-
-### 6.2 Customer Dashboard
-- [ ] `/my-bookings` - Upcoming + Past bookings
-- [ ] Cancel/Reschedule actions with optimistic updates
-
-### 6.3 Staff Dashboard
-- [ ] Calendar view (week/day toggle)
-- [ ] SignalR live updates for new bookings
-- [ ] Today's bookings list
-
-### 6.4 Admin Dashboard
-- [ ] Services CRUD
-- [ ] Staff + Schedules CRUD
-- [ ] Business Settings
-
-### 6.5 Responsive Polish
-- [ ] 375px viewport audit
-- [ ] Loading skeletons (not spinners)
-- [ ] Error states with retry for all TanStack Query calls
+| Phase | Task |
+|-------|------|
+| 4.5 | PayMongo payments (deposits optional instead) |
+| 5 | Notifications (Email/SMS/SignalR), background reminders |
+| 7.2 | Integration tests (Testcontainers/Respawn) |
+| 7.3 | E2E Playwright |
+| 8 | CI/CD + production deploy (Render/Vercel) |
+| 9 | README, Scalar docs, RA 10173 note, portfolio case study |
 
 ---
 
-## 📋 PHASE 7: TESTING (Week 2-3)
+## ⭐ PRIORITIZED NEXT STEPS (given limited time)
 
-### 7.1 Unit Tests (Booking.UnitTests)
-- [ ] Availability engine (core algorithm)
-- [ ] Booking status transitions
-- [ ] Auth handlers
-- [ ] Validators
-- [ ] Target: >80% coverage on Domain/Application
-
-### 7.2 Integration Tests (Booking.IntegrationTests)
-- [ ] Testcontainers PostgreSQL per test class
-- [ ] Respawn for DB reset
-- [ ] Auth flow
-- [ ] CRUD endpoints
-- [ ] Booking logic
-- [ ] Authorization policies
-
-### 7.3 E2E Tests (Playwright - Optional)
-- [ ] Book → Confirm → Cancel flow
-- [ ] Run in CI on PR
+1. **Push `feat/4.1-services`** (02 commits ahead) OR cut `feat/4.4-booking` to keep PRs clean — decide based on whether #8 is merged.
+2. **Build 4.4 Booking Flow backend** — create/cancel/reschedule/status/calendar + idempotency + **double-booking 409 test**. This is the one feature that makes the app real.
+3. **Wire `/api/availability` into booking creation** (validate chosen slot against live engine before persist).
+4. **Frontend**: public booking wizard + my-bookings — ties backend into something demo-able.
+5. Only then: notifications, deployment, polish (deferred).
 
 ---
 
-## 📋 PHASE 8: CI/CD & DEPLOYMENT (Week 3)
-
-### 8.1 GitHub Actions
-- [ ] `.github/workflows/ci.yml` - Build + Test (Postgres service container)
-- [ ] `.github/workflows/cd-api.yml` - Deploy API to Render/Fly.io
-- [ ] `.github/workflows/cd-client.yml` - Deploy Client to Vercel
-
-### 8.2 Production Deploy
-- [ ] Provision Postgres (Neon/Supabase)
-- [ ] Deploy API (Fly.io/Railway/Render paid tier - avoid free tier cold starts)
-- [ ] Deploy Client to Vercel
-- [ ] Configure environment variables
-- [ ] Run migrations against production DB
-
----
-
-## 📋 PHASE 9: DOCUMENTATION & PORTFOLIO (Week 3)
-
-- [ ] README.md (Architecture diagram, Local setup, Env vars, API docs link, Deployment guide, Screenshots)
-- [ ] API Documentation (Scalar UI at `/openapi/v1.json`)
-- [ ] RA 10173 / Data Privacy Act note in README
-- [ ] Portfolio Case Study (Problem, Stack, Architecture, Challenges, What's Next, Live Demo + GitHub links)
-- [ ] Demo GIF/Video (60-90s: Landing → Booking Wizard → Staff Calendar SignalR → Admin)
-
----
-
-## 🎯 IMMEDIATE NEXT STEPS (This Session)
-
-1. **Apply design system to LandingPage** - Use Fraunces/IBM Plex fonts, brass/paper colors, ticket stub component
-2. **Apply design system to Login/Register/Profile/Dashboard pages**
-3. **Test full auth flow in browser**
-4. **Commit & push frontend auth**
-
----
-
-## 📦 COMMANDS TO RUN
+## 📦 COMMANDS TO RUN (Windows PowerShell — run from repo ROOT, there is no `booking-system` subdir)
 
 ```bash
-# Test auth flow
-cd booking-client && npm run dev        # http://localhost:5173
-# In another terminal:
-dotnet run --project src/Booking.Api   # http://localhost:5018
+cd C:\Users\Carl\OneDrive\Desktop\Projects\Appointment booking
 
-# Build check
-dotnet build Booking.sln
+# Docker stack (API on localhost:5000, Postgres 5432, pgAdmin 5050)
+docker compose up -d
+docker compose build api
+docker compose up -d api
 
-# Commit frontend auth
-git add . && git commit -m "feat: React auth pages + design system tokens" && git push
+# Migrations against Docker Postgres
+dotnet ef database update --project src/Booking.Infrastructure --startup-project src/Booking.Api
+
+# Run tests
+dotnet test Booking.sln
+
+# Commit + push (feature branch — never commit to main/release)
+git add . && git commit -m "feat: ..." && git push
+
+# API in terminal, client in another
+dotnet run --project src/Booking.Api      # (or the docker api container :5000)
+cd booking-client && npm run dev          # http://localhost:5173
 ```
-
----
-
-## 🎨 DESIGN SYSTEM REFERENCE (from project-showcase.html)
-
-```css
-/* Colors */
---ink: #14213D;
---ink-soft: #233258;
---paper: #F5F0E4;
---paper-white: #FFFDF8;
---brass: #B8862B;
---brass-soft: #D8AE5F;
---sage: #4F7860;
---slate: #5B6270;
---line: rgba(20,33,61,0.14);
-
-/* Fonts */
-font-family: 'Fraunces', serif;        /* display */
-font-family: 'IBM Plex Sans', sans-serif;  /* body */
-font-family: 'IBM Plex Mono', monospace;   /* mono */
-
-/* Key Components */
-.ticket          /* rotated card with brass stamp */
-.stack-strip     /* 4-column metric strip */
-.arch            /* 4-layer architecture diagram */
-.roadmap         /* phased timeline */
-.ai-grid         /* 3-column feature cards */
-```
-
----
-
-**Next Action:** Apply design tokens to `LandingPage.tsx` → test in browser → iterate.

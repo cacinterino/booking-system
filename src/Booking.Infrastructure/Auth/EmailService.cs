@@ -69,4 +69,34 @@ public class EmailService : IEmailService
         var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
         await client.SendEmailAsync(msg);
     }
+
+    public string GetBaseUrl() => _configuration["PublicBaseUrl"] ?? "http://localhost:5173";
+
+    public async Task SendInvitationEmailAsync(string email, string inviteLink, string businessName)
+    {
+        var apiKey = _configuration["Email:ApiKey"];
+        var fromEmail = _configuration["Email:From"] ?? "noreply@booking.local";
+        var fromName = _configuration["Email:FromName"] ?? "Booking System";
+
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Console.WriteLine($"[DEV] Invitation for {email} to join {businessName}: {inviteLink}");
+            return;
+        }
+
+        var client = new SendGridClient(apiKey);
+        var from = new EmailAddress(fromEmail, fromName);
+        var to = new EmailAddress(email);
+        var subject = $"You've been invited to join {businessName} on Booked.";
+        var plainTextContent = $"Join {businessName} on Booked. by accepting this invitation: {inviteLink}";
+        var htmlContent = $@"
+            <h2>You've been invited!</h2>
+            <p>{businessName} has invited you to join their team on <strong>Booked.</strong></p>
+            <a href='{inviteLink}' style='background-color: #B8862B; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;'>Accept Invitation</a>
+            <p>Or copy this link: {inviteLink}</p>
+            <p>This invitation expires in 7 days.</p>";
+
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+        await client.SendEmailAsync(msg);
+    }
 }
