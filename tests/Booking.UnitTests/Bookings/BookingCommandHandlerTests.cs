@@ -125,6 +125,27 @@ public class CreateBookingCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_IdempotentKeySameKey_DifferentSlot_ThrowsConflictAfterRecheck()
+    {
+        SetupEngineBasics();
+        // Same idempotency key but a different requested slot -> must NOT reuse the booking (409).
+        var existing = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
+            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc),   // 11:00 Manila
+            new DateTime(2026, 8, 14, 4, 0, 0, DateTimeKind.Utc), 500, 0, _idempotencyKey);
+        _bookingRepo.Setup(r => r.GetByIdempotencyKeyAsync(_businessId, _idempotencyKey, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existing);
+
+        var handler = CreateHandler();
+        // Requested slot is 02:00 UTC (10:00 Manila) but the existing booking is at 03:00 -> mismatch.
+        var request = new CreateBookingCommand(ValidRequest(), _idempotencyKey, null);
+
+        var act = async () => await handler.Handle(request, CancellationToken.None);
+
+        await act.Should().ThrowAsync<BookingConflictException>();
+        _bookingRepo.Verify(r => r.AddAsync(It.IsAny<BookingEntity>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Handle_GuestBooking_ResolvesOrCreatesCustomerByEmail()
     {
         SetupEngineBasics();

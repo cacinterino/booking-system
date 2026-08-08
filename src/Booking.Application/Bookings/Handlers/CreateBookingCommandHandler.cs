@@ -52,10 +52,15 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
         if (settings == null)
             throw new KeyNotFoundException("Business not found");
 
-        // Idempotency: a retry with the same key returns the existing booking (200).
+        // Idempotency: a retry with the same key returns the existing booking (200)
+        // ONLY when the payload matches, otherwise the key belongs to a different request.
         var existing = await _bookingRepo.GetByIdempotencyKeyAsync(request.BusinessId, command.IdempotencyKey, cancellationToken);
         if (existing != null)
+        {
+            if (!MatchesRequest(existing, request))
+                throw new BookingConflictException("Idempotency-Key was already used for a different booking");
             return new CreateBookingResult(BookingDtoMapper.ToResponse(existing), WasIdempotentRetry: true);
+        }
 
         // Resolve-or-create the customer (guest by email, authenticated by user id).
         var customer = await ResolveCustomerAsync(request, command.AuthenticatedUserId, cancellationToken);
@@ -97,10 +102,15 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
         }
         catch (IdempotencyConflictException)
         {
-            // A concurrent request persisted the same key first; return that booking.
+            // A concurrent request persisted the same key first; return that booking
+            // (only when it is the same logical request).
             var persisted = await _bookingRepo.GetByIdempotencyKeyAsync(request.BusinessId, command.IdempotencyKey, cancellationToken);
             if (persisted != null)
+            {
+                if (!MatchesRequest(persisted, request))
+                    throw new BookingConflictException("Idempotency-Key was already used for a different booking");
                 return new CreateBookingResult(BookingDtoMapper.ToResponse(persisted), WasIdempotentRetry: true);
+            }
             throw;
         }
         // BookingConflictException (23P01 exclusion violation) propagates as 409.
@@ -253,5 +263,21 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
             DateTimeKind.Local => value.ToUniversalTime(),
             _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
         };
+    }
+
+    private static bool MatchesRequest(BookingEntity existing, CreateBookingRequest request)
+    {
+        var startUtc = ToUtc(request.StartTime);
+        var slotMatches = existing.ServiceId == request.ServiceId
+            && existing.StaffId == request.StaffId
+            && existing.StartTime == startUtc;
+        if (!slotMatches)
+            return false;
+
+        var requestEmail = request.GuestContact?.Email?.Trim();
+        var existingEmail = existing.Customer?.Email?.Trim();
+        return string.IsNullOrEmpty(requestEmail)
+            || string.IsNullOrEmpty(existingEmail)
+            || string.Equals(requestEmail, existingEmail, StringComparison.OrdinalIgnoreCase);
     }
 }
