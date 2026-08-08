@@ -17,6 +17,9 @@ internal static class ManilaBoundary
 
     public static (DateTime FromUtc, DateTime ToUtc) RangeUtc(DateOnly from, DateOnly to)
     {
+        // Guard against DateOnly.MinValue sentinels overflowing DateTime on -8h.
+        if (from.Year <= 1) from = DateOnly.FromDateTime(DateTime.UnixEpoch);
+        if (to.Year > 9990) to = new DateOnly(9999, 12, 30);
         var fromUtc = ToUtc(from.ToDateTime(TimeOnly.MinValue));
         var toUtc = ToUtc(to.AddDays(1).ToDateTime(TimeOnly.MinValue));
         return (fromUtc, toUtc);

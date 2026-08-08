@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Booking.Application.Bookings.Commands;
 using Booking.Application.Bookings.DTOs;
 using Booking.Application.Bookings.Queries;
@@ -22,6 +23,7 @@ public class BookingsController : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("publicBooking")]
     public async Task<ActionResult<BookingResponse>> Create([FromBody] CreateBookingRequest request)
     {
         var idempotencyKey = Request.Headers["Idempotency-Key"].ToString();
@@ -45,7 +47,7 @@ public class BookingsController : ControllerBase
     }
 
 [HttpPost("{id:guid}/reschedule")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<BookingResponse>> Reschedule(Guid id, [FromBody] RescheduleBookingRequest request)
     {
         var command = new RescheduleBookingCommand(id, request.StartTime, GetOptionalUserId(), request.AccessCode);
@@ -80,12 +82,19 @@ public class BookingsController : ControllerBase
     [HttpGet("calendar")]
     [Authorize(Policy = "StaffOrAdmin")]
     public async Task<ActionResult<IReadOnlyList<CalendarEventDto>>> Calendar(
-        [FromQuery] DateOnly from,
-        [FromQuery] DateOnly to,
+        [FromQuery] DateOnly? from = null,
+        [FromQuery] DateOnly? to = null,
         [FromQuery] Guid? staffId = null)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8));
         var isAdmin = User.IsInRole("Admin");
-        var query = new GetCalendarQuery(GetBusinessId(), staffId, GetUserId(), isAdmin, from, to);
+        var query = new GetCalendarQuery(
+            GetBusinessId(),
+            staffId,
+            GetUserId(),
+            isAdmin,
+            from ?? today,
+            to ?? today.AddDays(30));
         var result = await _mediator.Send(query);
         return Ok(result);
     }
