@@ -1,10 +1,10 @@
-using Microsoft.Extensions.Caching.Memory;
 using MediatR;
 using Booking.Application.Auth.Interfaces;
 using Booking.Application.Availability;
 using Booking.Application.Availability.DTOs;
 using Booking.Application.Availability.Interfaces;
 using Booking.Application.Availability.Queries;
+using Booking.Application.Bookings.Interfaces;
 using StaffEntity = Booking.Domain.Staff;
 
 namespace Booking.Application.Availability.Handlers;
@@ -16,12 +16,12 @@ public class GetAvailabilityQueryHandler : IRequestHandler<GetAvailabilityQuery,
 
     private readonly IAvailabilityRepository _repository;
     private readonly IDateTimeProvider _clock;
-    private readonly IMemoryCache _cache;
+    private readonly IAvailabilityCache _cache;
 
     public GetAvailabilityQueryHandler(
         IAvailabilityRepository repository,
         IDateTimeProvider clock,
-        IMemoryCache cache)
+        IAvailabilityCache cache)
     {
         _repository = repository;
         _clock = clock;
@@ -39,7 +39,8 @@ public class GetAvailabilityQueryHandler : IRequestHandler<GetAvailabilityQuery,
             throw new KeyNotFoundException("Business not found");
 
         var cacheKey = $"{CacheRegion}:{request.BusinessId}:{request.ServiceId}:{(request.StaffId?.ToString() ?? "any")}:{request.Date}";
-        if (_cache.TryGetValue(cacheKey, out AvailabilityResponse? cached) && cached != null)
+        var cached = _cache.Get<AvailabilityResponse>(cacheKey);
+        if (cached != null)
             return cached;
 
         var offset = ManilaOffsetFromUtc;

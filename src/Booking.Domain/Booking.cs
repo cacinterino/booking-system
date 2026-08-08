@@ -16,6 +16,7 @@ public class Booking : Entity
     public string? Notes { get; private set; }
     public string? CancellationReason { get; private set; }
     public string IdempotencyKey { get; private set; } = string.Empty;
+    public string? AccessCode { get; private set; }
     public decimal TotalAmount { get; private set; }
     public decimal DepositAmount { get; private set; }
     public DateTime? ConfirmedAt { get; private set; }
@@ -40,6 +41,12 @@ public class Booking : Entity
         DepositAmount = depositAmount;
         IdempotencyKey = idempotencyKey;
         Notes = notes;
+    }
+
+    public void SetAccessCode(string accessCode)
+    {
+        AccessCode = accessCode;
+        MarkUpdated();
     }
 
     public void AddService(BookingService bookingService)

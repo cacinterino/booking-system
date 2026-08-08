@@ -1,10 +1,10 @@
 # Remaining Tasks Plan - Appointment Booking System
 
-**Updated:** 2026-08-07  
-**Status:** Phases 1-3 (Auth API + Frontend) ✅ · Phase 4 backend core ✅ (4.1/4.2/4.3) · **Next:** 4.4 Booking Flow  
+**Updated:** 2026-08-08  
+**Status:** Phases 1-3 (Auth API + Frontend) ✅ · Phase 4 backend core ✅ (4.1/4.2/4.3) · **4.4 Booking Flow committed on `feat/4.4-booking`**  
 **Important decisions** (from working session):
 - **PayMongo (4.5) is SKIPPED** for now — deposits are optional (`BusinessSettings.RequireDeposit = false`) so bookings work without a payment gateway. Plan section kept for future.
-- Only **1 commit is not pushed** (`feat/4.1-services` is **2 commits ahead** of origin: 4.3 + navbar were committed locally, push is pending).
+- **4.4 is implemented and validated end-to-end against the Docker API** (create, idempotent retry, race → one 201 + one 409, my-bookings, cancel, reschedule, calendar, status transitions). Branch `feat/4.4-booking` is ahead of origin and NOT yet merged to `main`.
 
 ---
 
@@ -29,32 +29,33 @@
 | Ax | Dashboard navbar with role-based links | ✅ |
 | Ax | CORS + Docker fixes (API container on :5000) | ✅ |
 | 7.1 | Unit tests: **45 passing** (services, staff, business, availability engine, auth) | ✅ |
+| 4.4 | **Booking Flow backend** — create (idempotent + double-booking 409), my-bookings, cancel, reschedule, list, calendar, status transitions; Manila-boundary DTO conversion; rate limiting on POST /api/bookings | ✅ |
+| 7.2 | Testcontainers integration tests: **7 passing** (concurrency race, adjacent-slot regression, overlap 409, lifecycle, staff lifecycle, list/calendar/status) | ✅ |
 
-**Current branch:** `feat/4.1-services` (working branch; NOT merged to `main`). Repo is **clean** except un-pushed commits.
+**Current branch:** `feat/4.4-booking` (working branch; NOT merged to `main`). US1/US2/US3 + polish committed; ready for PR.
 
 ---
 
 ## 🔄 IN PROGRESS
 
-- **Pushing pending commits** — `feat/4.1-services` is 2 commits ahead of origin (4.3 Availability Engine + dashboard navbar). Push is low-risk but PR #8 already covers 4.1; assess whether to keep stacking on this branch or cut `feat/4.4-booking`.
+- **Merging `feat/4.4-booking` to `main`** via PR (US1–US3 + polish committed; full suite green: 66 unit + 7 integration). T046 security review (human) still outstanding before merge.
 
 ---
 
 ## 📋 PHASE 4: CORE FEATURES — REMAINING
 
-### 4.4 Booking Flow  ⭐ HIGHEST PRIORITY (the app's core value)
-- [ ] `POST /api/bookings` — Create booking (guest + authenticated), from an availability slot.
-- [ ] **Double-booking protection**: exactly one of two simultaneous creates wins, other gets clean **409, not 500**.
-       Option A: postgres EXCLUDE constraint `EXCLUDE USING gist (StaffId WITH =, tsrange("StartTime","EndTime") WITH &&)` + `CREATE EXTENSION btree_gist` (needs a raw-SQL EF migration).
-       Option B (lighter, shippable now): unique index + application-level reservation check in a single transaction with serializable isolation.
-- [ ] Idempotency key header (`Idempotency-Key`) → reuse existing unique index `IX_bookings_IdempotencyKey`. ✍️ *already in schema*.
-- [ ] `GET /api/bookings/my-bookings` — customer's bookings.
-- [ ] `POST /api/bookings/{id}/cancel` — customer cancel (soft delete / status=Cancelled).
-- [ ] `POST /api/bookings/{id}/reschedule` — customer reschedule (needs availability re-check).
-- [ ] `GET /api/bookings` — admin/staff list (filterable by status/staff/date).
-- [ ] `GET /api/bookings/calendar` — staff calendar view events.
-- [ ] `PUT /api/bookings/{id}/status` — staff confirm/complete/no-show.
-- Test availability invalidation on booking write (IMemoryCache).
+### 4.4 Booking Flow  ⭐ COMPLETE (backend on `feat/4.4-booking`)
+- [x] `POST /api/bookings` — Create booking (guest + authenticated), from an availability slot.
+- [x] **Double-booking protection**: exactly one of two simultaneous creates wins, other gets clean **409, not 500**. Postgres EXCLUDE constraint `EXCLUDE USING gist (StaffId WITH =, tstzrange("StartTime","EndTime",'[)') WITH &&) WHERE (Status IN (1,2))` (half-open `[)` so back-to-back slots do not conflict).
+- [x] Idempotency key header (`Idempotency-Key`) → 200 + existing booking on retry.
+- [x] `GET /api/bookings/my-bookings` — customer's bookings (guest access code).
+- [x] `POST /api/bookings/{id}/cancel` — guest/owner cancel (frees the slot).
+- [x] `POST /api/bookings/{id}/reschedule` — owner/guest/staff reschedule (live availability re-check).
+- [x] `GET /api/bookings` — admin/staff list (filterable by status/staff/date).
+- [x] `GET /api/bookings/calendar` — staff calendar view events.
+- [x] `PUT /api/bookings/{id}/status` — staff confirm/complete/no-show.
+- [x] Cache invalidation on booking write (IAvailabilityCache).
+- [x] Bug fixes found during quickstart: exclusion range `[]`→`[)` (adjacent slots) + calendar default `from/to` when omitted (was 500).
 
 ### 4.5 PayMongo Integration — **SKIPPED** (decision: deposits optional; revisit later)
 - [ ] Payment entity + EF config *(deferred)*
@@ -88,11 +89,19 @@
 
 ## ⭐ PRIORITIZED NEXT STEPS (given limited time)
 
-1. **Push `feat/4.1-services`** (02 commits ahead) OR cut `feat/4.4-booking` to keep PRs clean — decide based on whether #8 is merged.
-2. **Build 4.4 Booking Flow backend** — create/cancel/reschedule/status/calendar + idempotency + **double-booking 409 test**. This is the one feature that makes the app real.
-3. **Wire `/api/availability` into booking creation** (validate chosen slot against live engine before persist).
-4. **Frontend**: public booking wizard + my-bookings — ties backend into something demo-able.
-5. Only then: notifications, deployment, polish (deferred).
+1. **T046 security review (HUMAN)** — owner checks, guest accessCode handling, role policies on all booking endpoints. Must be documented before the `feat/4.4-booking` PR merges.
+2. **Merge `feat/4.4-booking` to `main`** via PR (staging), then validate staging. Never commit to `main` directly.
+3. **Frontend**: public booking wizard + my-bookings + staff calendar — ties the backend into a demo-able app.
+4. Only then: notifications, deployment, polish (deferred).
+
+---
+
+## 🚧 DEFERRED POST-PHASE-6 (recorded, NOT blocking)
+
+| Phase | Task |
+|-------|------|
+| 4.4 | Public confirmation link `GET /api/bookings/{id}/confirm/{token}` — depends on email delivery (Phase 5); in-app/staff confirmation is the current confirmation path. Move to Notifications when email lands. |
+| 5 | Notifications (Email/SMS/SignalR), background reminders, confirmation email with access code |
 
 ---
 

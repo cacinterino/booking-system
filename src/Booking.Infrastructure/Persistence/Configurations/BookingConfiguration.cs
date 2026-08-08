@@ -36,6 +36,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Domain.Booking>
         builder.Property(b => b.Notes).HasMaxLength(1000);
         builder.Property(b => b.CancellationReason).HasMaxLength(500);
         builder.Property(b => b.IdempotencyKey).IsRequired().HasMaxLength(100);
+        builder.Property(b => b.AccessCode).HasMaxLength(12);
         builder.Property(b => b.TotalAmount).HasColumnType("decimal(10,2)").IsRequired();
         builder.Property(b => b.DepositAmount).HasColumnType("decimal(10,2)").IsRequired();
         builder.HasOne(b => b.Business)
