@@ -28,3 +28,11 @@ public enum PaymentStatus
     Failed = 3,
     Refunded = 4
 }
+
+public enum InvitationStatus
+{
+    Pending = 1,
+    Accepted = 2,
+    Expired = 3,
+    Revoked = 4
+}

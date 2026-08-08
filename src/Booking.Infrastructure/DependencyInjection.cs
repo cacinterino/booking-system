@@ -6,7 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Booking.Application.Auth.Interfaces;
+using Booking.Application.Availability.Interfaces;
+using Booking.Application.Business.Interfaces;
+using Booking.Application.Services.Interfaces;
+using Booking.Application.Staff.Interfaces;
 using Booking.Infrastructure.Auth;
+using Booking.Infrastructure.Persistence.Repositories;
 using IdentityUser = Booking.Infrastructure.Persistence.ApplicationUser;
 using IdentityRole = Booking.Infrastructure.Persistence.ApplicationRole;
 using Booking.Infrastructure.Persistence;
@@ -74,6 +79,15 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasherService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+
+        // Repositories
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IStaffRepository, StaffRepository>();
+        services.AddScoped<IBusinessRepository, BusinessRepository>();
+        services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
+
+        // Caching for availability engine
+        services.AddMemoryCache();
 
         return services;
     }
