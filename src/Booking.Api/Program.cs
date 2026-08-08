@@ -1,4 +1,5 @@
 using Booking.Application;
+using Booking.Api.Middleware;
 using Booking.Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,6 +32,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Pipeline
+app.UseProblemDetailsExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

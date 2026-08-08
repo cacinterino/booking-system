@@ -1,4 +1,7 @@
+using System;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using Booking.Application.Bookings.Exceptions;
 using Booking.Application.Bookings.Interfaces;
 using Booking.Domain;
 using Booking.Infrastructure.Persistence;
@@ -169,6 +172,17 @@ public class BookingRepository : IBookingRepository
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23P01")
+        {
+            throw new BookingConflictException("The chosen slot is no longer available");
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg && pg.SqlState == "23505")
+        {
+            throw new IdempotencyConflictException("A booking with this idempotency key already exists");
+        }
     }
 }
