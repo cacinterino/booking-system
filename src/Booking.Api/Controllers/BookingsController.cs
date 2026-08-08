@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Booking.Application.Bookings.Commands;
 using Booking.Application.Bookings.DTOs;
+using Booking.Application.Bookings.Queries;
 
 namespace Booking.Api.Controllers;
 
@@ -34,7 +35,7 @@ public class BookingsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/cancel")]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult> Cancel(Guid id, [FromBody] CancelBookingRequest request)
     {
         var command = new CancelBookingCommand(id, request.Reason, GetOptionalUserId(), request.AccessCode);
@@ -42,12 +43,21 @@ public class BookingsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id:guid}/reschedule")]
+[HttpPost("{id:guid}/reschedule")]
     [Authorize]
     public async Task<ActionResult<BookingResponse>> Reschedule(Guid id, [FromBody] RescheduleBookingRequest request)
     {
         var command = new RescheduleBookingCommand(id, request.StartTime, GetOptionalUserId(), request.AccessCode);
         var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpGet("my-bookings")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IReadOnlyList<BookingResponse>>> MyBookings([FromQuery] string? accessCode = null, [FromQuery] bool upcoming = false)
+    {
+        var query = new MyBookingsQuery(GetOptionalUserId(), accessCode, upcoming);
+        var result = await _mediator.Send(query);
         return Ok(result);
     }
 

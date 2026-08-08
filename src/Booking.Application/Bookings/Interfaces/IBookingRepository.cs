@@ -33,6 +33,7 @@ public interface IBookingRepository
         CancellationToken cancellationToken);
     Task<Customer?> GetCustomerByEmailAsync(Guid businessId, string email, CancellationToken cancellationToken);
     Task<Customer?> GetCustomerByUserIdAsync(Guid userId, CancellationToken cancellationToken);
+    Task<Customer?> GetCustomerByAccessCodeAsync(string accessCode, CancellationToken cancellationToken);
     Task<Guid> CreateCustomerAsync(Customer customer, CancellationToken cancellationToken);
     Task<StaffEntity?> GetStaffByBusinessAndUserIdAsync(Guid businessId, Guid userId, CancellationToken cancellationToken);
     Task<Service?> GetServiceAsync(Guid businessId, Guid serviceId, CancellationToken cancellationToken);

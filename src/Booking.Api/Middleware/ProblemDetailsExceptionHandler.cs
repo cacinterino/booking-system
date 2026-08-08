@@ -24,6 +24,7 @@ errorApp.Run(async context =>
                     BookingConflictException => (HttpStatusCode.Conflict, "Conflict", exception.Message),
                     KeyNotFoundException => (HttpStatusCode.NotFound, "Not Found", exception.Message),
                     InvalidOperationException => (HttpStatusCode.BadRequest, "Bad Request", exception.Message),
+                    UnauthorizedAccessException => (HttpStatusCode.Forbidden, "Forbidden", exception.Message),
                     _ => (HttpStatusCode.InternalServerError, "Internal Server Error", "An unexpected error occurred.")
                 };
 

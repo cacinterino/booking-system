@@ -138,6 +138,20 @@ public class BookingRepository : IBookingRepository
             .FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
     }
 
+    public async Task<Customer?> GetCustomerByAccessCodeAsync(string accessCode, CancellationToken cancellationToken)
+    {
+        var booking = await _context.Bookings
+            .Where(b => b.AccessCode == accessCode)
+            .OrderByDescending(b => b.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (booking is null)
+            return null;
+
+        return await _context.Customers
+            .FirstOrDefaultAsync(c => c.Id == booking.CustomerId, cancellationToken);
+    }
+
     public async Task<Guid> CreateCustomerAsync(Customer customer, CancellationToken cancellationToken)
     {
         _context.Customers.Add(customer);
