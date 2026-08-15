@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-15T00:00:00.000Z",
+  "title": "Design System: Booked.",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Antique Brass",
+        "canonical": "#B8862B",
+        "tonalRamp": ["#4A3A10", "#5E4B15", "#74591B", "#8A6A22", "#B8862B", "#C99E45", "#D8AE5F", "#F2D5A0"]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Antique Brass Soft",
+        "canonical": "#D8AE5F",
+        "tonalRamp": ["#5E4B15", "#74591B", "#8A6A22", "#A17B2D", "#B8862B", "#D8AE5F", "#E4C07A", "#F2D5A0"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Midnight Ink",
+        "canonical": "#14213D",
+        "tonalRamp": ["#0A1224", "#101C33", "#14213D", "#1F2F52", "#2A3D66", "#3E5278", "#5B6C8F", "#8C98B0"]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "#233258",
+        "tonalRamp": ["#131B33", "#182142", "#233258", "#2E4170", "#3A5088", "#4A628F", "#66799F", "#97A5C0"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "#F5F0E4",
+        "tonalRamp": ["#4A4538", "#6E6857", "#928B77", "#B5AD96", "#D3CCB8", "#E3DCC8", "#F5F0E4", "#FAF7EF"]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Soft Ivory",
+        "canonical": "#FFFDF8",
+        "tonalRamp": ["#4C4A42", "#6E6C62", "#929080", "#B6B3A3", "#D6D3C4", "#E7E4D7", "#FFFDF8", "#FFFEFB"]
+      },
+      "sage": {
+        "role": "secondary",
+        "displayName": "Garden Sage",
+        "canonical": "#4F7860",
+        "tonalRamp": ["#1C2C22", "#24382C", "#2E4738", "#3A5A47", "#4F7860", "#6A9179", "#8AAFA0", "#BFD6CC"]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Sober Slate",
+        "canonical": "#5B6270",
+        "tonalRamp": ["#22262E", "#2E333D", "#3C424D", "#4B515D", "#5B6270", "#7A8190", "#9AA1B0", "#C4C8D2"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "canonical": "rgba(20, 33, 61, 0.14)",
+        "tonalRamp": ["rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)", "rgba(20,33,61,0.14)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero and section headlines; the serif authority of the ledger." },
+      "body": { "displayName": "Body", "purpose": "Primary reading text and form content; quiet, scannable." },
+      "label": { "displayName": "Label / Mono", "purpose": "Uppercase eyebrows, metadata, status chips, code-like ledger stamps." }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(0,0,0,0.05)", "purpose": "Resting card shadow; intentionally near-invisible (flat by default)." },
+      { "name": "shadow-lg", "value": "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)", "purpose": "Hover lift on cards and dashboard modules." },
+      { "name": "shadow-xl", "value": "0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", "purpose": "Ticket hover and card hover; the picked-up slip." },
+      { "name": "shadow-2xl", "value": "0 25px 50px -12px rgba(0,0,0,0.25)", "purpose": "Modals only — the one truly raised sheet." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default state-transition easing (colors, borders, shadows)." },
+      { "name": "float", "value": "7s / 11s ease-in-out infinite", "purpose": "Landing hero ticket float (animate-float, animate-float-slow); disabled under prefers-reduced-motion." },
+      { "name": "marquee", "value": "28s linear infinite", "purpose": "Landing stack strip marquee." },
+      { "name": "pulse-ring", "value": "2s ease-out infinite", "purpose": "Landing live badge ping." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single brass action on a screen. Antique Brass fill, Soft Ivory text, brass focus ring, lightens on hover.",
+      "html": "<button class=\"ds-btn-primary\">Sign in</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #B8862B; color: #FFFDF8; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 8px; transition: background-color 0.2s; cursor: pointer; } .ds-btn-primary:hover { background: #D8AE5F; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFDF8, 0 0 0 4px #B8862B; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet paper action: Soft Ivory fill, hairline ink border, Midnight Ink text, warms on hover.",
+      "html": "<button class=\"ds-btn-secondary\">Log out</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #FFFDF8; color: #14213D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid rgba(20,33,61,0.14); border-radius: 8px; transition: background-color 0.2s; cursor: pointer; } .ds-btn-secondary:hover { background: rgba(20,33,61,0.05); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFDF8, 0 0 0 4px #14213D; }"
+    },
+    {
+      "name": "Button On Dark",
+      "kind": "button",
+      "refersTo": "button-on-dark",
+      "description": "Brass action on Midnight Ink surfaces (landing CTA): Brass fill, Ink text. Outline variant on dark is a hairline ivory border.",
+      "html": "<button class=\"ds-btn-on-dark\">Book now</button>",
+      "css": ".ds-btn-on-dark { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; background: #B8862B; color: #14213D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 8px; transition: background-color 0.2s; cursor: pointer; } .ds-btn-on-dark:hover { background: #D8AE5F; } .ds-btn-on-dark:focus-visible { outline: none; box-shadow: 0 0 0 2px #14213D, 0 0 0 4px #D8AE5F; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Calm paper form entry: Soft Ivory fill, hairline border, brass focus ring. Label sits above in Ink Soft.",
+      "html": "<label class=\"ds-label\" for=\"ds-email\">Email address</label><input id=\"ds-email\" class=\"ds-input\" type=\"email\" placeholder=\"you@example.com\">",
+      "css": ".ds-label { display: block; margin-bottom: 8px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; color: #233258; } .ds-input { width: 100%; padding: 12px 16px; background: #FFFDF8; color: #14213D; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; border: 1px solid rgba(20,33,61,0.14); border-radius: 8px; transition: border-color 0.2s, box-shadow 0.2s; } .ds-input::placeholder { color: #5B6270; } .ds-input:focus { outline: none; border-color: #B8862B; box-shadow: 0 0 0 2px #FFFDF8, 0 0 0 4px #B8862B; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Soft Ivory ledger sheet on Warm Paper. Flat at rest with hairline border; lifts only on hover.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Today's bookings</h3><p class=\"ds-card-body\">A quiet sheet holding one entry of the day.</p></div>",
+      "css": ".ds-card { padding: 24px 32px; background: #FFFDF8; border: 1px solid rgba(20,33,61,0.14); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: box-shadow 0.2s, transform 0.2s; } .ds-card:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); } .ds-card-title { margin: 0 0 8px; font-family: 'Fraunces', Georgia, serif; font-size: 1.25rem; font-weight: 600; color: #14213D; } .ds-card-body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; line-height: 1.6; color: #5B6270; }"
+    },
+    {
+      "name": "Ticket Card",
+      "kind": "card",
+      "refersTo": "ticket",
+      "description": "The signature ledger slip: rotated at rest, brass-stamped corner circle, straightens and lifts on hover.",
+      "html": "<div class=\"ds-ticket\"><span class=\"ds-ticket-stamp\" aria-hidden=\"true\"></span><h3 class=\"ds-card-title\">Golden hour, Saturdays</h3><p class=\"ds-card-body\">The appointment slip you can almost pick up.</p></div>",
+      "css": ".ds-ticket { position: relative; padding: 24px 32px; background: #FFFDF8; border: 1px solid rgba(20,33,61,0.14); border-radius: 8px; transform: rotate(1deg); transition: transform 0.2s, box-shadow 0.2s; } .ds-ticket:hover { transform: rotate(0deg); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); } .ds-ticket-stamp { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 9999px; background: rgba(184,134,43,0.10); border: 1px solid rgba(184,134,43,0.30); } .ds-card-title { margin: 0 0 8px; font-family: 'Fraunces', Georgia, serif; font-size: 1.25rem; font-weight: 600; color: #14213D; } .ds-card-body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; line-height: 1.6; color: #5B6270; }"
+    },
+    {
+      "name": "Chip / Status",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Uppercase mono status stamp: low-opacity brass tint, brass text, pill shape. Active nav items and status tags.",
+      "html": "<span class=\"ds-chip\">Available</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 2px 10px; background: rgba(184,134,43,0.10); color: #B8862B; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; border-radius: 9999px; }"
+    },
+    {
+      "name": "Navbar",
+      "kind": "nav",
+      "refersTo": "navbar",
+      "description": "Translucent Soft Ivory top edge with hairline rule; Fraunces wordmark with brass period; active link is brass on a brass/10 tint.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-nav-brand\" href=\"#\">Booked<span class=\"ds-nav-dot\">.</span></a><nav><a class=\"ds-nav-link is-active\" href=\"#\">Dashboard</a><a class=\"ds-nav-link\" href=\"#\">Services</a></nav></header>",
+      "css": ".ds-nav { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; height: 64px; padding: 0 32px; background: rgba(255,253,248,0.90); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(20,33,61,0.14); } .ds-nav-brand { font-family: 'Fraunces', Georgia, serif; font-size: 1.25rem; font-weight: 700; color: #14213D; text-decoration: none; } .ds-nav-dot { color: #B8862B; } .ds-nav-link { padding: 8px 12px; border-radius: 8px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; color: #5B6270; text-decoration: none; transition: color 0.2s, background-color 0.2s; } .ds-nav-link:hover { color: #14213D; background: rgba(20,33,61,0.05); } .ds-nav-link.is-active { color: #B8862B; background: rgba(184,134,43,0.10); } .ds-nav-link:focus-visible { outline: none; box-shadow: 0 0 0 2px #FFFDF8, 0 0 0 4px #B8862B; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Brass-Bound Ledger",
+    "overview": "Booked. is a brass-bound appointment ledger kept by a careful owner. The interface reads like the inside of a well-loved business book: warm paper surfaces, inked entries set in an editorial serif, and antique brass used sparingly — the way a ledger's gilded edges are. Nothing shouts. The system earns trust through precision: hairline rules instead of heavy borders, an accent that appears like a stamp rather than a theme, and type that feels set, not rendered. The voice is editorial warmth, restrained. The landing page is the product's persuasion surface — darker, more theatrical, with brass glows and floating ticket motifs — while the application surfaces are its operational counterpart: calm paper, clear hierarchy, and the same brass reserved for the one action that matters. Both read as the same hand. Density leans comfortable; spacing is generous enough that the app never feels like a form, and tight enough that it still feels like a tool. The system deliberately rejects both the sterile dashboard and the florid 'spa' aesthetic. There are no pastels, no drop-shadow gradients, no soft-focus photo textures. Depth is a response to interaction, not a permanent condition. Warmth comes from material honesty — real paper tones, real ink, real metal — not from decoration.",
+    "keyCharacteristics": [
+      "Warm paper surfaces (paper, paper-white) with hairline line borders; never gray-on-white SaaS chrome.",
+      "A single antique brass accent used as a stamp, not a theme (the rarity is the point).",
+      "Editorial serif display (Fraunces) over humanist sans (IBM Plex Sans) — headlines feel set in lead.",
+      "Flat-by-default, lifting only on interaction.",
+      "Rounded but not cute: 8px surfaces, 9999px only for genuine pills/chips.",
+      "Monospace (IBM Plex Mono) reserved for labels and metadata, lending ledger authenticity."
+    ],
+    "rules": [
+      { "name": "The Rare Brass Rule", "body": "Antique Brass covers ≤10% of any app screen. Its scarcity is the point; when everything is brass, nothing is a ledger.", "section": "colors" },
+      { "name": "The Warm Paper Rule", "body": "Surfaces are paper-toned, never pure white or gray. Pure #FFFFFF and neutral grays are off-world unless a token explicitly maps to them.", "section": "colors" },
+      { "name": "The Eyebrow Rule", "body": "Section eyebrows are always uppercase IBM Plex Mono with a wide letter-spacing, in brass — a tiny typewritten ledger heading above each serif headline. If a section has a headline, it earns an eyebrow.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadows appear only as a response to state — hover, open, focus — never as a permanent condition.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Antique Brass below ~10% of any app screen — one primary brass action, brass only where it stamps meaning.",
+      "Do use Warm Paper for page backgrounds and Soft Ivory for cards/inputs; the two-notch contrast is the depth system.",
+      "Do set section eyebrows in uppercase IBM Plex Mono with wide tracking, in brass, above Fraunces serif headlines.",
+      "Do keep surfaces flat at rest; lift cards and tickets only on hover.",
+      "Do use hairline line borders (ink at 14% opacity) for dividers — they should read as printed on paper.",
+      "Do use rounded-lg (8px) as the default cut and reserve rounded-full for genuine pills and avatars."
+    ],
+    "donts": [
+      "Don't introduce pure white or neutral gray backgrounds, or pastel/SaaS gradients — paper tones are the world.",
+      "Don't let the brass accent become a theme (every button brass, every icon brass, every hover brass); it is a stamp.",
+      "Don't add persistent shadows to resting surfaces, or drop-shadow effects that fight the flat ledger language.",
+      "Don't set body copy in Fraunces or headlines in IBM Plex Sans — serif display / sans body is the contract.",
+      "Don't mix corner languages aggressively (a screen is cut from one paper); stay in the 8/12/16 + pill system.",
+      "Don't decorate with photographic textures, glittering gradients, or emoji in place of the brass stamp."
+    ]
+  }
+}

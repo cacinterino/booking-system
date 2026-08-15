@@ -139,7 +139,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-float, .animate-float-slow, .animate-marquee {
+  .animate-float, .animate-float-slow, .animate-marquee, .animate-spin {
     animation: none;
   }
 }
