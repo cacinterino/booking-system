@@ -81,27 +81,21 @@ public class UpdateStaffCommandHandler : IRequestHandler<UpdateStaffCommand, Sta
 
     public async Task<StaffResponse> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
     {
-        var staff = await _repository.GetStaffWithServicesAsync(request.BusinessId, request.Id, cancellationToken);
+        var staff = await _repository.GetStaffByIdAsync(request.BusinessId, request.Id, cancellationToken);
         if (staff == null)
             throw new KeyNotFoundException("Staff not found");
 
         var req = request.Request;
         staff.Update(req.FirstName, req.LastName, req.Email, req.Phone, req.IsActive, req.DisplayOrder);
 
-        var currentServiceIds = staff.Services.Select(s => s.ServiceId).ToHashSet();
-        var desiredServiceIds = (req.ServiceIds ?? Array.Empty<Guid>()).ToHashSet();
-
-        foreach (var serviceId in desiredServiceIds.Except(currentServiceIds))
+        var desiredServiceIds = req.ServiceIds ?? Array.Empty<Guid>();
+        foreach (var serviceId in desiredServiceIds)
         {
             if (!await _repository.ServiceBelongsToBusinessAsync(request.BusinessId, serviceId, cancellationToken))
                 throw new KeyNotFoundException($"Service {serviceId} not found in this business");
-            staff.AddService(serviceId);
         }
 
-        foreach (var serviceId in currentServiceIds.Except(desiredServiceIds))
-            staff.RemoveService(serviceId);
-
-        await _repository.UpdateAsync(staff, cancellationToken);
+        await _repository.SetStaffServicesAsync(staff.Id, desiredServiceIds, cancellationToken);
         await _repository.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Staff updated: {StaffId}", staff.Id);

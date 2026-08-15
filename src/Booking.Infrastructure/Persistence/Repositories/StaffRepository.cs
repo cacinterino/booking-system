@@ -90,6 +90,21 @@ public class StaffRepository : IStaffRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task SetStaffServicesAsync(Guid staffId, IEnumerable<Guid> serviceIds, CancellationToken cancellationToken)
+    {
+        var desired = serviceIds.ToHashSet();
+        var existing = await _context.StaffServices
+            .Where(ss => ss.StaffId == staffId)
+            .ToListAsync(cancellationToken);
+
+        foreach (var link in existing.Where(l => !desired.Contains(l.ServiceId)))
+            _context.StaffServices.Remove(link);
+
+        var existingIds = existing.Select(l => l.ServiceId).ToHashSet();
+        foreach (var serviceId in desired.Where(id => !existingIds.Contains(id)))
+            await _context.StaffServices.AddAsync(new StaffService(staffId, serviceId), cancellationToken);
+    }
+
     public async Task<bool> StaffExistsAsync(Guid businessId, Guid staffId, CancellationToken cancellationToken)
     {
         return await _context.Staff.AnyAsync(s => s.Id == staffId && s.BusinessId == businessId, cancellationToken);

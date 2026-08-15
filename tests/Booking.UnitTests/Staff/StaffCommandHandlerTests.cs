@@ -127,6 +127,75 @@ public class SetStaffScheduleCommandHandlerTests
     }
 }
 
+public class UpdateStaffCommandHandlerTests
+{
+    private readonly Mock<IStaffRepository> _repository = new();
+    private readonly NullLogger<UpdateStaffCommandHandler> _logger = new();
+
+    [Fact]
+    public async Task Handle_AddsNewService_ReconcilesJoinRows()
+    {
+        var businessId = Guid.NewGuid();
+        var staffId = Guid.NewGuid();
+        var existingServiceId = Guid.NewGuid();
+        var newServiceId = Guid.NewGuid();
+        var staff = new StaffEntity(businessId, "Juan", "Dela Cruz");
+        staff.AddService(existingServiceId);
+
+        var request = new UpdateStaffCommand(businessId, staffId,
+            new StaffRequest("Juan", "Dela Cruz", null, null, true, 0, new[] { existingServiceId, newServiceId }));
+
+        _repository
+            .Setup(r => r.GetStaffByIdAsync(businessId, staffId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(staff);
+        _repository
+            .Setup(r => r.ServiceBelongsToBusinessAsync(businessId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _repository
+            .Setup(r => r.GetServiceIdsForStaffAsync(staff.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { existingServiceId, newServiceId });
+
+        var handler = new UpdateStaffCommandHandler(_repository.Object, _logger);
+        var result = await handler.Handle(request, CancellationToken.None);
+
+        result.ServiceIds.Should().BeEquivalentTo(new[] { existingServiceId, newServiceId });
+        _repository.Verify(r => r.SetStaffServicesAsync(staff.Id, It.Is<IEnumerable<Guid>>(ids => ids.Contains(newServiceId)), It.IsAny<CancellationToken>()), Times.Once);
+        _repository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_RemovesService_ReconcilesJoinRows()
+    {
+        var businessId = Guid.NewGuid();
+        var staffId = Guid.NewGuid();
+        var removedServiceId = Guid.NewGuid();
+        var keptServiceId = Guid.NewGuid();
+        var staff = new StaffEntity(businessId, "Juan", "Dela Cruz");
+        staff.AddService(removedServiceId);
+        staff.AddService(keptServiceId);
+
+        var request = new UpdateStaffCommand(businessId, staffId,
+            new StaffRequest("Juan", "Dela Cruz", null, null, true, 0, new[] { keptServiceId }));
+
+        _repository
+            .Setup(r => r.GetStaffByIdAsync(businessId, staffId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(staff);
+        _repository
+            .Setup(r => r.ServiceBelongsToBusinessAsync(businessId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _repository
+            .Setup(r => r.GetServiceIdsForStaffAsync(staff.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new[] { keptServiceId });
+
+        var handler = new UpdateStaffCommandHandler(_repository.Object, _logger);
+        var result = await handler.Handle(request, CancellationToken.None);
+
+        result.ServiceIds.Should().BeEquivalentTo(new[] { keptServiceId });
+        _repository.Verify(r => r.SetStaffServicesAsync(staff.Id, It.Is<IEnumerable<Guid>>(ids => !ids.Contains(removedServiceId)), It.IsAny<CancellationToken>()), Times.Once);
+        _repository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+}
+
 public class CreateOverrideCommandHandlerTests
 {
     private readonly Mock<IStaffRepository> _repository = new();

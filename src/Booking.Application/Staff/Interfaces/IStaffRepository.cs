@@ -14,6 +14,7 @@ public interface IStaffRepository
     Task<ScheduleOverride?> GetOverrideByIdAsync(Guid businessId, Guid staffId, Guid overrideId, CancellationToken cancellationToken);
     Task<bool> ServiceBelongsToBusinessAsync(Guid businessId, Guid serviceId, CancellationToken cancellationToken);
     Task<IReadOnlyList<Guid>> GetServiceIdsForStaffAsync(Guid staffId, CancellationToken cancellationToken);
+    Task SetStaffServicesAsync(Guid staffId, IEnumerable<Guid> serviceIds, CancellationToken cancellationToken);
     Task<bool> StaffExistsAsync(Guid businessId, Guid staffId, CancellationToken cancellationToken);
     Task AddStaffAsync(StaffEntity staff, CancellationToken cancellationToken);
     Task AddAsync<T>(T entity, CancellationToken cancellationToken) where T : class;
