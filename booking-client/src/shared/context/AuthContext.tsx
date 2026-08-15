@@ -7,11 +7,34 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  registerBusiness: (data: RegisterBusinessData) => Promise<void>;
+  acceptInvitation: (data: AcceptInvitationData) => Promise<void>;
   logout: () => void;
   updateUser: (user: UserDto) => void;
 }
 
 interface RegisterData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+}
+
+interface RegisterBusinessData {
+  businessName: string;
+  businessSlug: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  description?: string;
+  address?: string;
+}
+
+interface AcceptInvitationData {
+  token: string;
   email: string;
   password: string;
   firstName: string;
@@ -64,6 +87,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
+  const registerBusiness = async (data: RegisterBusinessData) => {
+    const response = await api.post('/api/auth/register-business', data);
+    const { accessToken, refreshToken, user: userData } = response.data;
+
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    setUser(userData);
+  };
+
+  const acceptInvitation = async (data: AcceptInvitationData) => {
+    const response = await api.post('/api/auth/accept-invitation', data);
+    const { accessToken, refreshToken, user: userData } = response.data;
+
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    setUser(userData);
+  };
+
   const logout = () => {
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
@@ -78,7 +119,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateUser }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, login, register, registerBusiness, acceptInvitation, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

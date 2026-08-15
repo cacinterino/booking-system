@@ -7,6 +7,8 @@ import { queryClient } from './shared/api/queryClient';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { RegisterPage } from './features/auth/pages/RegisterPage';
+import { RegisterBusinessPage } from './features/auth/pages/RegisterBusinessPage';
+import { AcceptInvitationPage } from './features/auth/pages/AcceptInvitationPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
@@ -27,7 +29,11 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register-business" element={<RegisterBusinessPage />} />
             </Route>
+
+            {/* Public booking + invitation links — always reachable */}
+            <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
 
             {/* Guest booking wizard — fully anonymous */}
             <Route path="/book/:businessSlug" element={<BookingWizardPage />} />

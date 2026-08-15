@@ -105,6 +105,12 @@ export function LoginPage() {
                 Sign up
               </Link>
             </p>
+            <p className="mt-2 text-sm text-slate">
+              Have a business?{' '}
+              <Link to="/register-business" className="font-medium text-brass hover:text-brass-soft transition-colors">
+                Set up your booking page
+              </Link>
+            </p>
           </div>
         </div>
       </div>
