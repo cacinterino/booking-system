@@ -101,13 +101,13 @@ export function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-slate">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-brass hover:text-brass-soft transition-colors">
+              <Link to="/register" className="font-medium text-brass-deep hover:text-brass transition-colors">
                 Sign up
               </Link>
             </p>
             <p className="mt-2 text-sm text-slate">
               Have a business?{' '}
-              <Link to="/register-business" className="font-medium text-brass hover:text-brass-soft transition-colors">
+              <Link to="/register-business" className="font-medium text-brass-deep hover:text-brass transition-colors">
                 Set up your booking page
               </Link>
             </p>

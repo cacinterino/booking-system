@@ -204,8 +204,8 @@ export function RegisterBusinessPage() {
               />
             </div>
 
-            <details className="group rounded-lg border border-line bg-paper p-4">
-              <summary className="cursor-pointer font-mono text-xs uppercase tracking-widest text-brass">
+            <details className="group border-t border-line pt-4">
+              <summary className="cursor-pointer font-mono text-xs uppercase tracking-widest text-brass-deep">
                 Add details (optional)
               </summary>
               <div className="mt-4 space-y-4">
@@ -242,7 +242,7 @@ export function RegisterBusinessPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-slate">
               Already have a business?{' '}
-              <Link to="/login" className="font-medium text-brass hover:text-brass-soft transition-colors">
+              <Link to="/login" className="font-medium text-brass-deep hover:text-brass transition-colors">
                 Sign in
               </Link>
             </p>

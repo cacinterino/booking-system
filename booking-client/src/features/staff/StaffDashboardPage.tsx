@@ -118,7 +118,7 @@ export function StaffDashboardPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-brass">{workspace.businessName}</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{workspace.businessName}</p>
             <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Today's calendar</h1>
             <p className="mt-1 text-sm text-slate">
               {workspace.staff.fullName} · {new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -151,35 +151,37 @@ export function StaffDashboardPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-7 gap-2" role="group" aria-label="Week days">
-          {days.map((day) => {
-            const key = dayKey(day);
-            const count = eventsByDay.get(key)?.length ?? 0;
-            const isToday = key === todayKey();
-            const isSelected = key === selectedDate;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setSelectedDate(key)}
-                className={`rounded-lg border p-3 text-center transition-colors ${
-                  isSelected
-                    ? 'border-brass bg-brass text-paper-white'
-                    : isToday
-                      ? 'border-brass/50 bg-brass/10 text-ink hover:bg-brass/20'
-                      : 'border-line bg-paper-white text-ink hover:bg-ink/5'
-                }`}
-              >
-                <span className={`block font-mono text-xs uppercase tracking-wider ${isSelected ? 'text-paper-white' : 'text-slate'}`}>
-                  {WEEKDAY_LABELS[day.getDay()]}
-                </span>
-                <span className="mt-1 block font-display text-xl font-semibold">{day.getDate()}</span>
-                <span className={`mt-1 block font-mono text-xs ${isSelected ? 'text-paper-white/90' : 'text-slate'}`}>
-                  {count} booking{count === 1 ? '' : 's'}
-                </span>
-              </button>
-            );
-          })}
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <div className="grid grid-cols-7 gap-2 min-w-[560px]" role="group" aria-label="Week days">
+            {days.map((day) => {
+              const key = dayKey(day);
+              const count = eventsByDay.get(key)?.length ?? 0;
+              const isToday = key === todayKey();
+              const isSelected = key === selectedDate;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelectedDate(key)}
+                  className={`rounded-lg border p-3 text-center transition-colors ${
+                    isSelected
+                      ? 'border-brass bg-brass text-paper-white'
+                      : isToday
+                        ? 'border-brass/50 bg-brass/10 text-ink hover:bg-brass/20'
+                        : 'border-line bg-paper-white text-ink hover:bg-ink/5'
+                  }`}
+                >
+                  <span className={`block font-mono text-xs uppercase tracking-wider ${isSelected ? 'text-paper-white' : 'text-slate'}`}>
+                    {WEEKDAY_LABELS[day.getDay()]}
+                  </span>
+                  <span className="mt-1 block font-display text-xl font-semibold">{day.getDate()}</span>
+                  <span className={`mt-1 block font-mono text-xs ${isSelected ? 'text-paper-white/90' : 'text-slate'}`}>
+                    {count} booking{count === 1 ? '' : 's'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-6">

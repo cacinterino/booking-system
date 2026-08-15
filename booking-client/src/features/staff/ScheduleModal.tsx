@@ -96,7 +96,7 @@ export function ScheduleModal({ staff, services: _services, onClose }: ScheduleM
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-label={`Weekly schedule for ${staff.fullName}`}>
       <form onSubmit={handleSave} className="w-full max-w-2xl card shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="mb-6">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">Weekly schedule</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Weekly schedule</p>
           <h2 className="mt-1 font-display text-2xl font-semibold text-ink">{staff.fullName}</h2>
           <p className="mt-1 text-sm text-slate">
             This replaces the current week. Days with no working hours are treated as days off.

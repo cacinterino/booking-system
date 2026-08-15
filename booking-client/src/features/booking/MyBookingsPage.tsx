@@ -68,7 +68,7 @@ export function MyBookingsPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-10 sm:px-6 pb-20">
         <div className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">Your appointments</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Your appointments</p>
           <h1 className="mt-1 font-display text-3xl font-semibold text-ink">
             {isAuthenticatedCustomer ? `Welcome back, ${user?.fullName?.split(' ')[0] ?? ''}` : 'Manage your bookings'}
           </h1>
@@ -79,7 +79,7 @@ export function MyBookingsPage() {
 
         {!enabled && (
           <div className="ticket-plain max-w-lg">
-            <p className="font-mono text-xs uppercase tracking-widest text-brass">Access code</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Access code</p>
             <p className="mt-1 text-sm text-ink-soft">
               The code from your confirmation lets you see and manage your bookings here.
             </p>
@@ -112,7 +112,7 @@ export function MyBookingsPage() {
             )}
             <p className="mt-5 border-t border-line pt-4 text-sm text-slate">
               Didn't book yet?{' '}
-              <Link to="/" className="font-medium text-brass hover:text-brass-soft">
+              <Link to="/" className="font-medium text-brass-deep hover:text-brass">
                 Find a business to book
               </Link>
             </p>

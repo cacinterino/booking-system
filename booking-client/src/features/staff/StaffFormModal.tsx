@@ -62,7 +62,7 @@ export function StaffFormModal({ staff, services, onClose }: StaffFormModalProps
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-label={isEdit ? `Edit ${staff?.fullName}` : 'Add staff'}>
       <form onSubmit={handleSubmit} className="w-full max-w-lg card shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="mb-6">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">{isEdit ? 'Edit' : 'New team member'}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{isEdit ? 'Edit' : 'New team member'}</p>
           <h2 className="mt-1 font-display text-2xl font-semibold text-ink">
             {isEdit ? staff?.fullName : 'Add staff'}
           </h2>

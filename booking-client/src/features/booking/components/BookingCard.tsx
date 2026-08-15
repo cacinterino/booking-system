@@ -56,7 +56,7 @@ export function BookingCard({ booking, accessCode, showActions }: BookingCardPro
     <article className="ticket-plain">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">{booking.businessName}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{booking.businessName}</p>
           <h3 className="mt-1 font-display text-xl font-semibold text-ink">{booking.serviceName}</h3>
           <p className="mt-0.5 text-sm text-slate">with {booking.staffName}</p>
         </div>
@@ -107,7 +107,7 @@ export function BookingCard({ booking, accessCode, showActions }: BookingCardPro
 
       {panel === 'reschedule' && actionable && (
         <div className="mt-5 rounded-lg border border-line bg-paper p-4 sm:p-5">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">Pick a new time</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Pick a new time</p>
           {businessQuery.data ? (
             <div className="mt-4">
               <DateTimeStep

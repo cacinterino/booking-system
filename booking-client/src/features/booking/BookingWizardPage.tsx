@@ -36,7 +36,7 @@ function LookupMyBooking({ slug }: { slug: string }) {
 
   return (
     <div className="mt-12 ticket-plain">
-      <p className="font-mono text-xs uppercase tracking-widest text-brass">Have a booking already?</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Have a booking already?</p>
       <h3 className="mt-1 font-display text-lg font-semibold text-ink">Look it up with your access code</h3>
       <form
         className="mt-4 flex flex-col sm:flex-row gap-3"
@@ -195,7 +195,7 @@ export function BookingWizardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper px-4">
         <div className="ticket text-center max-w-md w-full">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">{eyebrow}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{eyebrow}</p>
           <h1 className="mt-2 font-display text-2xl font-semibold text-ink">No services available yet</h1>
           <p className="mt-3 text-ink-soft">This business hasn't published any services. Check back soon.</p>
         </div>
@@ -220,7 +220,7 @@ export function BookingWizardPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-10 sm:px-6 pb-20">
         <div className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">{eyebrow}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{eyebrow}</p>
           <h1 className="mt-1 font-display text-3xl font-semibold text-ink">
             {step === 4 ? 'Booking confirmed' : 'Book an appointment'}
           </h1>
@@ -237,7 +237,7 @@ export function BookingWizardPage() {
                   <span
                     className={`font-mono text-xs px-2.5 py-1 rounded-full border ${
                       i === step
-                        ? 'bg-brass text-paper-white border-brass'
+                        ? 'bg-brass text-ink border-brass'
                         : i < step
                           ? 'border-line bg-paper-white text-ink'
                           : 'border-line text-slate'

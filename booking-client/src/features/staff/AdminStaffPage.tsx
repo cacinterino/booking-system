@@ -23,7 +23,7 @@ export function AdminStaffPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-brass">Team</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Team</p>
             <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Staff</h1>
             <p className="mt-1 text-sm text-slate">Invite team members, set schedules, and manage availability.</p>
           </div>
@@ -88,11 +88,11 @@ export function AdminStaffPage() {
               <article key={staff.id} className="card">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 font-display text-lg font-semibold text-brass">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 font-display text-lg font-semibold text-brass-deep">
                       {staff.fullName.charAt(0).toUpperCase()}
                     </span>
                     <div>
-                      <h3 className="font-display font-semibold text-ink">{staff.fullName}</h3>
+                      <h2 className="font-display font-semibold text-ink">{staff.fullName}</h2>
                       <p className="text-sm text-slate">{staff.email ?? 'No email'}</p>
                     </div>
                   </div>

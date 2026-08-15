@@ -151,7 +151,7 @@ export function LandingPage() {
                 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight"
               >
                 Appointments booked.<br />
-                No-shows <span className="text-gradient-brass">cancelled.</span>
+                No-shows <span className="text-brass">cancelled.</span>
               </motion.h1>
 
               <motion.p
@@ -213,7 +213,7 @@ export function LandingPage() {
                     <span className="px-2.5 py-1 rounded-full bg-sage/15 text-sage text-xs font-semibold">Deposit paid</span>
                   </div>
                   <div className="mt-6 flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-ink/5 flex items-center justify-center font-display font-bold text-brass">
+                    <div className="w-12 h-12 rounded-full bg-ink/5 flex items-center justify-center font-display font-bold text-brass-deep">
                       JM
                     </div>
                     <div>
@@ -236,7 +236,7 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -bottom-6 -left-10 ticket-plain !rotate-3 w-52 shadow-xl animate-float-slow">
+                <div className="absolute -bottom-24 -left-8 ticket-plain !rotate-3 w-44 shadow-xl animate-float-slow">
                   <div className="flex items-center gap-3">
                     <span className="w-9 h-9 rounded-lg bg-brass/15 flex items-center justify-center text-brass">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -249,7 +249,7 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -top-6 -right-6 ticket-plain !-rotate-2 w-44 shadow-xl animate-float">
+                <div className="absolute -top-20 -right-8 ticket-plain !-rotate-2 w-40 shadow-xl animate-float">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-sage" />
                     <p className="text-sm font-semibold text-ink">Slot confirmed</p>
@@ -336,11 +336,11 @@ export function LandingPage() {
             custom={0}
             className="max-w-3xl mx-auto text-center"
           >
-            <p className="text-sm font-semibold text-brass uppercase tracking-widest mb-4">Why Booked.</p>
+            <p className="text-sm font-semibold text-brass-deep uppercase tracking-widest mb-4">Why Booked.</p>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink leading-tight">
               Running a service business is hard. Filling your calendar shouldn't be.
             </h2>
-            <p className="mt-6 text-lg text-slate leading-relaxed">
+            <p className="mt-6 text-lg text-slate leading-relaxed max-w-prose mx-auto">
               Every day, clinics, salons, and studios lose money to no-shows, missed calls,
               and double-bookings. Booked. puts your whole schedule online — customers pick
               a real, available slot, pay a small deposit with GCash or Maya, and get a
@@ -375,7 +375,7 @@ export function LandingPage() {
                 whileHover={{ y: -6 }}
                 className="card relative overflow-hidden group"
               >
-                <div className="w-11 h-11 rounded-xl bg-brass/12 text-brass flex items-center justify-center mb-5 font-display font-bold">
+                <div className="w-11 h-11 rounded-xl bg-brass/12 text-brass-deep flex items-center justify-center mb-5 font-display font-bold">
                   {step.n}
                 </div>
                 <h3 className="font-display text-xl font-semibold text-ink mb-2">{step.title}</h3>
@@ -464,7 +464,7 @@ export function LandingPage() {
             custom={0}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <p className="text-sm font-semibold text-brass uppercase tracking-widest mb-4">Word on the street</p>
+            <p className="text-sm font-semibold text-brass-deep uppercase tracking-widest mb-4">Word on the street</p>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink leading-tight">
               Business owners who use Booked. every day
             </h2>
@@ -491,7 +491,7 @@ export function LandingPage() {
                   A real customer story lands here soon.
                 </p>
                 <div className="mt-6 pt-6 border-t border-line flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-ink/5 flex items-center justify-center font-display font-bold text-brass">
+                  <div className="w-11 h-11 rounded-full bg-ink/5 flex items-center justify-center font-display font-bold text-brass-deep">
                     ?
                   </div>
                   <div>
@@ -508,7 +508,7 @@ export function LandingPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center text-sm text-slate mt-10"
+            className="text-center text-sm text-slate mt-10 max-w-prose mx-auto"
           >
             We're brand new — and we're looking for early partners to test Booked. free before launch.
           </motion.p>
@@ -559,19 +559,19 @@ export function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-ink border-t border-paper-white/10 text-slate py-14">
+      <footer className="bg-ink border-t border-paper-white/10 text-paper-white/60 py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
             <div>
               <p className="font-display text-2xl font-bold text-paper-white">
                 Booked<span className="text-brass">.</span>
               </p>
-              <p className="text-sm text-slate mt-3 max-w-xs leading-relaxed">
+              <p className="text-sm text-paper-white/60 mt-3 max-w-xs leading-relaxed">
                 Appointment booking, deposits, and reminders for Philippine service businesses.
               </p>
             </div>
             <div>
-              <h4 className="font-display text-paper-white font-semibold mb-4">Product</h4>
+              <h3 className="font-display text-paper-white font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link to="#" className="hover:text-paper-white transition-colors">Features</Link></li>
                 <li><Link to="#" className="hover:text-paper-white transition-colors">Pricing</Link></li>
@@ -579,7 +579,7 @@ export function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-display text-paper-white font-semibold mb-4">Company</h4>
+              <h3 className="font-display text-paper-white font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link to="#" className="hover:text-paper-white transition-colors">About</Link></li>
                 <li><Link to="#" className="hover:text-paper-white transition-colors">Contact</Link></li>
@@ -587,7 +587,7 @@ export function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-display text-paper-white font-semibold mb-4">Legal</h4>
+              <h3 className="font-display text-paper-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link to="#" className="hover:text-paper-white transition-colors">Privacy</Link></li>
                 <li><Link to="#" className="hover:text-paper-white transition-colors">Terms</Link></li>
@@ -595,7 +595,7 @@ export function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-paper-white/10 mt-12 pt-8 text-center text-sm text-slate/60">
+          <div className="border-t border-paper-white/10 mt-12 pt-8 text-center text-sm text-paper-white/40">
             <p>&copy; 2026 Booked. Built for the Philippines.</p>
           </div>
         </div>

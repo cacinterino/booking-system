@@ -2,7 +2,7 @@ import type { BookingResponse } from '../types';
 import { BookingStatusLabel } from '../types';
 
 const STATUS_STYLES: Record<number, string> = {
-  1: 'bg-brass/10 text-brass border-brass/30',
+  1: 'bg-brass/10 text-brass-deep border-brass/30',
   2: 'bg-sage/10 text-sage border-sage/30',
   3: 'bg-ink/5 text-slate border-line',
   4: 'bg-ink/5 text-ink-soft border-line',

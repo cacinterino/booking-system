@@ -61,7 +61,7 @@ export function OverrideModal({ staff, onClose }: OverrideModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-label={`Day overrides for ${staff.fullName}`}>
       <div className="w-full max-w-lg card shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="mb-6">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">Day overrides</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Day overrides</p>
           <h2 className="mt-1 font-display text-2xl font-semibold text-ink">{staff.fullName}</h2>
           <p className="mt-1 text-sm text-slate">
             Override the weekly schedule for a specific day — close, or open on an off day.
