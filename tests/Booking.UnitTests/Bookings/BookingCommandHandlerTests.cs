@@ -15,6 +15,23 @@ using StaffEntity = Booking.Domain.Staff;
 
 namespace Booking.UnitTests.Bookings;
 
+internal static class TestDates
+{
+    // The availability engine excludes slots already in the past, so tests must
+    // always book into a strictly-future Friday (the setup schedules 9:00-17:00).
+    public static DateTime NextFridayUtc(int hour)
+    {
+        var now = DateTime.UtcNow;
+        for (var i = 1; i <= 7; i++)
+        {
+            var day = now.Date.AddDays(i);
+            if (day.DayOfWeek == DayOfWeek.Friday)
+                return day.AddHours(hour);
+        }
+        throw new InvalidOperationException("Could not find a future Friday");
+    }
+}
+
 public class CreateBookingCommandHandlerTests
 {
     private readonly Mock<IBookingRepository> _bookingRepo = new();
@@ -52,8 +69,7 @@ public class CreateBookingCommandHandlerTests
 
     private CreateBookingRequest ValidRequest()
     {
-        // 2026-08-14 10:00 Manila == 02:00 UTC
-        var utcStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
+        var utcStart = TestDates.NextFridayUtc(2);
         return new CreateBookingRequest(
             _businessId,
             _serviceId,
@@ -66,7 +82,7 @@ public class CreateBookingCommandHandlerTests
     [Fact]
     public async Task Handle_OverlappingBooking_ThrowsConflictNot500()
     {
-        var bookingStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
+        var bookingStart = TestDates.NextFridayUtc(2);
         var conflicting = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
             bookingStart, bookingStart.AddHours(1), 500, 0, "other-key");
         SetupEngineBasics(new[] { conflicting });
@@ -108,8 +124,8 @@ public class CreateBookingCommandHandlerTests
     {
         SetupEngineBasics();
         var existing = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
-            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
-            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, _idempotencyKey);
+            TestDates.NextFridayUtc(2),
+            TestDates.NextFridayUtc(2).AddHours(1), 500, 0, _idempotencyKey);
         existing.SetAccessCode("ABC123");
         _bookingRepo.Setup(r => r.GetByIdempotencyKeyAsync(_businessId, _idempotencyKey, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existing);
@@ -130,8 +146,8 @@ public class CreateBookingCommandHandlerTests
         SetupEngineBasics();
         // Same idempotency key but a different requested slot -> must NOT reuse the booking (409).
         var existing = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
-            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc),   // 11:00 Manila
-            new DateTime(2026, 8, 14, 4, 0, 0, DateTimeKind.Utc), 500, 0, _idempotencyKey);
+            TestDates.NextFridayUtc(3),   // 11:00 Manila
+            TestDates.NextFridayUtc(3).AddHours(1), 500, 0, _idempotencyKey);
         _bookingRepo.Setup(r => r.GetByIdempotencyKeyAsync(_businessId, _idempotencyKey, It.IsAny<CancellationToken>()))
             .ReturnsAsync(existing);
 
@@ -179,9 +195,9 @@ public class CancelBookingCommandHandlerTests
 
     private BookingEntity ConfirmedBooking()
     {
+        var start = TestDates.NextFridayUtc(2);
         var booking = new BookingEntity(_businessId, _serviceId, _staffId, _customerId,
-            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
-            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, "key-1");
+            start, start.AddHours(1), 500, 0, "key-1");
         booking.Confirm();
         return booking;
     }
@@ -196,10 +212,12 @@ public class CancelBookingCommandHandlerTests
 
     private Guid _ownerCustomerId;
 
-    private BookingEntity BookingForOwner() =>
-        new(_businessId, _serviceId, _staffId, _ownerCustomerId,
-            new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc),
-            new DateTime(2026, 8, 14, 3, 0, 0, DateTimeKind.Utc), 500, 0, "key-1");
+    private BookingEntity BookingForOwner()
+    {
+        var start = TestDates.NextFridayUtc(2);
+        return new BookingEntity(_businessId, _serviceId, _staffId, _ownerCustomerId,
+            start, start.AddHours(1), 500, 0, "key-1");
+    }
 
     [Fact]
     public async Task Handle_OwnerCancel_InvalidatesCacheAndSaves()
@@ -306,8 +324,8 @@ public class RescheduleBookingCommandHandlerTests
     [Fact]
     public async Task Handle_NewSlotTaken_Throws409_OriginalUntouched()
     {
-        var originalStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
-        var targetStart = new DateTime(2026, 8, 15, 2, 0, 0, DateTimeKind.Utc);
+        var originalStart = TestDates.NextFridayUtc(2).AddDays(-1);
+        var targetStart = TestDates.NextFridayUtc(2);
         var conflicting = new BookingEntity(_businessId, _serviceId, _staffId, Guid.NewGuid(),
             targetStart, targetStart.AddHours(1), 500, 0, "other");
 
@@ -330,8 +348,8 @@ public class RescheduleBookingCommandHandlerTests
     [Fact]
     public async Task Handle_SlotFree_ReschedulesAndInvalidates()
     {
-        var originalStart = new DateTime(2026, 8, 14, 2, 0, 0, DateTimeKind.Utc);
-        var targetStart = new DateTime(2026, 8, 15, 2, 0, 0, DateTimeKind.Utc);
+        var originalStart = TestDates.NextFridayUtc(2).AddDays(-1);
+        var targetStart = TestDates.NextFridayUtc(2);
         SetupOwner();
         SetupEngineFor(targetStart, null);
         var booking = Booking(originalStart, originalStart.AddHours(1));

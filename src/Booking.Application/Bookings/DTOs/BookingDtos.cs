@@ -21,6 +21,8 @@ public record SetBookingStatusRequest(BookingStatus Status);
 public record BookingResponse(
     Guid Id,
     Guid BusinessId,
+    string BusinessName,
+    string BusinessSlug,
     Guid ServiceId,
     string ServiceName,
     Guid StaffId,
