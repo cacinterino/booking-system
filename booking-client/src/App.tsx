@@ -10,6 +10,7 @@ import { RegisterPage } from './features/auth/pages/RegisterPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
+import { BookingWizardPage } from './features/booking/BookingWizardPage';
 import './style.css';
 
 function App() {
@@ -24,6 +25,9 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
             </Route>
+
+            {/* Guest booking wizard — fully anonymous */}
+            <Route path="/book/:businessSlug" element={<BookingWizardPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>

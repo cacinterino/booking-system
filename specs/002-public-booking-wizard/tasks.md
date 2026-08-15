@@ -64,15 +64,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Add `booking-client/src/features/booking/types.ts` — `PublicBusiness`, `PublicStaff`, `Service` (reuse), `AvailabilityResponse`, `CreateBookingRequest`, `BookingResponse` types per `contracts/booking-public-api.md`
-- [ ] T015 [P] [US1] Add `booking-client/src/features/booking/api.ts` — axios functions: `getPublicBusiness`, `getPublicServices`, `getPublicStaff`, `getAvailability`, `createBooking` (with `Idempotency-Key` header, `startTime` = slot `startUtc`, UTC `Z`), `getMyBookings`
-- [ ] T016 [P] [US1] Add TanStack Query hooks in `booking-client/src/features/booking/hooks.ts`
-- [ ] T017 [US1] Create `BookingWizardPage.tsx` in `booking-client/src/features/booking/BookingWizardPage.tsx` — step container (Service → Staff → DateTime → Details → Confirmation), friendly states for not-found/no-services/fully-booked (FR-014), register route `/book/:businessSlug` in `booking-client/src/App.tsx`
-- [ ] T018 [P] [US1] `ServiceStep` component in `booking-client/src/features/booking/components/ServiceStep.tsx` — active services with price/duration/category
-- [ ] T019 [P] [US1] `StaffStep` component in `booking-client/src/features/booking/components/StaffStep.tsx` — eligible staff for selected service (name only)
-- [ ] T020 [P] [US1] `DateTimeStep` component in `booking-client/src/features/booking/components/DateTimeStep.tsx` — pick date, fetch availability, render slots grouped by staff; **never synthesize times; use slot `startUtc` verbatim** (research decision 5)
-- [ ] T021 [P] [US1] `DetailsStep` component in `booking-client/src/features/booking/components/DetailsStep.tsx` — name, email (validated), optional phone; deposit disclosure when `requireDeposit` (FR-013)
-- [ ] T022 [US1] Wire the submit flow in `BookingWizardPage.tsx` — call `createBooking`, hold an idempotency key per wizard attempt, map 409/400/404 Problem Details to friendly messages, store the created booking for the confirmation screen
+- [X] T014 [P] [US1] Add `booking-client/src/features/booking/types.ts` — `PublicBusiness`, `PublicStaff`, `Service` (reuse), `AvailabilityResponse`, `CreateBookingRequest`, `BookingResponse` types per `contracts/booking-public-api.md`
+- [X] T015 [P] [US1] Add `booking-client/src/features/booking/api.ts` — axios functions: `getPublicBusiness`, `getPublicServices`, `getPublicStaff`, `getAvailability`, `createBooking` (with `Idempotency-Key` header, `startTime` = slot `startUtc`, UTC `Z`), `getMyBookings`
+- [X] T016 [P] [US1] Add TanStack Query hooks in `booking-client/src/features/booking/hooks.ts`
+- [X] T017 [US1] Create `BookingWizardPage.tsx` in `booking-client/src/features/booking/BookingWizardPage.tsx` — step container (Service → Staff → DateTime → Details → Confirmation), friendly states for not-found/no-services/fully-booked (FR-014), register route `/book/:businessSlug` in `booking-client/src/App.tsx`
+- [X] T018 [P] [US1] `ServiceStep` component in `booking-client/src/features/booking/components/ServiceStep.tsx` — active services with price/duration/category
+- [X] T019 [P] [US1] `StaffStep` component in `booking-client/src/features/booking/components/StaffStep.tsx` — eligible staff for selected service (name only)
+- [X] T020 [P] [US1] `DateTimeStep` component in `booking-client/src/features/booking/components/DateTimeStep.tsx` — pick date, fetch availability, render slots grouped by staff; **never synthesize times; use slot `startUtc` verbatim** (research decision 5)
+- [X] T021 [P] [US1] `DetailsStep` component in `booking-client/src/features/booking/components/DetailsStep.tsx` — name, email (validated), optional phone; deposit disclosure when `requireDeposit` (FR-013)
+- [X] T022 [US1] Wire the submit flow in `BookingWizardPage.tsx` — call `createBooking`, hold an idempotency key per wizard attempt, map 409/400/404 Problem Details to friendly messages, store the created booking for the confirmation screen
 
 **Checkpoint**: US1 fully functional and testable independently — a guest can book end-to-end.
 
@@ -86,8 +86,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Handle 409 in the submit path in `booking-client/src/features/booking/BookingWizardPage.tsx` — detect `status === 409`, show the conflict message, automatically refresh availability for the selected date
-- [ ] T024 [US2] Add "Slot just taken — here are the next free times" UI state in `booking-client/src/features/booking/components/DateTimeStep.tsx`; offer re-selection with the same idempotency key invalidated
+- [X] T023 [P] [US2] Handle 409 in the submit path in `booking-client/src/features/booking/BookingWizardPage.tsx` — detect `status === 409`, show the conflict message, automatically refresh availability for the selected date
+- [X] T024 [US2] Add "Slot just taken — here are the next free times" UI state in `booking-client/src/features/booking/components/DateTimeStep.tsx`; offer re-selection with the same idempotency key invalidated
 
 **Checkpoint**: US1 + US2 both work — race behaves per constitution III.
 
@@ -101,8 +101,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [P] [US3] `ConfirmationStep` component in `booking-client/src/features/booking/components/ConfirmationStep.tsx` — booking summary, reference, access code (FR-011), copy-to-clipboard for the code
-- [ ] T026 [US3] Add access-code lookup UI in `BookingWizardPage.tsx` (or a small `MyBookingLookup` component) — call `getMyBookings(accessCode)`, show upcoming booking(s) (FR-012); link from confirmation and the wizard entry
+- [X] T025 [P] [US3] `ConfirmationStep` component in `booking-client/src/features/booking/components/ConfirmationStep.tsx` — booking summary, reference, access code (FR-011), copy-to-clipboard for the code
+- [X] T026 [US3] Add access-code lookup UI in `BookingWizardPage.tsx` (or a small `MyBookingLookup` component) — call `getMyBookings(accessCode)`, show upcoming booking(s) (FR-012); link from confirmation and the wizard entry
 
 **Checkpoint**: US1–US3 all work — full guest journey.
 
@@ -116,8 +116,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify no account/auth is involved in the wizard flow in `booking-client/src/features/booking/` (US1 path is fully anonymous; remove any auth-gated component if one leaked in)
-- [ ] T028 [US4] Verify public staff rendering uses `PublicStaffResponse` name only and never requests/renders `email`, `phone`, or `avatarUrl` in `StaffStep.tsx` and `api.ts`
+- [X] T027 [US4] Verify no account/auth is involved in the wizard flow in `booking-client/src/features/booking/` (US1 path is fully anonymous; remove any auth-gated component if one leaked in)
+- [X] T028 [US4] Verify public staff rendering uses `PublicStaffResponse` name only and never requests/renders `email`, `phone`, or `avatarUrl` in `StaffStep.tsx` and `api.ts`
 
 **Checkpoint**: All four user stories independently functional.
 
@@ -129,8 +129,8 @@
 
 - [X] T029 [P] Run `dotnet test Booking.sln` (all unit + integration green, incl. existing 4.4 availability/booking tests untouched)
 - [X] T030 [P] Run `npm run build` (tsc + vite) in `booking-client/`
-- [ ] T031 Run the `quickstart.md` scenarios against the Docker stack (steps 1–6 incl. race smoke)
-- [ ] T032 Apply the Brass-Bound Ledger design system (DESIGN.md): warm paper surfaces, hairline borders, brass single-accent, Fraunces + IBM Plex, flat-by-default elevation across all wizard components
+- [X] T031 Run the `quickstart.md` scenarios against the Docker stack (steps 1–6 incl. race smoke)
+- [X] T032 Apply the Brass-Bound Ledger design system (DESIGN.md): warm paper surfaces, hairline borders, brass single-accent, Fraunces + IBM Plex, flat-by-default elevation across all wizard components
 - [ ] T033 Security review (human) of the `[AllowAnonymous]` public routes — confirm read-only, no PII, no write/role changes; sign off in `specs/002-public-booking-wizard/`
 - [ ] T034 Commit backend slice (Phase 2) separately, then client slice (Phases 3–7) separately on `feat/6.1-booking-wizard`; open PR → `main` with test results; update `REMAINING_TASKS_PLAN.md`
 
