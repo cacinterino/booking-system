@@ -11,6 +11,7 @@ import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
 import { BookingWizardPage } from './features/booking/BookingWizardPage';
+import { MyBookingsPage } from './features/booking/MyBookingsPage';
 import './style.css';
 
 function App() {
@@ -28,6 +29,9 @@ function App() {
 
             {/* Guest booking wizard — fully anonymous */}
             <Route path="/book/:businessSlug" element={<BookingWizardPage />} />
+
+            {/* Customer self-service — access code or signed-in customer */}
+            <Route path="/my-bookings" element={<MyBookingsPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>

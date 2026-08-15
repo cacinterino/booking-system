@@ -207,9 +207,14 @@ export function BookingWizardPage() {
     <div className="min-h-screen bg-paper">
       <header className="border-b border-line bg-paper-white/90 backdrop-blur">
         <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6">
-          <Link to="/" className="font-display text-xl font-bold text-ink">
-            Booked<span className="text-brass">.</span>
-          </Link>
+          <div className="flex items-center justify-between gap-4">
+            <Link to="/" className="font-display text-xl font-bold text-ink">
+              Booked<span className="text-brass">.</span>
+            </Link>
+            <Link to="/my-bookings" className="font-mono text-xs uppercase tracking-widest text-slate hover:text-ink transition-colors">
+              My bookings
+            </Link>
+          </div>
         </div>
       </header>
 
