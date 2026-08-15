@@ -7,6 +7,7 @@
   --color-paper: #F5F0E4;
   --color-paper-white: #FFFDF8;
   --color-brass: #B8862B;
+  --color-brass-deep: #806A28;
   --color-brass-soft: #D8AE5F;
   --color-sage: #4F7860;
   --color-slate: #5B6270;
@@ -48,7 +49,7 @@
   }
   
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg bg-brass text-paper-white hover:bg-brass-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-paper-white;
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium rounded-lg bg-brass text-ink hover:bg-brass-soft transition-colors focus:outline-none focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-paper-white;
   }
   
   .btn-secondary {
@@ -105,13 +106,6 @@
 
   .animate-marquee {
     animation: marquee 28s linear infinite;
-  }
-
-  .text-gradient-brass {
-    background: linear-gradient(120deg, #D8AE5F, #B8862B, #F2D5A0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
   }
 
   .bg-grid-faint {

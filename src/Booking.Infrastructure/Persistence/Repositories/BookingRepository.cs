@@ -22,6 +22,7 @@ public class BookingRepository : IBookingRepository
     public async Task<BookingEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _context.Bookings
+            .Include(b => b.Business)
             .Include(b => b.Service)
             .Include(b => b.Staff)
             .Include(b => b.Customer)
@@ -31,6 +32,7 @@ public class BookingRepository : IBookingRepository
     public async Task<BookingEntity?> GetByIdempotencyKeyAsync(Guid businessId, string idempotencyKey, CancellationToken cancellationToken)
     {
         return await _context.Bookings
+            .Include(b => b.Business)
             .Include(b => b.Service)
             .Include(b => b.Staff)
             .Include(b => b.Customer)
@@ -40,6 +42,7 @@ public class BookingRepository : IBookingRepository
     public async Task<IReadOnlyList<BookingEntity>> GetByCustomerAsync(Guid customerId, bool upcomingOnly, CancellationToken cancellationToken)
     {
         var query = _context.Bookings
+            .Include(b => b.Business)
             .Include(b => b.Service)
             .Include(b => b.Staff)
             .Where(b => b.CustomerId == customerId && b.Status != BookingStatus.Cancelled);
@@ -61,6 +64,7 @@ public class BookingRepository : IBookingRepository
         CancellationToken cancellationToken)
     {
         var query = _context.Bookings
+            .Include(b => b.Business)
             .Include(b => b.Service)
             .Include(b => b.Staff)
             .Include(b => b.Customer)

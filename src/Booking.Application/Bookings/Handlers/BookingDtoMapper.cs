@@ -13,6 +13,8 @@ internal static class BookingDtoMapper
         return new BookingResponse(
             booking.Id,
             booking.BusinessId,
+            booking.Business?.Name ?? string.Empty,
+            booking.Business?.Slug ?? string.Empty,
             booking.ServiceId,
             booking.Service?.Name ?? string.Empty,
             booking.StaffId,

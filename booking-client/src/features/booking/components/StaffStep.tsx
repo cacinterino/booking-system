@@ -26,7 +26,7 @@ export function StaffStep({ staff, selectedId, onSelect }: StaffStepProps) {
             selectedId === member.id ? 'border-brass ring-2 ring-brass ring-offset-2 ring-offset-paper' : ''
           }`}
         >
-          <h3 className="font-display text-lg font-semibold text-ink">{member.fullName}</h3>
+          <h2 className="font-display text-lg font-semibold text-ink">{member.fullName}</h2>
           <p className="mt-1 font-mono text-xs uppercase tracking-widest text-slate">Available for this service</p>
         </button>
       ))}

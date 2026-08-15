@@ -34,7 +34,7 @@ export function ConfirmationStep({ booking }: ConfirmationStepProps) {
   return (
     <div className="space-y-6">
       <div className="ticket text-center">
-        <p className="font-mono text-xs uppercase tracking-widest text-brass">You're booked</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">You're booked</p>
         <h2 className="mt-2 font-display text-2xl font-semibold text-ink">See you there</h2>
         <p className="mt-3 text-ink-soft">{booking.serviceName}</p>
         <p className="mt-1 text-ink-soft">with {booking.staffName}</p>
@@ -59,7 +59,7 @@ export function ConfirmationStep({ booking }: ConfirmationStepProps) {
 
         {booking.accessCode && (
           <div className="p-4 rounded-lg border border-brass/30 bg-brass/10">
-            <p className="font-mono text-xs uppercase tracking-widest text-brass">Your access code</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Your access code</p>
             <div className="mt-2 flex items-center justify-between gap-3">
               <p className="font-mono text-lg font-bold tracking-widest text-ink">{booking.accessCode}</p>
               <button type="button" onClick={copyCode} className="btn-secondary px-4 py-2 text-sm">

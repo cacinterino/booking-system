@@ -3,9 +3,11 @@ import type { Service } from '../services/types';
 import type {
   AvailabilityResponse,
   BookingResponse,
+  CancelBookingRequest,
   CreateBookingRequest,
   PublicBusiness,
   PublicStaff,
+  RescheduleBookingRequest,
 } from './types';
 
 export const publicBookingApi = {
@@ -49,6 +51,15 @@ export const publicBookingApi = {
     const { data } = await api.get('/api/bookings/my-bookings', {
       params: { accessCode, upcoming },
     });
+    return data;
+  },
+
+  async cancelBooking(id: string, payload: CancelBookingRequest): Promise<void> {
+    await api.post(`/api/bookings/${id}/cancel`, payload);
+  },
+
+  async rescheduleBooking(id: string, payload: RescheduleBookingRequest): Promise<BookingResponse> {
+    const { data } = await api.post(`/api/bookings/${id}/reschedule`, payload);
     return data;
   },
 };

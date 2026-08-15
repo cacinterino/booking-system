@@ -94,10 +94,11 @@ public class BookingLifecycleTests
         var service = new Service(business.Id, "Lifecycle Cut", 60, 500m);
         var staff = new Staff(business.Id, "Lyle", "Staff", "lyle.staff@example.com");
         staff.AddService(service.Id);
-        // Saturday 2026-08-15 at 10:00 Manila == 02:00 UTC.
-        var localDate = new DateOnly(2026, 8, 15);
-        var schedule = new StaffSchedule(staff.Id, localDate.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(17, 0, 0));
-        var startUtc = new DateTime(localDate.Year, localDate.Month, localDate.Day, 2, 0, 0, DateTimeKind.Utc);
+        // Book the first slot of a strictly-future day (09:00 Manila == 01:00 UTC)
+        // so the availability engine keeps it open and the time aligns to the interval.
+        var localDay = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8).Date.AddDays(3));
+        var schedule = new StaffSchedule(staff.Id, localDay.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(17, 0, 0));
+        var startUtc = new DateTime(localDay.Year, localDay.Month, localDay.Day, 1, 0, 0, DateTimeKind.Utc);
 
         db.Businesses.Add(business);
         db.Services.Add(service);
