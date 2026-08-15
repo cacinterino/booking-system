@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext';
 
 const adminLinks = [
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/staff/calendar', label: 'Calendar' },
   { to: '/admin/services', label: 'Services' },
 ];
 
 const staffLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/staff/calendar', label: 'Calendar' },
 ];
 
 export function Navbar() {
@@ -17,7 +18,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   const isAdmin = user?.roles.includes('Admin') ?? false;
-  const links = (isAdmin ? [...adminLinks, { to: '/staff', label: 'Staff' }] : staffLinks);
+  const links = (isAdmin ? [...adminLinks, { to: '/admin/staff', label: 'Staff' }] : staffLinks);
 
   const handleLogout = () => {
     logout();

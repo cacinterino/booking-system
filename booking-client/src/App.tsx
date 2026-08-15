@@ -10,6 +10,8 @@ import { RegisterPage } from './features/auth/pages/RegisterPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
+import { StaffDashboardPage } from './features/staff/StaffDashboardPage';
+import { AdminStaffPage } from './features/staff/AdminStaffPage';
 import { BookingWizardPage } from './features/booking/BookingWizardPage';
 import { MyBookingsPage } from './features/booking/MyBookingsPage';
 import './style.css';
@@ -39,6 +41,8 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/admin/services" element={<AdminServicesPage />} />
+                <Route path="/admin/staff" element={<AdminStaffPage />} />
+                <Route path="/staff/calendar" element={<StaffDashboardPage />} />
               </Route>
             </Route>
           </Routes>
