@@ -1,6 +1,7 @@
 using MediatR;
 using Booking.Application.Business.Interfaces;
 using Booking.Application.Business.Queries;
+using Booking.Application.Business.DTOs;
 using Booking.Application.Staff.DTOs;
 
 namespace Booking.Application.Business.Handlers;
@@ -51,5 +52,35 @@ public class GetMyWorkspaceQueryHandler : IRequestHandler<GetMyWorkspaceQuery, W
             .ToList();
 
         return new WorkspaceResponse(staffResponse, schedule, overrides, business.Id, business.Name, business.Slug);
+    }
+}
+
+public class GetPublicBusinessQueryHandler : IRequestHandler<GetPublicBusinessQuery, PublicBusinessResponse>
+{
+    private readonly IBusinessRepository _repository;
+
+    public GetPublicBusinessQueryHandler(IBusinessRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<PublicBusinessResponse> Handle(GetPublicBusinessQuery request, CancellationToken cancellationToken)
+    {
+        var business = await _repository.GetBySlugAsync(request.Slug, cancellationToken);
+        if (business == null)
+            throw new KeyNotFoundException("Business not found");
+
+        var settings = business.Settings;
+        return new PublicBusinessResponse(
+            business.Id,
+            business.Name,
+            business.Slug,
+            business.Description,
+            business.Timezone,
+            settings.RequireDeposit,
+            settings.DepositAmount,
+            settings.Currency,
+            settings.AdvanceBookingDays,
+            settings.SlotIntervalMinutes);
     }
 }

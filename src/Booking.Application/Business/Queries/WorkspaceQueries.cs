@@ -14,3 +14,5 @@ public record WorkspaceResponse(
     string BusinessName,
     string BusinessSlug
 );
+
+public record GetPublicBusinessQuery(string Slug) : IRequest<PublicBusinessResponse>;

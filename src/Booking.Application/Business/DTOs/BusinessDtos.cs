@@ -35,3 +35,16 @@ public record AcceptInvitationRequest(
     string LastName,
     string? PhoneNumber = null
 );
+
+public record PublicBusinessResponse(
+    Guid Id,
+    string Name,
+    string Slug,
+    string? Description,
+    string Timezone,
+    bool RequireDeposit,
+    decimal DepositAmount,
+    string Currency,
+    int AdvanceBookingDays,
+    int SlotIntervalMinutes
+);

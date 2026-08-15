@@ -71,3 +71,10 @@ public record StaffCalendarEntryResponse(
     OverrideResponse? Override,
     ScheduleEntryResponse? Schedule
 );
+
+public record PublicStaffResponse(
+    Guid Id,
+    string FullName,
+    int DisplayOrder,
+    IReadOnlyList<Guid> ServiceIds
+);

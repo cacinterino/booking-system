@@ -40,6 +40,8 @@
 
 - **Design system foundation committed on `feat/design-system-foundation`** — PRODUCT.md + DESIGN.md (Brass-Bound Ledger) + `.impeccable/design.json` sidecar; favicon + loading spinner rebranded (off-world indigo removed); Dockerfile.dev node_modules fix.
 - **Phase 6 first slice: public booking wizard** (`/book/:businessSlug`).
+  - **Backend slice DONE on `feat/6.1-booking-wizard`** (specs/002, PR pending): `PublicBookingController` (`[AllowAnonymous]` `api/public/businesses/{slug}` + `/services` + `/staff` + `/availability`), `GetPublicBusinessQuery` + `PublicBusinessResponse`, `PublicStaffResponse` + PII-stripping mapper; 5 new unit tests (64 passed incl. all new; 8 pre-existing date-sensitive booking tests fail on baseline too). Availability engine + booking write path untouched.
+  - **Client slice NEXT** (Phases 3–7): `features/booking/` wizard UI per `contracts/booking-public-api.md`.
 
 ---
 

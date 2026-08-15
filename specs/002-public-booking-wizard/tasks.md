@@ -40,17 +40,17 @@
 
 **Gates**: Availability engine and booking write path are NOT modified (constitution II + III). `[AllowAnonymous]` only on read-only public routes.
 
-- [ ] T003 [P] Add `PublicBusinessResponse` record (Id, Name, Slug, Description, Timezone, RequireDeposit, DepositAmount, Currency, AdvanceBookingDays, SlotIntervalMinutes) in `src/Booking.Application/Business/DTOs/BusinessDtos.cs`
-- [ ] T004 [P] Add `PublicStaffResponse` record (Id, FullName, DisplayOrder, ServiceIds — NO email/phone/avatar) in `src/Booking.Application/Staff/DTOs/StaffDtos.cs`
-- [ ] T005 Add `GetPublicBusinessQuery(string Slug)` + handler mapping `Business` + `BusinessSettings` to `PublicBusinessResponse`, throwing `KeyNotFoundException` on null slug, in `src/Booking.Application/Business/Queries/WorkspaceQueries.cs` and `src/Booking.Application/Business/Handlers/WorkspaceQueryHandler.cs`
-- [ ] T006 Add `PublicStaffResponse` mapper (from `StaffResponse`, dropping Email/Phone/AvatarUrl) in `src/Booking.Application/Staff/Handlers/StaffQueryHandlers.cs` (or a small static mapper class next to it)
-- [ ] T007 [P] Create `PublicBookingController` in `src/Booking.Api/Controllers/PublicBookingController.cs`: `[AllowAnonymous]`, route `api/public/businesses/{slug}`, injecting `IBusinessRepository.GetBySlugAsync` to resolve slug → businessId, 404 on unknown slug
-- [ ] T008 [US1] Add `GET api/public/businesses/{slug}` → `PublicBusinessResponse` in `src/Booking.Api/Controllers/PublicBookingController.cs` (dispatch T005 query)
-- [ ] T009 [US1] Add `GET api/public/businesses/{slug}/services` → `ServiceResponse[]` (active only) in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetServicesQuery`, `IncludeInactive: false`)
-- [ ] T010 [US1] Add `GET api/public/businesses/{slug}/staff?serviceId=` → `PublicStaffResponse[]` (PII stripped) in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetStaffQuery` / `GetStaffByServiceQuery` + T006 mapper)
-- [ ] T011 [US1] Add `GET api/public/businesses/{slug}/availability?serviceId=&date=&staffId=` → `AvailabilityResponse` in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetAvailabilityQuery` unchanged; inject slug-resolved businessId)
-- [ ] T012 [P] Unit tests for `GetPublicBusinessQueryHandler` (slug resolve, unknown-slug 404, settings mapped) in `tests/Booking.UnitTests/Business/PublicBusinessQueryTests.cs`
-- [ ] T013 [P] Unit tests for the public staff mapper (PII stripped, serviceIds preserved) in `tests/Booking.UnitTests/Staff/PublicStaffMapperTests.cs`
+- [X] T003 [P] Add `PublicBusinessResponse` record (Id, Name, Slug, Description, Timezone, RequireDeposit, DepositAmount, Currency, AdvanceBookingDays, SlotIntervalMinutes) in `src/Booking.Application/Business/DTOs/BusinessDtos.cs`
+- [X] T004 [P] Add `PublicStaffResponse` record (Id, FullName, DisplayOrder, ServiceIds — NO email/phone/avatar) in `src/Booking.Application/Staff/DTOs/StaffDtos.cs`
+- [X] T005 Add `GetPublicBusinessQuery(string Slug)` + handler mapping `Business` + `BusinessSettings` to `PublicBusinessResponse`, throwing `KeyNotFoundException` on null slug, in `src/Booking.Application/Business/Queries/WorkspaceQueries.cs` and `src/Booking.Application/Business/Handlers/WorkspaceQueryHandler.cs`
+- [X] T006 Add `PublicStaffResponse` mapper (from `StaffResponse`, dropping Email/Phone/AvatarUrl) in `src/Booking.Application/Staff/Handlers/StaffQueryHandlers.cs` (or a small static mapper class next to it)
+- [X] T007 [P] Create `PublicBookingController` in `src/Booking.Api/Controllers/PublicBookingController.cs`: `[AllowAnonymous]`, route `api/public/businesses/{slug}`, injecting `IBusinessRepository.GetBySlugAsync` to resolve slug → businessId, 404 on unknown slug
+- [X] T008 [US1] Add `GET api/public/businesses/{slug}` → `PublicBusinessResponse` in `src/Booking.Api/Controllers/PublicBookingController.cs` (dispatch T005 query)
+- [X] T009 [US1] Add `GET api/public/businesses/{slug}/services` → `ServiceResponse[]` (active only) in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetServicesQuery`, `IncludeInactive: false`)
+- [X] T010 [US1] Add `GET api/public/businesses/{slug}/staff?serviceId=` → `PublicStaffResponse[]` (PII stripped) in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetStaffQuery` / `GetStaffByServiceQuery` + T006 mapper)
+- [X] T011 [US1] Add `GET api/public/businesses/{slug}/availability?serviceId=&date=&staffId=` → `AvailabilityResponse` in `src/Booking.Api/Controllers/PublicBookingController.cs` (reuse `GetAvailabilityQuery` unchanged; inject slug-resolved businessId)
+- [X] T012 [P] Unit tests for `GetPublicBusinessQueryHandler` (slug resolve, unknown-slug 404, settings mapped) in `tests/Booking.UnitTests/Business/PublicBusinessQueryTests.cs`
+- [X] T013 [P] Unit tests for the public staff mapper (PII stripped, serviceIds preserved) in `tests/Booking.UnitTests/Staff/PublicStaffMapperTests.cs`
 
 **Checkpoint**: Foundation ready — public discovery API complete and unit-tested; all 4 endpoints in `contracts/booking-public-api.md` callable anonymously. **This is the backend slice; commit + PR here per one-slice-per-session.**
 
@@ -127,8 +127,8 @@
 
 **Purpose**: Integration, validation, and slice handoff.
 
-- [ ] T029 [P] Run `dotnet test Booking.sln` (all unit + integration green, incl. existing 4.4 availability/booking tests untouched)
-- [ ] T030 [P] Run `npm run build` (tsc + vite) in `booking-client/`
+- [X] T029 [P] Run `dotnet test Booking.sln` (all unit + integration green, incl. existing 4.4 availability/booking tests untouched)
+- [X] T030 [P] Run `npm run build` (tsc + vite) in `booking-client/`
 - [ ] T031 Run the `quickstart.md` scenarios against the Docker stack (steps 1–6 incl. race smoke)
 - [ ] T032 Apply the Brass-Bound Ledger design system (DESIGN.md): warm paper surfaces, hairline borders, brass single-accent, Fraunces + IBM Plex, flat-by-default elevation across all wizard components
 - [ ] T033 Security review (human) of the `[AllowAnonymous]` public routes — confirm read-only, no PII, no write/role changes; sign off in `specs/002-public-booking-wizard/`
