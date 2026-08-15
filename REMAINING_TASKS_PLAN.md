@@ -1,10 +1,10 @@
 # Remaining Tasks Plan - Appointment Booking System
 
-**Updated:** 2026-08-08  
-**Status:** Phases 1-3 (Auth API + Frontend) ✅ · Phase 4 backend core ✅ (4.1/4.2/4.3) · **4.4 Booking Flow committed on `feat/4.4-booking`**  
+**Updated:** 2026-08-15  
+**Status:** Phases 1-3 (Auth API + Frontend) ✅ · Phase 4 backend core ✅ (4.1/4.2/4.3/4.4) · **4.4 Booking Flow MERGED to `main`** · **Phase 6 frontend STARTED**  
 **Important decisions** (from working session):
 - **PayMongo (4.5) is SKIPPED** for now — deposits are optional (`BusinessSettings.RequireDeposit = false`) so bookings work without a payment gateway. Plan section kept for future.
-- **4.4 is implemented and validated end-to-end against the Docker API** (create, idempotent retry, race → one 201 + one 409, my-bookings, cancel, reschedule, calendar, status transitions). Branch `feat/4.4-booking` is ahead of origin and NOT yet merged to `main`.
+- **4.4 is implemented and validated end-to-end against the Docker API** (create, idempotent retry, race → one 201 + one 409, my-bookings, cancel, reschedule, calendar, status transitions). **Merged to `main` via PR #10** (merge commit `8eec249`). Design system documented in `PRODUCT.md` + `DESIGN.md` (Brass-Bound Ledger).
 
 ---
 
@@ -32,13 +32,14 @@
 | 4.4 | **Booking Flow backend** — create (idempotent + double-booking 409), my-bookings, cancel, reschedule, list, calendar, status transitions; Manila-boundary DTO conversion; rate limiting on POST /api/bookings | ✅ |
 | 7.2 | Testcontainers integration tests: **7 passing** (concurrency race, adjacent-slot regression, overlap 409, lifecycle, staff lifecycle, list/calendar/status) | ✅ |
 
-**Current branch:** `feat/4.4-booking` (working branch; NOT merged to `main`). US1/US2/US3 + polish committed; ready for PR.
+**Current branch:** `feat/design-system-foundation` (branched off `main`; design-system docs + client polish). PR #10 (`feat/4.4-booking` → `main`) **MERGED** (merge commit `8eec249`). Next: Phase 6 frontend — public booking wizard first.
 
 ---
 
 ## 🔄 IN PROGRESS
 
-- **Merging `feat/4.4-booking` to `main`** via PR (US1–US3 + polish committed; full suite green: 66 unit + 7 integration). T046 security review (human) still outstanding before merge.
+- **Design system foundation committed on `feat/design-system-foundation`** — PRODUCT.md + DESIGN.md (Brass-Bound Ledger) + `.impeccable/design.json` sidecar; favicon + loading spinner rebranded (off-world indigo removed); Dockerfile.dev node_modules fix.
+- **Phase 6 first slice: public booking wizard** (`/book/:businessSlug`).
 
 ---
 
