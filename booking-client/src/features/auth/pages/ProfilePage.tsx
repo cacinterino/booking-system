@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../../shared/context/AuthContext';
 import type { UserDto } from '../../../shared/types/auth';
+import { Card } from '../../../shared/ui/Card';
+import { Input } from '../../../shared/ui/Input';
+import { Button } from '../../../shared/ui/Button';
 
 interface ProfileForm {
   firstName: string;
@@ -45,9 +48,12 @@ export function ProfilePage() {
   return (
     <div className="min-h-screen bg-paper py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="card">
+        <Card>
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-ink font-display">Profile</h1>
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1">Profile</p>
+              <h1 className="text-3xl font-bold text-ink font-display">Profile</h1>
+            </div>
             <button
               onClick={handleLogout}
               className="btn-danger text-sm py-2 px-4"
@@ -57,10 +63,9 @@ export function ProfilePage() {
           </div>
 
           {message && (
-            <div className={`mb-6 p-4 rounded-lg ${
-              message.type === 'success' 
-                ? 'bg-green-50 text-green-600 border border-green-200' 
-                : 'bg-red-50 text-red-600 border border-red-200'
+            <div className={`mb-6 p-4 rounded-lg ${message.type === 'success'
+              ? 'bg-green-50 text-green-600 border border-green-200'
+              : 'bg-red-50 text-red-600 border border-red-200'
             }`} role="alert">
               {message.text}
             </div>
@@ -68,54 +73,56 @@ export function ProfilePage() {
 
           <div className="space-y-8">
             <div className="border-b border-line pb-8">
+              <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1">Personal Information</p>
               <h2 className="text-lg font-medium text-ink mb-6 font-display">Personal Information</h2>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="firstName" className="label-field">First Name</label>
-                    <input
+                    <Input
+                      label="First Name"
                       id="firstName"
                       {...register('firstName', { required: 'First name is required' })}
-                      className={`input-field ${errors.firstName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
-                      aria-invalid={errors.firstName ? 'true' : 'false'}
-                      aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+                      error={errors.firstName ? true : false}
                     />
-                    {errors.firstName && <p id="firstName-error" className="mt-1 text-sm text-red-600" role="alert">{errors.firstName.message}</p>}
+                    {errors.firstName && (
+                      <p id="firstName-error" className="mt-1 text-sm text-red-600" role="alert">
+                        {errors.firstName.message}
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="label-field">Last Name</label>
-                    <input
+                    <Input
+                      label="Last Name"
                       id="lastName"
                       {...register('lastName', { required: 'Last name is required' })}
-                      className={`input-field ${errors.lastName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
-                      aria-invalid={errors.lastName ? 'true' : 'false'}
-                      aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+                      error={errors.lastName ? true : false}
                     />
-                    {errors.lastName && <p id="lastName-error" className="mt-1 text-sm text-red-600" role="alert">{errors.lastName.message}</p>}
+                    {errors.lastName && (
+                      <p id="lastName-error" className="mt-1 text-sm text-red-600" role="alert">
+                        {errors.lastName.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="phoneNumber" className="label-field">Phone Number</label>
-                  <input
+                  <Input
+                    label="Phone Number"
                     id="phoneNumber"
                     {...register('phoneNumber')}
-                    className="input-field"
                   />
                 </div>
 
                 <div>
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                  >
+                  <Button type="submit">
                     Save Changes
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
 
             <div className="border-b border-line pb-8">
+              <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1">Account Information</p>
               <h2 className="text-lg font-medium text-ink mb-6 font-display">Account Information</h2>
               <dl className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -129,7 +136,7 @@ export function ProfilePage() {
               </dl>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
