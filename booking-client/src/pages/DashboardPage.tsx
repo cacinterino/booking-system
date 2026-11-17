@@ -57,7 +57,7 @@ export function DashboardPage() {
           {stats.map((stat, i) => (
             <div key={i} className="card hover:shadow-lg transition-shadow group">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-slate">{stat.label}</h3>
+                <h2 className="text-sm font-medium text-slate">{stat.label}</h2>
                 <div className="p-2 bg-brass/10 rounded-lg text-brass group-hover:bg-brass/20 transition-colors">
                   {stat.icon}
                 </div>

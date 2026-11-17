@@ -53,6 +53,8 @@ export interface CreateBookingRequest {
 export interface BookingResponse {
   id: string;
   businessId: string;
+  businessName: string;
+  businessSlug: string;
   serviceId: string;
   serviceName: string;
   staffId: string;
@@ -66,3 +68,21 @@ export interface BookingResponse {
   notes?: string | null;
   accessCode?: string | null;
 }
+
+export interface CancelBookingRequest {
+  reason?: string | null;
+  accessCode?: string | null;
+}
+
+export interface RescheduleBookingRequest {
+  startTime: string;
+  accessCode?: string | null;
+}
+
+export const BookingStatusLabel: Record<number, string> = {
+  1: 'Pending',
+  2: 'Confirmed',
+  3: 'Cancelled',
+  4: 'Completed',
+  5: 'No-show',
+};

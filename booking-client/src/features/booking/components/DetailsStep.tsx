@@ -94,7 +94,7 @@ export function DetailsStep({ business, onConfirm, submitting, error }: DetailsS
 
       {business.requireDeposit && (
         <div className="p-4 rounded-lg border border-brass/30 bg-brass/10">
-          <p className="font-mono text-xs uppercase tracking-widest text-brass">Deposit required</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Deposit required</p>
           <p className="mt-1 text-sm text-ink">
             {new Intl.NumberFormat('en-PH', { style: 'currency', currency: business.currency }).format(
               business.depositAmount,

@@ -7,10 +7,15 @@ import { queryClient } from './shared/api/queryClient';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { RegisterPage } from './features/auth/pages/RegisterPage';
+import { RegisterBusinessPage } from './features/auth/pages/RegisterBusinessPage';
+import { AcceptInvitationPage } from './features/auth/pages/AcceptInvitationPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
+import { StaffDashboardPage } from './features/staff/StaffDashboardPage';
+import { AdminStaffPage } from './features/staff/AdminStaffPage';
 import { BookingWizardPage } from './features/booking/BookingWizardPage';
+import { MyBookingsPage } from './features/booking/MyBookingsPage';
 import './style.css';
 
 function App() {
@@ -24,10 +29,17 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/register-business" element={<RegisterBusinessPage />} />
             </Route>
+
+            {/* Public booking + invitation links — always reachable */}
+            <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
 
             {/* Guest booking wizard — fully anonymous */}
             <Route path="/book/:businessSlug" element={<BookingWizardPage />} />
+
+            {/* Customer self-service — access code or signed-in customer */}
+            <Route path="/my-bookings" element={<MyBookingsPage />} />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
@@ -35,6 +47,8 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/admin/services" element={<AdminServicesPage />} />
+                <Route path="/admin/staff" element={<AdminStaffPage />} />
+                <Route path="/staff/calendar" element={<StaffDashboardPage />} />
               </Route>
             </Route>
           </Routes>

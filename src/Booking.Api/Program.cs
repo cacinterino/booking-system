@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Booking.Application.Auth.Commands.RegisterCommand).Assembly));
 
 // Public (anonymous) booking creation is rate limited per IP to blunt spam/abuse.

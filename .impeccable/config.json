@@ -1,0 +1,19 @@
+{
+  "detector": {
+    "ignoreRules": [
+      "cream-palette",
+      "kicker-above-heading",
+      "overused-font",
+      "marquee",
+      "codex-grid-background",
+      "em-dash-overuse",
+      "clipped-overflow-container"
+    ],
+    "ignoreFiles": [],
+    "ignoreValues": []
+  },
+  "designSystem": {
+    "enabled": true
+  },
+  "note": "cream-palette is suppressed because the committed design system (DESIGN.md / .impeccable/design.json) explicitly declares Warm Paper #F5F0E4 as the canonical page background via the Warm Paper Rule. The detector fires on any warm off-white surface, which would flag the brand's own paper token. kicker-above-heading is suppressed because DESIGN.md's The Eyebrow Rule mandates uppercase mono brass eyebrows directly above serif headlines as the system's signature rhythm (\"If a section has a headline, it earns an eyebrow\"). overused-font is suppressed because DESIGN.md pins Fraunces as the display/serif headline face and IBM Plex Mono for labels — the exact pairing the brand specifies. marquee is suppressed because .impeccable/design.json pins the landing use-case stack strip marquee as an explicit design token (\"Landing stack strip marquee\"). codex-grid-background is suppressed (and advisory) because the faint hairline grid on the dark hero is the ledger-page motif the brand's brass-bound-ledger concept calls for. em-dash-overuse is suppressed because it is advisory and the flagged em-dashes are legitimate pauses in landing marketing copy. clipped-overflow-container is suppressed because the dark hero section must clip its decorative brass/sage glow orbs (blurred 110px radial blobs positioned beyond the section edge) — the clip is what makes the \"brass glows\" the brief calls for bleed off the section edge; the only positioned children it clips are those decorative orbs and the mobile-hidden floating tickets."
+}

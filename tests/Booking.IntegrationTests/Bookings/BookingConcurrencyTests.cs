@@ -161,8 +161,8 @@ public class BookingConcurrencyTests
         var service = new Service(business.Id, "Express Cut", 60, 500m);
         var staff = new Staff(business.Id, "Race", "Staff", $"{slug}.staff@example.com");
         staff.AddService(service.Id);
-        // Friday 2026-08-14 at 10:00 Manila == 02:00 UTC.
-        var localDate = new DateOnly(2026, 8, 14);
+        // First slot of a strictly-future day (10:00 Manila == 02:00 UTC, interval-aligned).
+        var localDate = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8).Date.AddDays(3));
         var schedule = new StaffSchedule(staff.Id, localDate.DayOfWeek, new TimeSpan(9, 0, 0), new TimeSpan(17, 0, 0));
         var startUtc = new DateTime(localDate.Year, localDate.Month, localDate.Day, 2, 0, 0, DateTimeKind.Utc);
 

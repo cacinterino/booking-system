@@ -234,7 +234,7 @@ export function AdminServicesPage() {
 
                 <h2 className="font-display text-lg font-semibold text-ink mb-1">{service.name}</h2>
                 {service.categoryName && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-brass/10 text-brass text-xs font-medium mb-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-brass/10 text-brass-deep text-xs font-medium mb-2">
                     {service.categoryName}
                   </span>
                 )}

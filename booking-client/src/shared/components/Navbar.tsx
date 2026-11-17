@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext';
 
 const adminLinks = [
   { to: '/dashboard', label: 'Dashboard' },
+  { to: '/staff/calendar', label: 'Calendar' },
   { to: '/admin/services', label: 'Services' },
 ];
 
 const staffLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/staff/calendar', label: 'Calendar' },
 ];
 
 export function Navbar() {
@@ -17,7 +18,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   const isAdmin = user?.roles.includes('Admin') ?? false;
-  const links = (isAdmin ? [...adminLinks, { to: '/staff', label: 'Staff' }] : staffLinks);
+  const links = (isAdmin ? [...adminLinks, { to: '/admin/staff', label: 'Staff' }] : staffLinks);
 
   const handleLogout = () => {
     logout();
@@ -39,7 +40,7 @@ export function Navbar() {
                 to={link.to}
                 className={({ isActive }) =>
                   `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive ? 'text-brass bg-brass/10' : 'text-slate hover:text-ink hover:bg-ink/5'
+                    isActive ? 'text-brass-deep bg-brass/10' : 'text-slate hover:text-ink hover:bg-ink/5'
                   }`
                 }
               >
@@ -53,11 +54,11 @@ export function Navbar() {
               to="/profile"
               className={({ isActive }) =>
                 `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive ? 'text-brass bg-brass/10' : 'text-ink hover:bg-ink/5'
+                  isActive ? 'text-brass-deep bg-brass/10' : 'text-ink hover:bg-ink/5'
                 }`
               }
             >
-              <span className="w-7 h-7 rounded-full bg-brass/15 text-brass flex items-center justify-center font-semibold">
+              <span className="w-7 h-7 rounded-full bg-brass/15 text-brass-deep flex items-center justify-center font-semibold">
                 {user?.fullName?.[0]?.toUpperCase() ?? '?'}
               </span>
               <span className="hidden lg:inline">{user?.fullName?.split(' ')[0]}</span>
@@ -96,7 +97,7 @@ export function Navbar() {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `block px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive ? 'text-brass bg-brass/10' : 'text-ink hover:bg-ink/5'
+                    isActive ? 'text-brass-deep bg-brass/10' : 'text-ink hover:bg-ink/5'
                   }`
                 }
               >

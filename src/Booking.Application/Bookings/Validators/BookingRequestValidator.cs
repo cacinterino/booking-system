@@ -23,9 +23,6 @@ public class CreateBookingRequestValidator : AbstractValidator<CreateBookingRequ
         RuleFor(x => x.Notes)
             .MaximumLength(500).WithMessage("Notes cannot exceed 500 characters")
             .When(x => !string.IsNullOrEmpty(x.Notes));
-
-        RuleFor(x => x.GuestContact)
-            .NotNull().WithMessage("Contact information is required for guest bookings");
     }
 
     private static bool BeInFuture(DateTime startTime)

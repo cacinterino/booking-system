@@ -32,11 +32,11 @@ export function ServiceStep({ services, selectedId, onSelect }: ServiceStepProps
         >
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="font-display text-lg font-semibold text-ink">{service.name}</h3>
+              <h2 className="font-display text-lg font-semibold text-ink">{service.name}</h2>
               {service.description && <p className="mt-1 text-sm text-slate">{service.description}</p>}
             </div>
             <div className="text-right shrink-0">
-              <p className="font-mono text-sm font-medium text-brass">{formatPrice(service.price)}</p>
+              <p className="font-mono text-sm font-medium text-brass-deep">{formatPrice(service.price)}</p>
               <p className="mt-1 font-mono text-xs text-slate">{service.durationMinutes} min</p>
             </div>
           </div>
