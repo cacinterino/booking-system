@@ -141,6 +141,7 @@ export function AdminServicesPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Services</p>
             <h1 className="font-display text-3xl font-bold text-ink">Services</h1>
             <p className="text-slate mt-1">Manage what you offer, pricing, and categories</p>
           </div>
@@ -242,7 +243,7 @@ export function AdminServicesPage() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-line">
                   <span className="text-sm text-slate">{formatDuration(service.durationMinutes)}</span>
-                  <span className="font-display font-bold text-ink">{formatPrice(service.price)}</span>
+                  <span className="font-mono font-bold text-ink">{formatPrice(service.price)}</span>
                 </div>
               </div>
             ))}

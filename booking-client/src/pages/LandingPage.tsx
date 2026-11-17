@@ -204,7 +204,7 @@ export function LandingPage() {
             >
               <div className="relative mx-auto max-w-md">
                 <div className="absolute -inset-4 bg-gradient-to-br from-brass/30 to-transparent rounded-3xl blur-2xl" aria-hidden="true" />
-                <div className="ticket !rotate-0 shadow-2xl">
+                <div className="ticket !rotate-0 hover:shadow-xl">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-xs font-medium text-slate uppercase tracking-widest">Upcoming</p>
@@ -236,7 +236,7 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -bottom-24 -left-8 ticket-plain !rotate-3 w-44 shadow-xl animate-float-slow">
+                <div className="absolute -bottom-24 -left-8 ticket-plain !rotate-3 w-44 animate-float-slow">
                   <div className="flex items-center gap-3">
                     <span className="w-9 h-9 rounded-lg bg-brass/15 flex items-center justify-center text-brass">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -249,7 +249,7 @@ export function LandingPage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -top-20 -right-8 ticket-plain !-rotate-2 w-40 shadow-xl animate-float">
+                <div className="absolute -top-20 -right-8 ticket-plain !-rotate-2 w-40 animate-float">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-sage" />
                     <p className="text-sm font-semibold text-ink">Slot confirmed</p>
