@@ -12,6 +12,8 @@ import {
   useDeleteCategory,
 } from './hooks';
 import type { Service, ServiceCategory } from './types';
+import { Card, Badge, Button, SectionHeader, EmptyState, LoadingSkeleton, Modal } from '../../shared/ui';
+import { formatPhp } from '../booking/format';
 
 interface ServiceFormValues {
   name: string;
@@ -38,10 +40,6 @@ const emptyServiceForm: ServiceFormValues = {
   color: '#B8862B',
   isActive: true,
 };
-
-function formatPrice(value: number): string {
-  return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(value);
-}
 
 function formatDuration(minutes: number): string {
   const h = Math.floor(minutes / 60);
@@ -99,8 +97,8 @@ export function AdminServicesPage() {
       description: values.description || null,
       color: values.color || null,
       isActive: values.isActive,
-      displayOrder: 0,
     };
+
     if (serviceModal.editing) {
       await updateService.mutateAsync({ id: serviceModal.editing.id, payload });
     } else {
@@ -110,17 +108,26 @@ export function AdminServicesPage() {
   });
 
   const openCreateCategory = () => {
-    categoryForm.reset({ name: '', description: '', displayOrder: 0 });
+    categoryForm.reset({ name: '', description: '', displayOrder: (categories?.length ?? 0) + 1 });
     setCategoryModal({ open: true });
   };
 
   const openEditCategory = (category: ServiceCategory) => {
-    categoryForm.reset({ name: category.name, description: category.description ?? '', displayOrder: category.displayOrder });
+    categoryForm.reset({
+      name: category.name,
+      description: category.description ?? '',
+      displayOrder: category.displayOrder,
+    });
     setCategoryModal({ open: true, editing: category });
   };
 
   const onCategorySubmit = categoryForm.handleSubmit(async (values) => {
-    const payload = { name: values.name, description: values.description || null, displayOrder: values.displayOrder };
+    const payload = {
+      name: values.name,
+      description: values.description || null,
+      displayOrder: Number(values.displayOrder),
+    };
+
     if (categoryModal.editing) {
       await updateCategory.mutateAsync({ id: categoryModal.editing.id, payload });
     } else {
@@ -137,364 +144,466 @@ export function AdminServicesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-paper py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-10">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-line">
           <div>
-            <h1 className="font-display text-3xl font-bold text-ink">Services</h1>
-            <p className="text-slate mt-1">Manage what you offer, pricing, and categories</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1.5">
+              Offerings &amp; Catalog
+            </p>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink">
+              Services &amp; Pricing
+            </h1>
+            <p className="text-slate text-sm sm:text-base mt-1">
+              Configure available service offerings, durations, and pricing in Philippine Pesos.
+            </p>
           </div>
           {isAdmin && (
-            <div className="flex gap-3">
-              <button onClick={openCreateCategory} className="btn-secondary text-sm">New Category</button>
-              <button onClick={openCreateService} className="btn-primary text-sm">New Service</button>
+            <div className="flex items-center gap-3">
+              <Button onClick={openCreateCategory} variant="secondary" size="sm">
+                New Category
+              </Button>
+              <Button onClick={openCreateService} variant="primary" size="sm">
+                + New Service
+              </Button>
             </div>
           )}
         </div>
 
         {isAdmin && (
-          <div className="mb-6">
-            <label className="inline-flex items-center gap-2 text-sm text-slate cursor-pointer">
+          <div className="flex items-center justify-between">
+            <label className="inline-flex items-center gap-2 text-xs font-mono uppercase text-slate cursor-pointer">
               <input
                 type="checkbox"
                 checked={includeInactive}
                 onChange={(e) => setIncludeInactive(e.target.checked)}
-                className="w-4 h-4 accent-brass"
+                className="w-4 h-4 rounded border-line text-brass focus:ring-brass"
               />
-              Show inactive services
+              Show archived / inactive services
             </label>
           </div>
         )}
 
-        {/* Services list */}
+        {/* Services List */}
         {servicesLoading && (
-          <div className="space-y-3">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="h-5 bg-ink/10 rounded w-1/3 mb-3" />
-                <div className="h-4 bg-ink/10 rounded w-1/4" />
-              </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <LoadingSkeleton key={i} className="h-48 w-full" />
             ))}
           </div>
         )}
 
         {servicesError && (
-          <div className="card border-red-200 bg-red-50 text-red-700" role="alert">
-            Failed to load services. Please try again.
+          <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+            Failed to load services. Please refresh your browser or try again later.
           </div>
         )}
 
         {!servicesLoading && !servicesError && services && services.length === 0 && (
-          <div className="card text-center py-16">
-            <h2 className="font-display text-xl font-semibold text-ink">No services yet</h2>
-            <p className="text-slate mt-2 mb-6">Add your first service to start taking bookings.</p>
-            {isAdmin && (
-              <button onClick={openCreateService} className="btn-primary text-sm">
-                Add your first service
-              </button>
-            )}
-          </div>
+          <Card>
+            <EmptyState
+              title="No services added yet"
+              description="Add your first service to enable customers to book appointments online."
+              icon={
+                <svg className="w-8 h-8 text-brass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              }
+              action={
+                isAdmin && (
+                  <Button onClick={openCreateService} variant="primary" size="sm">
+                    Add your first service
+                  </Button>
+                )
+              }
+            />
+          </Card>
         )}
 
         {!servicesLoading && !servicesError && services && services.length > 0 && (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
-              <div key={service.id} className={`card hover:shadow-lg transition-shadow ${!service.isActive ? 'opacity-60' : ''}`}>
-                <div className="flex items-start justify-between mb-4">
-                  <span
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-paper-white font-display font-bold text-lg shrink-0"
-                    style={{ backgroundColor: service.color || '#B8862B' }}
-                    aria-hidden="true"
-                  >
-                    {service.name.charAt(0).toUpperCase()}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => openEditService(service)}
-                      className="text-slate hover:text-ink transition-colors p-1"
-                      aria-label={`Edit ${service.name}`}
+              <Card
+                key={service.id}
+                className={`flex flex-col justify-between ${!service.isActive ? 'opacity-60 bg-paper/30' : ''}`}
+              >
+                <div>
+                  <div className="flex items-start justify-between mb-3">
+                    <span
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-paper-white font-display font-bold text-lg shrink-0 shadow-xs"
+                      style={{ backgroundColor: service.color || '#B8862B' }}
+                      aria-hidden="true"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    {isAdmin && (
+                      {service.name.charAt(0).toUpperCase()}
+                    </span>
+                    <div className="flex items-center gap-1">
                       <button
-                        onClick={() => setDeleteTarget({ type: 'service', id: service.id, name: service.name })}
-                        className="text-slate hover:text-red-600 transition-colors p-1"
-                        aria-label={`Delete ${service.name}`}
+                        onClick={() => openEditService(service)}
+                        className="text-slate hover:text-ink transition-colors p-1.5 rounded-md hover:bg-ink/5"
+                        aria-label={`Edit ${service.name}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => setDeleteTarget({ type: 'service', id: service.id, name: service.name })}
+                          className="text-slate hover:text-red-600 transition-colors p-1.5 rounded-md hover:bg-red-50"
+                          aria-label={`Delete ${service.name}`}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className="font-display text-lg font-bold text-ink">
+                    {service.name}
+                  </h3>
+
+                  <div className="flex flex-wrap items-center gap-2 mt-1 mb-2">
+                    {service.categoryName && (
+                      <Badge variant="brass">
+                        {service.categoryName}
+                      </Badge>
+                    )}
+                    {!service.isActive && (
+                      <Badge variant="slate">
+                        Archived
+                      </Badge>
                     )}
                   </div>
+
+                  <p className="text-slate text-sm line-clamp-2 mt-2">
+                    {service.description || 'No description provided.'}
+                  </p>
                 </div>
 
-                <h2 className="font-display text-lg font-semibold text-ink mb-1">{service.name}</h2>
-                {service.categoryName && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-brass/10 text-brass-deep text-xs font-medium mb-2">
-                    {service.categoryName}
+                <div className="flex items-center justify-between pt-4 mt-4 border-t border-line text-sm">
+                  <span className="text-slate font-mono text-xs flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-slate" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {formatDuration(service.durationMinutes)}
                   </span>
-                )}
-                <p className="text-slate text-sm line-clamp-2 mb-4">{service.description || 'No description'}</p>
-
-                <div className="flex items-center justify-between pt-4 border-t border-line">
-                  <span className="text-sm text-slate">{formatDuration(service.durationMinutes)}</span>
-                  <span className="font-display font-bold text-ink">{formatPrice(service.price)}</span>
+                  <span className="font-display font-bold text-base text-ink">
+                    {formatPhp(service.price)}
+                  </span>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
 
-        {/* Categories section */}
-        <div className="mt-12">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display text-xl font-semibold text-ink">Categories</h2>
+        {/* Categories Section */}
+        <div className="pt-8 border-t border-line">
+          <SectionHeader
+            eyebrow="Taxonomy"
+            headline="Service Categories"
+            description="Group related services together on your public booking page."
+          >
             {isAdmin && (
-              <button onClick={openCreateCategory} className="btn-secondary text-sm">
-                New Category
-              </button>
+              <Button onClick={openCreateCategory} variant="secondary" size="sm">
+                + New Category
+              </Button>
             )}
-          </div>
+          </SectionHeader>
 
-          {(!categories || categories.length === 0) && (
-            <p className="text-slate text-sm">No categories yet. Group your services to make browsing easier.</p>
-          )}
-
-          {categories && categories.length > 0 && (
+          {(!categories || categories.length === 0) ? (
+            <p className="text-slate text-sm font-mono">No categories yet. Group your services to improve navigation.</p>
+          ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {categories.map((category) => (
-                <div key={category.id} className="card flex items-center justify-between gap-3">
+                <Card key={category.id} className="p-4 flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-medium text-ink truncate">{category.name}</h3>
-                    <p className="text-sm text-slate">{category.serviceCount} service{category.serviceCount === 1 ? '' : 's'}</p>
+                    <h4 className="font-display font-semibold text-ink truncate">
+                      {category.name}
+                    </h4>
+                    <p className="text-xs text-slate font-mono mt-0.5">
+                      {category.serviceCount} {category.serviceCount === 1 ? 'service' : 'services'}
+                    </p>
                   </div>
                   {isAdmin && (
                     <div className="flex gap-1 shrink-0">
                       <button
                         onClick={() => openEditCategory(category)}
-                        className="text-slate hover:text-ink p-1 transition-colors"
+                        className="text-slate hover:text-ink p-1.5 rounded-md hover:bg-ink/5 transition-colors"
                         aria-label={`Edit ${category.name}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
                       <button
                         onClick={() => setDeleteTarget({ type: 'category', id: category.id, name: category.name })}
-                        className="text-slate hover:text-red-600 p-1 transition-colors"
+                        className="text-slate hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors"
                         aria-label={`Delete ${category.name}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
                   )}
-                </div>
+                </Card>
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Service modal */}
-      {serviceModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60" role="dialog" aria-modal="true" aria-label="Service form">
-          <div className="bg-paper-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="p-6 border-b border-line flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-ink">
-                {serviceModal.editing ? 'Edit Service' : 'New Service'}
-              </h2>
-              <button onClick={() => setServiceModal({ open: false })} className="text-slate hover:text-ink p-1" aria-label="Close">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form onSubmit={onServiceSubmit} className="p-6 space-y-4">
-              <div>
-                <label htmlFor="service-name" className="label-field">Service Name</label>
-                <input id="service-name" {...serviceForm.register('name', { required: 'Name is required' })} className="input-field" placeholder="e.g. Signature Manicure" />
-                {serviceForm.formState.errors.name && (
-                  <p className="mt-1 text-sm text-red-600" role="alert">{serviceForm.formState.errors.name.message}</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="service-duration" className="label-field">Duration (minutes)</label>
-                  <input
-                    id="service-duration"
-                    type="number"
-                    min={5}
-                    step={5}
-                    {...serviceForm.register('durationMinutes', { required: 'Required', min: { value: 5, message: 'Min 5 min' } })}
-                    className="input-field"
-                  />
-                  {serviceForm.formState.errors.durationMinutes && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{serviceForm.formState.errors.durationMinutes.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="service-price" className="label-field">Price (₱)</label>
-                  <input
-                    id="service-price"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    {...serviceForm.register('price', { required: 'Required', min: { value: 0, message: 'Min 0' } })}
-                    className="input-field"
-                  />
-                  {serviceForm.formState.errors.price && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{serviceForm.formState.errors.price.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="service-category" className="label-field">Category</label>
-                <select id="service-category" {...serviceForm.register('categoryId')} className="input-field">
-                  <option value="">No category</option>
-                  {categories?.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="service-description" className="label-field">Description</label>
-                <textarea
-                  id="service-description"
-                  rows={3}
-                  {...serviceForm.register('description')}
-                  className="input-field resize-none"
-                  placeholder="What's included?"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 items-end">
-                <div>
-                  <label htmlFor="service-color" className="label-field">Color</label>
-                  <div className="flex gap-2 items-center">
-                    <input type="color" {...serviceForm.register('color')} className="w-10 h-10 rounded border border-line bg-paper-white" aria-label="Service color" />
-                    <span className="text-sm text-slate font-mono">{serviceForm.watch('color')}</span>
-                  </div>
-                </div>
-                <label className="inline-flex items-center gap-2 text-sm text-slate cursor-pointer mb-2">
-                  <input type="checkbox" {...serviceForm.register('isActive')} className="w-4 h-4 accent-brass" />
-                  Active
-                </label>
-              </div>
-
-              {(createService.isError || updateService.isError) && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm" role="alert">
-                  Failed to save service. Please try again.
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setServiceModal({ open: false })}
-                  className="btn-secondary flex-1"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary flex-1"
-                  disabled={createService.isPending || updateService.isPending}
-                >
-                  {createService.isPending || updateService.isPending ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Category modal */}
-      {categoryModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60" role="dialog" aria-modal="true" aria-label="Category form">
-          <div className="bg-paper-white rounded-xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b border-line flex items-center justify-between">
-              <h2 className="font-display text-xl font-semibold text-ink">
-                {categoryModal.editing ? 'Edit Category' : 'New Category'}
-              </h2>
-              <button onClick={() => setCategoryModal({ open: false })} className="text-slate hover:text-ink p-1" aria-label="Close">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form onSubmit={onCategorySubmit} className="p-6 space-y-4">
-              <div>
-                <label htmlFor="category-name" className="label-field">Category Name</label>
-                <input id="category-name" {...categoryForm.register('name', { required: 'Name is required' })} className="input-field" placeholder="e.g. Nails" />
-                {categoryForm.formState.errors.name && (
-                  <p className="mt-1 text-sm text-red-600" role="alert">{categoryForm.formState.errors.name.message}</p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="category-description" className="label-field">Description</label>
-                <input id="category-description" {...categoryForm.register('description')} className="input-field" placeholder="Optional" />
-              </div>
-              <div>
-                <label htmlFor="category-order" className="label-field">Display Order</label>
-                <input id="category-order" type="number" min={0} {...categoryForm.register('displayOrder')} className="input-field" />
-              </div>
-
-              {(createCategory.isError || updateCategory.isError) && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm" role="alert">
-                  Failed to save category. Please try again.
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setCategoryModal({ open: false })} className="btn-secondary flex-1">Cancel</button>
-                <button
-                  type="submit"
-                  className="btn-primary flex-1"
-                  disabled={createCategory.isPending || updateCategory.isPending}
-                >
-                  {createCategory.isPending || updateCategory.isPending ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete confirm modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60" role="dialog" aria-modal="true" aria-label="Confirm delete">
-          <div className="bg-paper-white rounded-xl w-full max-w-sm shadow-2xl p-6">
-            <h2 className="font-display text-lg font-semibold text-ink mb-2">Delete {deleteTarget.type === 'service' ? 'service' : 'category'}</h2>
-            <p className="text-slate text-sm mb-6">
-              Are you sure you want to delete <span className="font-medium text-ink">"{deleteTarget.name}"</span>? This can't be undone.
-            </p>
-            {(deleteService.isError || deleteCategory.isError) && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4" role="alert">
-                Failed to delete. Please try again.
-              </div>
+      {/* Service Modal */}
+      <Modal
+        isOpen={serviceModal.open}
+        onClose={() => setServiceModal({ open: false })}
+        title={serviceModal.editing ? 'Edit Service' : 'New Service'}
+        maxWidth="max-w-xl"
+      >
+        <form onSubmit={onServiceSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="service-name" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Service Name *
+            </label>
+            <input
+              id="service-name"
+              {...serviceForm.register('name', { required: 'Name is required' })}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+              placeholder="e.g. Signature Facial"
+            />
+            {serviceForm.formState.errors.name && (
+              <p className="mt-1 text-xs text-red-600 font-mono" role="alert">
+                {serviceForm.formState.errors.name.message}
+              </p>
             )}
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="btn-secondary flex-1">Cancel</button>
-              <button
-                onClick={confirmDelete}
-                className="btn-danger flex-1"
-                disabled={deleteService.isPending || deleteCategory.isPending}
-              >
-                {deleteService.isPending || deleteCategory.isPending ? 'Deleting…' : 'Delete'}
-              </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="service-duration" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+                Duration (minutes) *
+              </label>
+              <input
+                id="service-duration"
+                type="number"
+                min={5}
+                step={5}
+                {...serviceForm.register('durationMinutes', {
+                  required: 'Required',
+                  min: { value: 5, message: 'Min 5 min' },
+                })}
+                className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+              />
+              {serviceForm.formState.errors.durationMinutes && (
+                <p className="mt-1 text-xs text-red-600 font-mono" role="alert">
+                  {serviceForm.formState.errors.durationMinutes.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="service-price" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+                Price (â‚± PHP) *
+              </label>
+              <input
+                id="service-price"
+                type="number"
+                min={0}
+                step={0.01}
+                {...serviceForm.register('price', {
+                  required: 'Required',
+                  min: { value: 0, message: 'Min â‚±0' },
+                })}
+                className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+              />
+              {serviceForm.formState.errors.price && (
+                <p className="mt-1 text-xs text-red-600 font-mono" role="alert">
+                  {serviceForm.formState.errors.price.message}
+                </p>
+              )}
             </div>
           </div>
+
+          <div>
+            <label htmlFor="service-category" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Category
+            </label>
+            <select
+              id="service-category"
+              {...serviceForm.register('categoryId')}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+            >
+              <option value="">No category (Unassigned)</option>
+              {categories?.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="service-desc" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Description
+            </label>
+            <textarea
+              id="service-desc"
+              rows={3}
+              {...serviceForm.register('description')}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+              placeholder="Provide a clear description of what this service includes..."
+            />
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center gap-2">
+              <input
+                id="service-color"
+                type="color"
+                {...serviceForm.register('color')}
+                className="w-8 h-8 rounded border border-line cursor-pointer"
+              />
+              <label htmlFor="service-color" className="text-xs font-mono uppercase tracking-wider text-slate cursor-pointer">
+                Tile Color
+              </label>
+            </div>
+
+            <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate cursor-pointer">
+              <input
+                type="checkbox"
+                {...serviceForm.register('isActive')}
+                className="w-4 h-4 rounded border-line text-brass focus:ring-brass"
+              />
+              Active for booking
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-line">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setServiceModal({ open: false })}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={createService.isPending || updateService.isPending}
+            >
+              {createService.isPending || updateService.isPending ? 'Saving...' : 'Save Service'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Category Modal */}
+      <Modal
+        isOpen={categoryModal.open}
+        onClose={() => setCategoryModal({ open: false })}
+        title={categoryModal.editing ? 'Edit Category' : 'New Category'}
+      >
+        <form onSubmit={onCategorySubmit} className="space-y-4">
+          <div>
+            <label htmlFor="category-name" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Category Name *
+            </label>
+            <input
+              id="category-name"
+              {...categoryForm.register('name', { required: 'Name is required' })}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+              placeholder="e.g. Hair Care, Aesthetics"
+            />
+            {categoryForm.formState.errors.name && (
+              <p className="mt-1 text-xs text-red-600 font-mono" role="alert">
+                {categoryForm.formState.errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="category-desc" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Description
+            </label>
+            <textarea
+              id="category-desc"
+              rows={2}
+              {...categoryForm.register('description')}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="category-order" className="block text-xs font-mono uppercase tracking-wider text-slate mb-1">
+              Display Order
+            </label>
+            <input
+              id="category-order"
+              type="number"
+              {...categoryForm.register('displayOrder')}
+              className="w-full px-4 py-2.5 border border-line rounded-lg bg-paper-white text-ink focus:outline-none focus:ring-2 focus:ring-brass"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-line">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setCategoryModal({ open: false })}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={createCategory.isPending || updateCategory.isPending}
+            >
+              {createCategory.isPending || updateCategory.isPending ? 'Saving...' : 'Save Category'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title={`Delete ${deleteTarget?.type === 'service' ? 'Service' : 'Category'}`}
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <p className="text-slate text-sm">
+            Are you sure you want to remove <span className="font-semibold text-ink">"{deleteTarget?.name}"</span>? This action cannot be reversed.
+          </p>
+
+          {(deleteService.isError || deleteCategory.isError) && (
+            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-xs font-mono" role="alert">
+              Failed to delete item. Please ensure no active appointments depend on it.
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="secondary" size="sm" onClick={() => setDeleteTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={confirmDelete}
+              disabled={deleteService.isPending || deleteCategory.isPending}
+            >
+              {deleteService.isPending || deleteCategory.isPending ? 'Deleting...' : 'Confirm Delete'}
+            </Button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

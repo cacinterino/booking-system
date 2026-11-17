@@ -4,16 +4,9 @@ import { BookingStatusLabel } from './types';
 import type { CalendarEvent } from './types';
 import { toManilaDate, formatTimeManila } from '../booking/format';
 import { extractApiDetail } from '../booking/errors';
+import { Card, Badge, Button, SectionHeader, EmptyState, LoadingSkeleton } from '../../shared/ui';
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-const STATUS_STYLES: Record<number, string> = {
-  1: 'bg-brass/10 text-brass border-brass/30',
-  2: 'bg-sage/10 text-sage border-sage/30',
-  3: 'bg-ink/5 text-slate border-line',
-  4: 'bg-ink/5 text-ink-soft border-line',
-  5: 'bg-red-50 text-red-600 border-red-200',
-};
 
 function toDateKey(localIso: string): string {
   return toManilaDate(localIso).toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
@@ -82,19 +75,36 @@ export function StaffDashboardPage() {
     }
   };
 
+  const getStatusVariant = (status: number): 'brass' | 'sage' | 'slate' | 'red' => {
+    switch (status) {
+      case 1:
+        return 'brass';
+      case 2:
+        return 'sage';
+      case 4:
+        return 'slate';
+      case 3:
+      case 5:
+        return 'red';
+      default:
+        return 'slate';
+    }
+  };
+
   const prevWeek = () => setAnchor((a) => new Date(a.getTime() - 7 * 86400000));
   const nextWeek = () => setAnchor((a) => new Date(a.getTime() + 7 * 86400000));
 
   if (workspaceQuery.isLoading) {
     return (
-      <div className="py-12 px-4 sm:px-6 lg:px-8">
+      <div className="py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-4" aria-busy="true">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="card animate-pulse">
-              <div className="h-4 w-48 rounded bg-ink/10" />
-              <div className="mt-3 h-6 w-72 rounded bg-ink/10" />
-            </div>
-          ))}
+          <LoadingSkeleton className="h-10 w-64" />
+          <LoadingSkeleton className="h-6 w-96" />
+          <div className="grid grid-cols-7 gap-2 mt-6">
+            {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+              <LoadingSkeleton key={i} className="h-24 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -103,11 +113,18 @@ export function StaffDashboardPage() {
   if (workspaceQuery.isError || !workspace) {
     return (
       <div className="py-12 px-4 sm:px-6 lg:px-8">
-        <div className="card max-w-lg">
-          <h1 className="font-display text-2xl font-semibold text-ink">No workspace found</h1>
-          <p className="mt-2 text-ink-soft">
-            You need to be invited as staff to a business before you can see a calendar.
-          </p>
+        <div className="max-w-xl mx-auto">
+          <Card>
+            <EmptyState
+              title="No staff workspace found"
+              description="You must be registered as a staff member or business administrator to view this calendar."
+              icon={
+                <svg className="w-8 h-8 text-brass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              }
+            />
+          </Card>
         </div>
       </div>
     );
@@ -115,68 +132,101 @@ export function StaffDashboardPage() {
 
   return (
     <div className="py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header with week navigation */}
+        <div className="flex flex-wrap items-end justify-between gap-4 pb-6 border-b border-line">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{workspace.businessName}</p>
-            <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Today's calendar</h1>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1.5">
+              {workspace.businessName} &bull; Staff Ledger
+            </p>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink">
+              Team Calendar
+            </h1>
             <p className="mt-1 text-sm text-slate">
-              {workspace.staff.fullName} · {new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })}
+              Active staff: <span className="font-medium text-ink">{workspace.staff.fullName}</span> &bull; Asia/Manila (UTC+8)
             </p>
           </div>
+
           <div className="flex items-center gap-2">
-            <button type="button" onClick={prevWeek} className="btn-secondary px-4 py-2 text-sm">
-              Previous week
-            </button>
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={prevWeek}
+              aria-label="Previous week"
+            >
+              &larr; Prev Week
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => {
-                const now = new Date();
-                setAnchor(now);
+                setAnchor(new Date());
                 setSelectedDate(todayKey());
               }}
-              className="btn-secondary px-4 py-2 text-sm"
             >
               Today
-            </button>
-            <button type="button" onClick={nextWeek} className="btn-secondary px-4 py-2 text-sm">
-              Next week
-            </button>
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={nextWeek}
+              aria-label="Next week"
+            >
+              Next Week &rarr;
+            </Button>
           </div>
         </div>
 
         {actionError && (
-          <div role="alert" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {actionError}
+          <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-center justify-between">
+            <span>{actionError}</span>
+            <button
+              onClick={() => setActionError(null)}
+              className="text-red-500 hover:text-red-800 text-xs font-mono ml-4"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          <div className="grid grid-cols-7 gap-2 min-w-[560px]" role="group" aria-label="Week days">
+        {/* 7-Day Week Selector Bar */}
+        <div className="bg-paper-white border border-line rounded-lg p-3 shadow-xs">
+          <div className="grid grid-cols-7 gap-2">
             {days.map((day) => {
               const key = dayKey(day);
-              const count = eventsByDay.get(key)?.length ?? 0;
-              const isToday = key === todayKey();
               const isSelected = key === selectedDate;
+              const isToday = key === todayKey();
+              const count = eventsByDay.get(key)?.length ?? 0;
+
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setSelectedDate(key)}
-                  className={`rounded-lg border p-3 text-center transition-colors ${
+                  className={`rounded-lg border p-3 text-center transition-all cursor-pointer ${
                     isSelected
-                      ? 'border-brass bg-brass text-paper-white'
+                      ? 'border-brass bg-brass text-paper-white shadow-xs'
                       : isToday
-                        ? 'border-brass/50 bg-brass/10 text-ink hover:bg-brass/20'
-                        : 'border-line bg-paper-white text-ink hover:bg-ink/5'
+                        ? 'border-brass/40 bg-brass/10 text-ink hover:bg-brass/20'
+                        : 'border-line/70 bg-paper-white text-ink hover:bg-ink/5'
                   }`}
                 >
-                  <span className={`block font-mono text-xs uppercase tracking-wider ${isSelected ? 'text-paper-white' : 'text-slate'}`}>
+                  <span
+                    className={`block font-mono text-xs uppercase tracking-wider ${
+                      isSelected ? 'text-paper-white' : 'text-slate'
+                    }`}
+                  >
                     {WEEKDAY_LABELS[day.getDay()]}
                   </span>
-                  <span className="mt-1 block font-display text-xl font-semibold">{day.getDate()}</span>
-                  <span className={`mt-1 block font-mono text-xs ${isSelected ? 'text-paper-white/90' : 'text-slate'}`}>
-                    {count} booking{count === 1 ? '' : 's'}
+                  <span className="mt-1 block font-display text-xl sm:text-2xl font-bold">
+                    {day.getDate()}
+                  </span>
+                  <span
+                    className={`mt-1 block font-mono text-[11px] ${
+                      isSelected ? 'text-paper-white/90' : 'text-slate'
+                    }`}
+                  >
+                    {count} {count === 1 ? 'booking' : 'bookings'}
                   </span>
                 </button>
               );
@@ -184,83 +234,98 @@ export function StaffDashboardPage() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-slate">
-            {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('en-PH', {
+        {/* Selected Day Timeline */}
+        <div className="space-y-4">
+          <SectionHeader
+            eyebrow="Daily Schedule"
+            headline={new Date(`${selectedDate}T00:00:00`).toLocaleDateString('en-PH', {
               weekday: 'long',
               month: 'long',
               day: 'numeric',
             })}
-          </p>
+            description={`${selectedEvents.length} appointment${selectedEvents.length === 1 ? '' : 's'} on the ledger for this date.`}
+          />
 
           {calendarQuery.isLoading && (
             <div className="space-y-3" aria-busy="true">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="h-5 w-64 rounded bg-ink/10" />
-                </div>
+                <LoadingSkeleton key={i} className="h-20 w-full" />
               ))}
             </div>
           )}
 
           {!calendarQuery.isLoading && selectedEvents.length === 0 && (
-            <div className="card text-center">
-              <p className="font-display text-lg font-semibold text-ink">No bookings this day</p>
-              <p className="mt-1 text-sm text-slate">The ledger is clear — enjoy the quiet.</p>
-            </div>
+            <Card>
+              <EmptyState
+                title="The ledger is clear for this day"
+                description="No client appointments booked for this date. Time to prep or take walk-ins."
+                icon={
+                  <svg className="w-7 h-7 text-brass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
+              />
+            </Card>
           )}
 
           {selectedEvents.length > 0 && (
             <div className="space-y-3">
               {selectedEvents.map((event) => (
-                <article key={event.id} className="card">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-4">
-                      <span className="w-24 shrink-0 font-mono text-lg font-medium text-ink">
+                <Card key={event.id} className="p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start sm:items-center gap-4">
+                      <div className="w-24 shrink-0 font-mono text-base sm:text-lg font-bold text-ink">
                         {formatTimeManila(event.start)}
-                      </span>
-                      <div>
-                        <p className="font-display font-semibold text-ink">{event.customerName}</p>
-                        <p className="text-sm text-slate">{event.title}</p>
+                      </div>
+                      <div className="border-l border-line pl-4">
+                        <p className="font-display text-lg font-semibold text-ink">
+                          {event.customerName}
+                        </p>
+                        <p className="text-sm text-slate mt-0.5">
+                          {event.title}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-mono text-xs uppercase tracking-wider ${STATUS_STYLES[event.status] ?? STATUS_STYLES[1]}`}>
+
+                    <div className="flex flex-wrap items-center gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-line">
+                      <Badge variant={getStatusVariant(event.status)}>
                         {BookingStatusLabel[event.status] ?? 'Booking'}
-                      </span>
+                      </Badge>
+
                       {event.status === 1 && (
-                        <button
-                          type="button"
+                        <Button
+                          variant="primary"
+                          size="sm"
                           onClick={() => handleStatus(event, 2)}
                           disabled={statusMutation.isPending}
-                          className="btn-primary px-4 py-2 text-sm disabled:opacity-50"
                         >
                           Confirm
-                        </button>
+                        </Button>
                       )}
+
                       {event.status === 2 && (
                         <div className="flex gap-2">
-                          <button
-                            type="button"
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={() => handleStatus(event, 4)}
                             disabled={statusMutation.isPending}
-                            className="btn-secondary px-4 py-2 text-sm disabled:opacity-50"
                           >
                             Complete
-                          </button>
-                          <button
-                            type="button"
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
                             onClick={() => handleStatus(event, 5)}
                             disabled={statusMutation.isPending}
-                            className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50 transition-colors"
                           >
                             No-show
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </div>
                   </div>
-                </article>
+                </Card>
               ))}
             </div>
           )}
