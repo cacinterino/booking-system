@@ -2,7 +2,6 @@
 
 > Real-time, conflict-free appointment booking for Philippine service businesses — clinics, salons, barbershops, and spas.
 
-[![CI](https://github.com/cacinterino/booking-system/actions/workflows/ci.yml/badge.svg)](https://github.com/cacinterino/booking-system/actions)
 [![ASP.NET Core 9](https://img.shields.io/badge/API-ASP.NET%20Core%209-512BD8?logo=dotnet)](https://dotnet.microsoft.com/)
 [![React 18](https://img.shields.io/badge/Client-React%2018-61DAFB?logo=react)](https://reactjs.org/)
 [![PostgreSQL 16](https://img.shields.io/badge/DB-PostgreSQL%2016-336791?logo=postgresql)](https://www.postgresql.org/)
