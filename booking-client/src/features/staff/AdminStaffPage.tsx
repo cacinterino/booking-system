@@ -5,6 +5,7 @@ import { StaffFormModal } from './StaffFormModal';
 import { ScheduleModal } from './ScheduleModal';
 import { OverrideModal } from './OverrideModal';
 import type { StaffResponse } from './types';
+import { Card, Badge, Button, EmptyState, LoadingSkeleton, Modal } from '../../shared/ui';
 
 export function AdminStaffPage() {
   const [includeInactive, setIncludeInactive] = useState(false);
@@ -20,15 +21,23 @@ export function AdminStaffPage() {
 
   return (
     <div className="py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-wrap items-end justify-between gap-4 pb-6 border-b border-line">
           <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Team</p>
-            <h1 className="mt-1 font-display text-3xl font-semibold text-ink">Staff</h1>
-            <p className="mt-1 text-sm text-slate">Invite team members, set schedules, and manage availability.</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1.5">
+              Team &amp; Practitioners
+            </p>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink">
+              Staff &amp; Schedules
+            </h1>
+            <p className="mt-1 text-sm text-slate">
+              Invite team members, assign services, configure weekly shifts, and manage availability.
+            </p>
           </div>
+
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-slate">
+            <label className="flex items-center gap-2 text-xs font-mono uppercase text-slate cursor-pointer">
               <input
                 type="checkbox"
                 checked={includeInactive}
@@ -37,95 +46,123 @@ export function AdminStaffPage() {
               />
               Show inactive
             </label>
-            <button type="button" onClick={() => setCreating(true)} className="btn-primary">
-              Add staff
-            </button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setCreating(true)}
+            >
+              + Add Staff Member
+            </Button>
           </div>
         </div>
 
         {staffQuery.isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy="true">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="h-5 w-40 rounded bg-ink/10" />
-                <div className="mt-3 h-4 w-56 rounded bg-ink/10" />
-                <div className="mt-4 h-9 w-full rounded bg-ink/10" />
-              </div>
+              <LoadingSkeleton key={i} className="h-52 w-full" />
             ))}
           </div>
         )}
 
         {staffQuery.isError && (
-          <div className="card max-w-lg">
-            <p className="text-red-600">Could not load staff. Please refresh.</p>
+          <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+            Could not load staff members. Please refresh your browser.
           </div>
         )}
 
         {!staffQuery.isLoading && !staffQuery.isError && (staffQuery.data ?? []).length === 0 && (
-          <div className="card text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-brass/30 bg-brass/10">
-              <svg className="h-7 w-7 text-brass" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h2 className="mt-4 font-display text-xl font-semibold text-ink">No staff yet</h2>
-            <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">
-              Add your first team member and give them a weekly schedule so guests can book their time.
-            </p>
-            <button type="button" onClick={() => setCreating(true)} className="btn-primary mt-6">
-              Add staff
-            </button>
-          </div>
+          <Card>
+            <EmptyState
+              title="No staff members yet"
+              description="Add your first team member and configure their weekly schedule so clients can book appointments with them."
+              icon={
+                <svg className="w-8 h-8 text-brass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              }
+              action={
+                <Button variant="primary" size="sm" onClick={() => setCreating(true)}>
+                  Add staff member
+                </Button>
+              }
+            />
+          </Card>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(staffQuery.data ?? []).map((staff) => {
             const serviceNames = staff.serviceIds
               .map((id) => services.find((s) => s.id === id)?.name)
               .filter(Boolean)
               .join(', ');
+
             return (
-              <article key={staff.id} className="card">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brass/15 font-display text-lg font-semibold text-brass-deep">
-                      {staff.fullName.charAt(0).toUpperCase()}
-                    </span>
-                    <div>
-                      <h2 className="font-display font-semibold text-ink">{staff.fullName}</h2>
-                      <p className="text-sm text-slate">{staff.email ?? 'No email'}</p>
+              <Card key={staff.id} className="flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brass/15 font-display text-lg font-bold text-brass-deep shrink-0">
+                        {staff.fullName.charAt(0).toUpperCase()}
+                      </span>
+                      <div>
+                        <h2 className="font-display text-lg font-bold text-ink">
+                          {staff.fullName}
+                        </h2>
+                        <p className="text-xs text-slate font-mono mt-0.5">
+                          {staff.email ?? 'No email associated'}
+                        </p>
+                      </div>
                     </div>
+                    <Badge variant={staff.isActive ? 'sage' : 'slate'}>
+                      {staff.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
-                  <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-mono text-xs uppercase tracking-wider ${
-                      staff.isActive ? 'bg-sage/10 text-sage border-sage/30' : 'bg-ink/5 text-slate border-line'
-                    }`}
-                  >
-                    {staff.isActive ? 'Active' : 'Inactive'}
-                  </span>
+
+                  <div className="mt-4 pt-3 border-t border-line">
+                    <p className="text-xs font-mono uppercase tracking-wider text-slate mb-1">
+                      Assigned Services
+                    </p>
+                    <p className="text-sm text-ink leading-relaxed">
+                      {serviceNames || 'No specific services assigned'}
+                    </p>
+                  </div>
                 </div>
 
-                {serviceNames && <p className="mt-3 text-sm text-ink-soft">{serviceNames}</p>}
-
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
-                  <button type="button" onClick={() => setScheduleFor(staff)} className="btn-secondary px-3 py-1.5 text-sm">
-                    Schedule
-                  </button>
-                  <button type="button" onClick={() => setOverridesFor(staff)} className="btn-secondary px-3 py-1.5 text-sm">
-                    Overrides
-                  </button>
-                  <button type="button" onClick={() => setEditing(staff)} className="btn-secondary px-3 py-1.5 text-sm">
-                    Edit
-                  </button>
-                  <button
+                <div className="mt-6 flex flex-wrap gap-2 border-t border-line pt-4">
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setScheduleFor(staff)}
+                  >
+                    Schedule
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setOverridesFor(staff)}
+                  >
+                    Overrides
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setEditing(staff)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
                     onClick={() => setDeleteTarget(staff)}
-                    className="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
                   >
                     Remove
-                  </button>
+                  </Button>
                 </div>
-              </article>
+              </Card>
             );
           })}
         </div>
@@ -158,28 +195,38 @@ function DeleteStaffModal({ staff, onClose }: { staff: StaffResponse; onClose: (
     } catch (err) {
       setError(
         (err as { response?: { data?: { title?: string; detail?: string } } }).response?.data?.title ??
-          'Could not remove staff',
+          'Could not remove staff member',
       );
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" role="dialog" aria-modal="true" aria-label={`Remove ${staff.fullName}`}>
-      <div className="w-full max-w-md card shadow-2xl">
-        <h2 className="font-display text-xl font-semibold text-ink">Remove {staff.fullName}?</h2>
-        <p className="mt-2 text-sm text-ink-soft">
-          They'll be removed from your team and their schedule. Their past bookings stay on the books.
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={`Remove ${staff.fullName}?`}
+      maxWidth="max-w-md"
+    >
+      <div className="space-y-4">
+        <p className="text-sm text-slate">
+          They will be removed from your active team and roster. Their past bookings and historical appointments will remain preserved for audit.
         </p>
-        {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
-        <div className="mt-6 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="btn-secondary">
+        {error && <p role="alert" className="text-xs font-mono text-red-600">{error}</p>}
+        <div className="flex justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
             Keep
-          </button>
-          <button type="button" onClick={handleDelete} disabled={isPending} className="btn-danger disabled:opacity-50">
-            {isPending ? 'Removing…' : 'Remove staff'}
-          </button>
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={handleDelete}
+            disabled={isPending}
+          >
+            {isPending ? 'Removing...' : 'Confirm Remove'}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
