@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../../shared/context/AuthContext';
+import { Card } from '../../../shared/ui/Card';
+import { Input } from '../../../shared/ui/Input';
+import { Button } from '../../../shared/ui/Button';
 
 interface RegisterForm {
   email: string;
@@ -41,14 +44,14 @@ export function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link to="/" className="inline-block mb-8">
-            <h2 className="text-3xl font-bold text-ink font-display">Booked.</h2>
+            <h2 className="text-3xl font-bold text-ink font-display">Booked<span className="text-brass">.</span></h2>
           </Link>
           <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Create account</p>
           <h3 className="text-2xl font-bold text-ink font-display">Create your account</h3>
           <p className="mt-2 text-slate">Start managing bookings in minutes</p>
         </div>
 
-        <div className="card">
+        <Card>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {error && (
               <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm" role="alert">
@@ -58,46 +61,47 @@ export function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="label-field">First Name</label>
-                <input
+                <Input
+                  label="First Name"
                   id="firstName"
                   type="text"
                   required
-                  {...register('firstName', { required: 'First name is required' })}
-                  className={`input-field ${errors.firstName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
                   placeholder="First name"
-                  aria-invalid={errors.firstName ? 'true' : 'false'}
-                  aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+                  {...register('firstName', { required: 'First name is required' })}
+                  error={errors.firstName ? true : false}
                 />
                 {errors.firstName && (
-                  <p id="firstName-error" className="mt-1 text-sm text-red-600" role="alert">{errors.firstName.message}</p>
+                  <p id="firstName-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
               <div>
-                <label htmlFor="lastName" className="label-field">Last Name</label>
-                <input
+                <Input
+                  label="Last Name"
                   id="lastName"
                   type="text"
                   required
-                  {...register('lastName', { required: 'Last name is required' })}
-                  className={`input-field ${errors.lastName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
                   placeholder="Last name"
-                  aria-invalid={errors.lastName ? 'true' : 'false'}
-                  aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+                  {...register('lastName', { required: 'Last name is required' })}
+                  error={errors.lastName ? true : false}
                 />
                 {errors.lastName && (
-                  <p id="lastName-error" className="mt-1 text-sm text-red-600" role="alert">{errors.lastName.message}</p>
+                  <p id="lastName-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="label-field">Email address</label>
-              <input
+              <Input
+                label="Email address"
                 id="email"
                 type="email"
                 autoComplete="email"
                 required
+                placeholder="you@example.com"
                 {...register('email', {
                   required: 'Email is required',
                   pattern: {
@@ -105,34 +109,33 @@ export function RegisterPage() {
                     message: 'Invalid email address',
                   },
                 })}
-                className={`input-field ${errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
-                placeholder="you@example.com"
-                aria-invalid={errors.email ? 'true' : 'false'}
-                aria-describedby={errors.email ? 'email-error' : undefined}
+                error={errors.email ? true : false}
               />
               {errors.email && (
-                <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">{errors.email.message}</p>
+                <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="label-field">Phone Number (optional)</label>
-              <input
+              <Input
+                label="Phone Number (optional)"
                 id="phoneNumber"
                 type="tel"
-                {...register('phoneNumber')}
-                className="input-field"
                 placeholder="Phone number"
+                {...register('phoneNumber')}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="label-field">Password</label>
-              <input
+              <Input
+                label="Password"
                 id="password"
                 type="password"
                 autoComplete="new-password"
                 required
+                placeholder="••••••••"
                 {...register('password', {
                   required: 'Password is required',
                   minLength: { value: 8, message: 'Password must be at least 8 characters' },
@@ -141,44 +144,40 @@ export function RegisterPage() {
                     message: 'Must contain uppercase, lowercase, number, and special character',
                   },
                 })}
-                className={`input-field ${errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
-                placeholder="••••••••"
-                aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={errors.password ? 'password-error' : undefined}
+                error={errors.password ? true : false}
               />
               {errors.password && (
-                <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">{errors.password.message}</p>
+                <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="label-field">Confirm Password</label>
-              <input
+              <Input
+                label="Confirm Password"
                 id="confirmPassword"
                 type="password"
                 autoComplete="new-password"
                 required
+                placeholder="••••••••"
                 {...register('confirmPassword', {
                   required: 'Please confirm your password',
                   validate: (value) => value === password || 'Passwords do not match',
                 })}
-                className={`input-field ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
-                placeholder="••••••••"
-                aria-invalid={errors.confirmPassword ? 'true' : 'false'}
-                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                error={errors.confirmPassword ? true : false}
               />
               {errors.confirmPassword && (
-                <p id="confirmPassword-error" className="mt-1 text-sm text-red-600" role="alert">{errors.confirmPassword.message}</p>
+                <p id="confirmPassword-error" className="mt-1 text-sm text-red-600" role="alert">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
             <div>
-              <button
-                type="submit"
-                className="btn-primary w-full"
-              >
+              <Button type="submit" className="w-full">
                 Create account
-              </button>
+              </Button>
             </div>
           </form>
 
@@ -190,7 +189,7 @@ export function RegisterPage() {
               </Link>
             </p>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

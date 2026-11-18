@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { extractApiDetail } from '../../booking/errors';
+import { Card } from '../../../shared/ui/Card';
+import { Input } from '../../../shared/ui/Input';
+import { Button } from '../../../shared/ui/Button';
 
 export function AcceptInvitationPage() {
   const navigate = useNavigate();
@@ -50,7 +53,7 @@ export function AcceptInvitationPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper px-4">
-        <div className="card max-w-md w-full text-center">
+        <Card max-w-md w-full text-center>
           <h1 className="font-display text-2xl font-semibold text-ink">Missing invitation</h1>
           <p className="mt-2 text-ink-soft">
             This link is missing its invitation token. Use the link from your invitation email.
@@ -58,7 +61,7 @@ export function AcceptInvitationPage() {
           <Link to="/" className="btn-secondary mt-6 inline-flex">
             Back to Booked.
           </Link>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -77,7 +80,7 @@ export function AcceptInvitationPage() {
           <p className="mt-2 text-slate">You've been invited to a business on Booked.</p>
         </div>
 
-        <div className="card">
+        <Card>
           <form className="space-y-6" onSubmit={onSubmit}>
             {error && (
               <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm" role="alert">
@@ -86,13 +89,12 @@ export function AcceptInvitationPage() {
             )}
 
             <div>
-              <label htmlFor="invEmail" className="label-field">Work email</label>
-              <input
+              <Input
+                label="Work email"
                 id="invEmail"
                 type="email"
                 autoComplete="email"
                 required
-                className="input-field"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -102,24 +104,22 @@ export function AcceptInvitationPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="invFirst" className="label-field">First name</label>
-                <input
+                <Input
+                  label="First name"
                   id="invFirst"
                   type="text"
                   required
-                  className="input-field"
                   placeholder="First name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="invLast" className="label-field">Last name</label>
-                <input
+                <Input
+                  label="Last name"
                   id="invLast"
                   type="text"
                   required
-                  className="input-field"
                   placeholder="Last name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -128,11 +128,10 @@ export function AcceptInvitationPage() {
             </div>
 
             <div>
-              <label htmlFor="invPhone" className="label-field">Phone (optional)</label>
-              <input
+              <Input
+                label="Phone (optional)"
                 id="invPhone"
                 type="tel"
-                className="input-field"
                 placeholder="0917 000 0000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -140,13 +139,12 @@ export function AcceptInvitationPage() {
             </div>
 
             <div>
-              <label htmlFor="invPassword" className="label-field">Password</label>
-              <input
+              <Input
+                label="Password"
                 id="invPassword"
                 type="password"
                 autoComplete="new-password"
                 required
-                className="input-field"
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -154,24 +152,25 @@ export function AcceptInvitationPage() {
             </div>
 
             <div>
-              <label htmlFor="invConfirm" className="label-field">Confirm password</label>
-              <input
+              <Input
+                label="Confirm password"
                 id="invConfirm"
                 type="password"
                 autoComplete="new-password"
                 required
-                className="input-field"
                 placeholder="Repeat your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
 
-            <button type="submit" className="btn-primary w-full" disabled={submitting}>
-              {submitting ? 'Accepting…' : 'Accept invitation'}
-            </button>
+            <div>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? 'Accepting…' : 'Accept invitation'}
+              </Button>
+            </div>
           </form>
-        </div>
+        </Card>
       </div>
     </div>
   );

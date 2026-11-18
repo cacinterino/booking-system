@@ -5,11 +5,13 @@ export interface InputProps
   label?: string;
   error?: string;
   className?: string;
+  as?: 'input' | 'textarea';
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, id, ...props }, ref) => {
+const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
+  ({ label, error, className, id, as = 'input', ...props }, ref) => {
     const inputId = id || `input-${Math.random().toString(36).slice(2, 9)}`;
+    const Comp = as === 'textarea' ? 'textarea' : 'input';
     return (
       <div className="space-y-2">
         {label && (
@@ -20,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
-        <input
+        <Comp
           ref={ref}
           id={inputId}
           className={`w-full px-4 py-3 border rounded-lg bg-paper-white text-ink placeholder-slate focus:outline-none focus:ring-2 focus:ring-brass focus:border-brass transition-all ${

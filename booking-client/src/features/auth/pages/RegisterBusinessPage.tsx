@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { extractApiDetail } from '../../booking/errors';
+import { Card } from '../../../shared/ui/Card';
+import { Input } from '../../../shared/ui/Input';
+import { Button } from '../../../shared/ui/Button';
 
 function slugify(name: string): string {
   return name
@@ -80,7 +83,7 @@ export function RegisterBusinessPage() {
           <p className="mt-2 text-slate">Create your booking page in under a minute</p>
         </div>
 
-        <div className="card">
+        <Card>
           <form className="space-y-6" onSubmit={onSubmit}>
             {error && (
               <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm" role="alert">
@@ -89,12 +92,11 @@ export function RegisterBusinessPage() {
             )}
 
             <div>
-              <label htmlFor="bizName" className="label-field">Business name</label>
-              <input
+              <Input
+                label="Business name"
                 id="bizName"
                 type="text"
                 required
-                className="input-field"
                 placeholder="e.g. Juan's Barbershop"
                 value={businessName}
                 onChange={(e) => handleBusinessNameChange(e.target.value)}
@@ -102,48 +104,41 @@ export function RegisterBusinessPage() {
             </div>
 
             <div>
-              <label htmlFor="bizSlug" className="label-field">Booking page link</label>
-              <div className="flex items-center rounded-lg border border-line bg-paper-white focus-within:ring-2 focus-within:ring-brass focus-within:border-brass transition-all">
-                <span className="pl-4 font-mono text-sm text-slate">/book/</span>
-                <input
-                  id="bizSlug"
-                  type="text"
-                  required
-                  className="w-full bg-transparent px-3 py-3 font-mono text-sm text-ink placeholder-slate focus:outline-none"
-                  placeholder="juans-barbershop"
-                  value={businessSlug}
-                  onChange={(e) => {
-                    setBusinessSlug(e.target.value);
-                    setSlugTouched(true);
-                  }}
-                  aria-describedby="bizSlug-hint"
-                />
-              </div>
-              <p id="bizSlug-hint" className="mt-1 text-xs text-slate">
+              <Input
+                label="Booking page link"
+                id="bizSlug"
+                type="text"
+                required
+                placeholder="juans-barbershop"
+                value={businessSlug}
+                onChange={(e) => {
+                  setBusinessSlug(e.target.value);
+                  setSlugTouched(true);
+                }}
+              />
+              <p className="mt-1 text-xs text-slate">
                 This is the link you'll share with customers.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="bizFirst" className="label-field">First name</label>
-                <input
+                <Input
+                  label="First name"
                   id="bizFirst"
                   type="text"
                   required
-                  className="input-field"
                   placeholder="First name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="bizLast" className="label-field">Last name</label>
-                <input
+                <Input
+                  label="Last name"
                   id="bizLast"
                   type="text"
                   required
-                  className="input-field"
                   placeholder="Last name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -152,13 +147,12 @@ export function RegisterBusinessPage() {
             </div>
 
             <div>
-              <label htmlFor="bizEmail" className="label-field">Email address</label>
-              <input
+              <Input
+                label="Email address"
                 id="bizEmail"
                 type="email"
                 autoComplete="email"
                 required
-                className="input-field"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -166,11 +160,10 @@ export function RegisterBusinessPage() {
             </div>
 
             <div>
-              <label htmlFor="bizPhone" className="label-field">Phone (optional)</label>
-              <input
+              <Input
+                label="Phone (optional)"
                 id="bizPhone"
                 type="tel"
-                className="input-field"
                 placeholder="0917 000 0000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -178,13 +171,12 @@ export function RegisterBusinessPage() {
             </div>
 
             <div>
-              <label htmlFor="bizPassword" className="label-field">Password</label>
-              <input
+              <Input
+                label="Password"
                 id="bizPassword"
                 type="password"
                 autoComplete="new-password"
                 required
-                className="input-field"
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -192,13 +184,12 @@ export function RegisterBusinessPage() {
             </div>
 
             <div>
-              <label htmlFor="bizConfirm" className="label-field">Confirm password</label>
-              <input
+              <Input
+                label="Confirm password"
                 id="bizConfirm"
                 type="password"
                 autoComplete="new-password"
                 required
-                className="input-field"
                 placeholder="Repeat your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -211,10 +202,10 @@ export function RegisterBusinessPage() {
               </summary>
               <div className="mt-4 space-y-4">
                 <div>
-                  <label htmlFor="bizDesc" className="label-field">Description</label>
-                  <textarea
+                  <Input
+                    label="Description"
                     id="bizDesc"
-                    className="input-field"
+                    as="textarea"
                     rows={2}
                     placeholder="What do you offer?"
                     value={description}
@@ -222,11 +213,10 @@ export function RegisterBusinessPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="bizAddr" className="label-field">Address</label>
-                  <input
+                  <Input
+                    label="Address"
                     id="bizAddr"
                     type="text"
-                    className="input-field"
                     placeholder="City, province"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
@@ -235,9 +225,11 @@ export function RegisterBusinessPage() {
               </div>
             </details>
 
-            <button type="submit" className="btn-primary w-full" disabled={submitting}>
-              {submitting ? 'Setting up…' : 'Create my booking page'}
-            </button>
+            <div>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? 'Setting up…' : 'Create my booking page'}
+              </Button>
+            </div>
           </form>
 
           <div className="mt-6 text-center">
@@ -248,7 +240,7 @@ export function RegisterBusinessPage() {
               </Link>
             </p>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
