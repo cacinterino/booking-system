@@ -49,6 +49,7 @@ export function DashboardPage() {
     <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-10">
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Dashboard</p>
           <h1 className="text-3xl md:text-4xl font-bold text-ink font-display">Welcome, {user?.fullName}</h1>
           <p className="text-slate mt-2">Here's what's happening with your bookings</p>
         </div>
@@ -69,6 +70,7 @@ export function DashboardPage() {
 
         <div className="card">
           <div className="mb-8">
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Quick Actions</p>
             <h2 className="text-lg font-semibold text-ink font-display">Quick Actions</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

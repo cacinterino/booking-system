@@ -104,6 +104,7 @@ export function StaffDashboardPage() {
     return (
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="card max-w-lg">
+          <h2 className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Workspace</h2>
           <h1 className="font-display text-2xl font-semibold text-ink">No workspace found</h1>
           <p className="mt-2 text-ink-soft">
             You need to be invited as staff to a business before you can see a calendar.
@@ -174,7 +175,7 @@ export function StaffDashboardPage() {
                   <span className={`block font-mono text-xs uppercase tracking-wider ${isSelected ? 'text-paper-white' : 'text-slate'}`}>
                     {WEEKDAY_LABELS[day.getDay()]}
                   </span>
-                  <span className="mt-1 block font-display text-xl font-semibold">{day.getDate()}</span>
+                  <span className="mt-1 block font-mono text-xl font-semibold">{day.getDate()}</span>
                   <span className={`mt-1 block font-mono text-xs ${isSelected ? 'text-paper-white/90' : 'text-slate'}`}>
                     {count} booking{count === 1 ? '' : 's'}
                   </span>

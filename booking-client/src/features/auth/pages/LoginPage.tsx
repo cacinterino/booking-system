@@ -32,6 +32,7 @@ export function LoginPage() {
           <Link to="/" className="inline-block mb-8">
             <h2 className="text-3xl font-bold text-ink font-display">Booked.</h2>
           </Link>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Sign in</p>
           <h3 className="text-2xl font-bold text-ink font-display">Welcome back</h3>
           <p className="mt-2 text-slate">Sign in to your account</p>
         </div>

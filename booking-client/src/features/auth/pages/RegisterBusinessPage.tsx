@@ -75,6 +75,7 @@ export function RegisterBusinessPage() {
               Booked<span className="text-brass">.</span>
             </h2>
           </Link>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Set up business</p>
           <h3 className="text-2xl font-bold text-ink font-display">Set up your business</h3>
           <p className="mt-2 text-slate">Create your booking page in under a minute</p>
         </div>

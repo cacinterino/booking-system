@@ -43,6 +43,7 @@ export function RegisterPage() {
           <Link to="/" className="inline-block mb-8">
             <h2 className="text-3xl font-bold text-ink font-display">Booked.</h2>
           </Link>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Create account</p>
           <h3 className="text-2xl font-bold text-ink font-display">Create your account</h3>
           <p className="mt-2 text-slate">Start managing bookings in minutes</p>
         </div>

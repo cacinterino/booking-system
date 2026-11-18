@@ -72,6 +72,7 @@ export function AcceptInvitationPage() {
               Booked<span className="text-brass">.</span>
             </h2>
           </Link>
+          <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Accept invitation</p>
           <h3 className="text-2xl font-bold text-ink font-display">Join the team</h3>
           <p className="mt-2 text-slate">You've been invited to a business on Booked.</p>
         </div>

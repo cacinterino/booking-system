@@ -47,7 +47,10 @@ export function ProfilePage() {
       <div className="max-w-2xl mx-auto">
         <div className="card">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-ink font-display">Profile</h1>
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-1">Profile</p>
+              <h1 className="text-3xl font-bold text-ink font-display">Profile</h1>
+            </div>
             <button
               onClick={handleLogout}
               className="btn-danger text-sm py-2 px-4"
