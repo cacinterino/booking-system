@@ -1,6 +1,6 @@
 # Spec: Dashboard & App Pages
 
-**Feature:** Transform internal app and dashboard pages into the cohesive "Brass-Bound Ledger" editorial design system
+**Feature:** Polish Dashboard, MyBookings, AdminServices, AdminStaff, StaffDashboard pages with shared UI components and seeded data
 **Phase:** 5 of Showcase Readiness Plan  
 **Status:** In Progress  
 **Branch:** `feat/dashboard-app-pages` (from `develop`)
@@ -9,32 +9,29 @@
 
 ## WHAT
 
-Elevate all primary application and dashboard screens from plain/unstyled interfaces to polished, showcase-ready editorial experiences matching `DESIGN.md` and `PRODUCT.md` ("The Brass-Bound Ledger").
+Transform the logged-in experience from empty-state-only to a professional tool with real-looking data and consistent components.
 
-**Target Pages and Components:**
+**Pages:**
 
-| Page / Component | File | Purpose |
-|------------------|------|---------|
-| `DashboardPage` | `booking-client/src/pages/DashboardPage.tsx` | Owner/business overview with KPI cards, quick actions, and recent activity |
-| `StaffDashboardPage` | `booking-client/src/features/staff/StaffDashboardPage.tsx` | Staff daily schedule, week selector, calendar events, and booking status workflow |
-| `AdminServicesPage` | `booking-client/src/features/services/AdminServicesPage.tsx` | Services & categories management with modals, pricing, and duration tags |
-| `AdminStaffPage` | `booking-client/src/features/staff/AdminStaffPage.tsx` | Team management, working hours, overrides, and invitation workflows |
-| `MyBookingsPage` | `booking-client/src/features/booking/MyBookingsPage.tsx` | Customer appointment ledger, access code lookup, upcoming/past appointments, cancel/reschedule |
-| `Navbar` & Shell | `booking-client/src/shared/components/Navbar.tsx` | Sticky translucent navigation, role badge, user profile, and mobile drawer |
+| Page | Current State | Target State |
+|------|--------------|--------------|
+| `DashboardPage.tsx` | All stats show `0` | Seeded data, brass-accented stat cards, quick actions as cards |
+| `MyBookingsPage.tsx` | Decent structure | `Ticket` cards, better empty state, status chips |
+| `AdminServicesPage.tsx` | Done | `Card`, `Badge`, `Button` consistency check |
+| `AdminStaffPage.tsx` | Done | `Card`, `Badge`, `Button` consistency check |
+| `StaffDashboardPage.tsx` | Basic | Calendar view with data, not empty |
 
-**Design System Rigor:**
-- Every page begins with a mono brass uppercase eyebrow and a Fraunces display headline.
-- Warm Paper surfaces (`#F5F0E4`), Soft Ivory card backgrounds (`#FFFDF8`), and Ink text (`#14213D`).
-- Antique brass (`#B8862B`) used strictly as an accent (≤10% of viewport area) — buttons, active indicators, and focus rings.
-- Flat-by-default surfaces with hairline borders (`rgba(20, 33, 61, 0.14)`) and subtle elevation on interaction.
-- Shared UI components utilized consistently (`Card`, `Button`, `Input`, `Badge`, `EmptyState`, `LoadingSkeleton`, `Modal`, `SectionHeader`).
-- Microcopy customized for Philippine service businesses (PHP `₱` formatting, Manila timezone context, friendly tone).
+**Changes:**
+- Replace `animate-pulse` boxes with `LoadingSkeleton`
+- Replace bare empty states with `EmptyState` component
+- Stat cards use brass-accented icons and proper typography
+- All pages use shared UI components only
 
 ---
 
 ## WHY
 
-The dashboard and internal app pages are what prospective employers, clients, and evaluators inspect during live demos. Generic Bootstrap-like cards or inconsistent styles break immersion and look like unfinished coursework. A cohesive editorial aesthetic across all internal pages establishes high craft, attention to detail, and production readiness.
+A screener logging into the dashboard should see something that looks functional, not empty boxes. Seeded data + consistent components = professional product.
 
 ---
 
@@ -42,20 +39,26 @@ The dashboard and internal app pages are what prospective employers, clients, an
 
 | Decision | Rationale |
 |----------|-----------|
-| Standardize on shared UI components (`shared/ui/`) | Guarantees visual consistency across dashboard, staff, services, and booking management |
-| Retain existing data fetching hooks and mutations | Preserves clean architecture integration with ASP.NET Core API without regressing business logic |
-| Currency formatting in Philippine Pesos (`₱` / `PHP`) | Aligns with market-specific rules in `AGENTS.md` and `DESIGN.md` |
-| Cohesive Empty & Loading states | Replaces jarring spinners and blank screens with informative skeletons and guided empty states |
+| Seed data via `dotnet run --seed` (Phase 8) | Frontend needs data to display; seed script is backend concern |
+| Use `LoadingSkeleton` instead of `animate-pulse` | More professional loading states |
+| Use `EmptyState` for no-data screens | Branded, actionable empty states |
+
+---
+
+## OPEN QUESTIONS (for clarify step)
+
+| # | Question | Options |
+|---|----------|---------|
+| Q1 | Should dashboard show mock data or connect to seeded API? | Mock data (frontend only) / Seeded API (full stack) |
+| Q2 | Should StaffDashboard calendar be a full calendar grid or list view? | Full grid / List view (simpler) |
 
 ---
 
 ## ACCEPTANCE CRITERIA
 
-- [ ] All 5 key app pages (`DashboardPage`, `StaffDashboardPage`, `AdminServicesPage`, `AdminStaffPage`, `MyBookingsPage`) and `Navbar` follow the Brass-Bound Ledger design system.
-- [ ] Uppercase mono brass eyebrow above every page/section headline.
-- [ ] Shared UI components (`Button`, `Card`, `Badge`, `Input`, `Modal`, `LoadingSkeleton`, `EmptyState`) used consistently across all app views.
-- [ ] No hardcoded stark white/grey backgrounds; warm paper and soft ivory used uniformly.
-- [ ] Brass accents kept under 10% screen coverage.
-- [ ] Currency values formatted as `₱` (Philippine Peso) with proper decimal precision.
-- [ ] TypeScript compilation (`tsc --noEmit`) passes with zero errors.
-- [ ] Client builds cleanly without errors.
+- [ ] No `animate-pulse` boxes remain (replaced with `LoadingSkeleton`)
+- [ ] No bare empty states (replaced with `EmptyState`)
+- [ ] Dashboard stat cards have data (or seeded via API)
+- [ ] All pages use shared `Card`, `Badge`, `Button` only
+- [ ] Impeccable audit passes on all app pages
+- [ ] Responsive at 375px–1440px

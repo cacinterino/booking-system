@@ -1,16 +1,15 @@
 # Tasks: Dashboard & App Pages
 
-**Spec:** `specs/007-dashboard-app-pages/spec.md`  
-**Plan:** `specs/007-dashboard-app-pages/plan.md`
+**Spec:** `specs/007-dashboard-app-pages/spec.md`
 
 | ID | Task | Status | Depends On |
 |----|------|--------|------------|
-| T060 | Scaffold spec files and requirements for Phase 5 | ✅ Done | — |
-| T061 | Ensure complete shared UI components in `booking-client/src/shared/ui/` | ✅ Done | T060 |
-| T062 | Redesign `DashboardPage.tsx` with editorial header, KPI cards, quick actions, and schedule overview | ✅ Done | T061 |
-| T063 | Redesign `StaffDashboardPage.tsx` with week picker, schedule ledger, and status transition workflows | ✅ Done | T061 |
-| T064 | Redesign `AdminServicesPage.tsx` with category tabs, service cards, and modal forms | ✅ Done | T061 |
-| T065 | Redesign `AdminStaffPage.tsx` with team cards, weekly schedule viewer, and modals | ✅ Done | T061 |
-| T066 | Redesign `MyBookingsPage.tsx` with access code input card and appointment tickets | ✅ Done | T061 |
-| T067 | Polish `Navbar.tsx` and app navigation shell with role badges and active states | ✅ Done | T061 |
-| T068 | Run TypeScript validation, production build check, and verify acceptance criteria | ✅ Done | T062–T067 |
+| T060 | Replace `animate-pulse` with `LoadingSkeleton` on all pages | In Progress | — |
+| T061 | Replace bare empty states with `EmptyState` component | Pending | T060 |
+| T062 | Polish `DashboardPage.tsx` with seeded data + brass stat cards | Pending | T060, T061 |
+| T063 | Polish `MyBookingsPage.tsx` with `Ticket` cards + status chips | Pending | T060, T061 |
+| T064 | Consistency check: `AdminServicesPage.tsx` uses shared components | Pending | T060 |
+| T065 | Consistency check: `AdminStaffPage.tsx` uses shared components | Pending | T060 |
+| T066 | Polish `StaffDashboardPage.tsx` calendar view with data | Pending | T060, T061 |
+| T067 | Impeccable audit on all app pages; fix violations | Pending | T062–T066 |
+| T068 | Responsive check at 375px–1440px | Pending | T062–T066 |
