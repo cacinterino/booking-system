@@ -25,9 +25,9 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
         <Comp
           ref={ref}
           id={inputId}
-          className={`w-full px-4 py-3 border rounded-lg bg-paper-white text-ink placeholder-slate focus:outline-none focus:ring-2 focus:ring-brass focus:border-brass transition-all ${
+          className={`w-full px-4 py-3 border rounded-lg bg-paper-white text-ink placeholder-slate focus:outline-none focus-visible:ring-2 focus-visible:ring-brass focus-visible:border-brass transition-all ${
             error
-              ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+              ? 'border-red-500 focus-visible:ring-red-500 focus-visible:border-red-500'
               : 'border-line'
           } ${className ?? ''}`}
           {...props}

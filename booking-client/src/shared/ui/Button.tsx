@@ -5,15 +5,15 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-brass text-paper-white hover:bg-brass-soft focus:ring-2 focus:ring-brass focus:ring-offset-2 focus:ring-offset-paper-white',
+    'bg-brass text-paper-white hover:bg-brass-soft focus-visible:ring-2 focus-visible:ring-brass focus-visible:ring-offset-2 focus-visible:ring-offset-paper-white',
   secondary:
-    'bg-paper-white text-ink border border-line hover:bg-ink/5 focus:ring-2 focus:ring-ink focus:ring-offset-2 focus:ring-offset-paper-white',
+    'bg-paper-white text-ink border border-line hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper-white',
   'on-dark':
-    'bg-brass text-ink hover:bg-brass-soft hover:text-ink focus:ring-2 focus:ring-brass-soft focus:ring-offset-2 focus:ring-offset-ink',
+    'bg-brass text-ink hover:bg-brass-soft hover:text-ink focus-visible:ring-2 focus-visible:ring-brass-soft focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
   'outline-on-dark':
-    'border border-paper-white/30 text-paper-white hover:bg-paper-white/10 focus:ring-2 focus:ring-paper-white focus:ring-offset-2 focus:ring-offset-ink',
+    'border border-paper-white/30 text-paper-white hover:bg-paper-white/10 focus-visible:ring-2 focus-visible:ring-paper-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-paper-white',
+    'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-white',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
