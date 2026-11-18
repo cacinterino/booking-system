@@ -1,4 +1,5 @@
 import type { Service } from '../../services/types';
+import { Card, Button } from '../../../shared/ui';
 
 interface ServiceStepProps {
   services: Service[];
@@ -13,22 +14,21 @@ function formatPrice(price: number): string {
 export function ServiceStep({ services, selectedId, onSelect }: ServiceStepProps) {
   if (services.length === 0) {
     return (
-      <div className="ticket-plain text-center">
+      <Card className="text-center">
         <p className="text-ink-soft">No services available right now. Please check back later.</p>
-      </div>
+      </Card>
     );
   }
 
   return (
     <div className="grid grid-cols-1 gap-3">
       {services.map((service) => (
-        <button
+        <Card
           key={service.id}
-          type="button"
-          onClick={() => onSelect(service)}
-          className={`ticket-plain text-left w-full transition-colors ${
+          className={`text-left w-full transition-colors cursor-pointer ${
             selectedId === service.id ? 'border-brass ring-2 ring-brass ring-offset-2 ring-offset-paper' : ''
           }`}
+          onClick={() => onSelect(service)}
         >
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -43,7 +43,7 @@ export function ServiceStep({ services, selectedId, onSelect }: ServiceStepProps
           {service.categoryName && (
             <p className="mt-2 font-mono text-xs uppercase tracking-widest text-slate">{service.categoryName}</p>
           )}
-        </button>
+        </Card>
       ))}
     </div>
   );

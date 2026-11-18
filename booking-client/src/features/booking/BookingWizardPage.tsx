@@ -8,7 +8,7 @@ import { StaffStep } from './components/StaffStep';
 import { DateTimeStep } from './components/DateTimeStep';
 import { DetailsStep } from './components/DetailsStep';
 import { ConfirmationStep } from './components/ConfirmationStep';
-import { LoadingSpinner } from '../../shared/components/LoadingSpinner';
+import { LoadingSkeleton } from '../../shared/ui';
 import type { AvailableSlot, BookingResponse, PublicStaff } from './types';
 import type { Service as ServiceType } from '../services/types';
 
@@ -35,7 +35,8 @@ function LookupMyBooking({ slug }: { slug: string }) {
   });
 
   return (
-    <div className="mt-12 ticket-plain">
+    <div className="mt-12 max-w-md w-full">
+      <Card className="text-center">
       <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">Have a booking already?</p>
       <h3 className="mt-1 font-display text-lg font-semibold text-ink">Look it up with your access code</h3>
       <form
@@ -86,6 +87,7 @@ function LookupMyBooking({ slug }: { slug: string }) {
           ))}
         </ul>
       )}
+      </Card>
     </div>
   );
 }
@@ -171,7 +173,7 @@ export function BookingWizardPage() {
   if (businessQuery.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper">
-        <LoadingSpinner />
+        <LoadingSkeleton className="h-10 w-24" />
       </div>
     );
   }
@@ -179,7 +181,7 @@ export function BookingWizardPage() {
   if (notFound) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper px-4">
-        <div className="ticket text-center max-w-md w-full">
+        <div className="max-w-md w-full">
           <p className="font-mono text-xs uppercase tracking-widest text-brass">Page not found</p>
           <h1 className="mt-2 font-display text-2xl font-semibold text-ink">We couldn't find that business</h1>
           <p className="mt-3 text-ink-soft">The booking link may be out of date. Check the address and try again.</p>
@@ -194,7 +196,7 @@ export function BookingWizardPage() {
   if (noServices) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper px-4">
-        <div className="ticket text-center max-w-md w-full">
+        <div className="max-w-md w-full">
           <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">{eyebrow}</p>
           <h1 className="mt-2 font-display text-2xl font-semibold text-ink">No services available yet</h1>
           <p className="mt-3 text-ink-soft">This business hasn't published any services. Check back soon.</p>
@@ -235,13 +237,7 @@ export function BookingWizardPage() {
               {STEPS.map((label, i) => (
                 <li key={label} className="flex items-center gap-2">
                   <span
-                    className={`font-mono text-xs px-2.5 py-1 rounded-full border ${
-                      i === step
-                        ? 'bg-brass text-ink border-brass'
-                        : i < step
-                          ? 'border-line bg-paper-white text-ink'
-                          : 'border-line text-slate'
-                    }`}
+                    className={`font-mono text-xs px-2.5 py-1 rounded-full border ${i === step ? 'bg-brass text-ink border-brass' : i < step ? 'border-line bg-paper-white text-ink' : 'border-line text-slate'}`}
                   >
                     {label}
                   </span>
@@ -304,7 +300,7 @@ export function BookingWizardPage() {
         {step === 3 && business && (
           <>
             {slot && service && (
-              <div className="mb-6 ticket-plain">
+              <div className="mb-6 Card">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-display font-semibold text-ink">{service.name}</p>
