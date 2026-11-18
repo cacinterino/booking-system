@@ -1,9 +1,12 @@
 using Booking.Application;
 using Booking.Api.Middleware;
 using Booking.Infrastructure;
+using Booking.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
@@ -32,6 +35,17 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0,
                 AutoReplenishment = true
             }));
+
+    options.AddPolicy("authLogin", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
 });
 
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?
@@ -51,6 +65,22 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Auto-run migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+    db.Database.Migrate();
+
+    // Seed demo data when --seed argument is passed
+    if (args.Contains("--seed"))
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        await SeedData.SeedAsync(db, userManager, roleManager, config);
+    }
+}
+
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -66,6 +96,9 @@ app.UseCors("Default");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Health endpoint (no external NuGet dependencies)
+app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
 
 app.MapControllers();
 
