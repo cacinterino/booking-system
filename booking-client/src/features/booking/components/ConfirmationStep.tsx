@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { BookingResponse } from '../types';
+import { Ticket } from '../../../shared/ui';
 
 interface ConfirmationStepProps {
   booking: BookingResponse;
@@ -33,15 +34,15 @@ export function ConfirmationStep({ booking }: ConfirmationStepProps) {
 
   return (
     <div className="space-y-6">
-      <div className="ticket text-center">
+      <Ticket className="text-center">
         <p className="font-mono text-xs uppercase tracking-widest text-brass-deep">You're booked</p>
         <h2 className="mt-2 font-display text-2xl font-semibold text-ink">See you there</h2>
         <p className="mt-3 text-ink-soft">{booking.serviceName}</p>
         <p className="mt-1 text-ink-soft">with {booking.staffName}</p>
         <p className="mt-3 font-display text-xl font-semibold text-ink">{formatDateTime(booking.startTime)}</p>
-      </div>
+      </Ticket>
 
-      <div className="ticket-plain space-y-3">
+      <Card className="space-y-3">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-slate">Booking reference</p>
@@ -71,7 +72,7 @@ export function ConfirmationStep({ booking }: ConfirmationStepProps) {
             </p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

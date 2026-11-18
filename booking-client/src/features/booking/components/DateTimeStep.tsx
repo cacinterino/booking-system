@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { usePublicAvailability } from '../hooks';
 import type { AvailableSlot } from '../types';
+import { Card, Button } from '../../../shared/ui';
 
 interface DateTimeStepProps {
   slug: string;
@@ -77,18 +78,14 @@ export function DateTimeStep({
         <label className="label-field">Choose a date</label>
         <div className="flex flex-wrap gap-2">
           {dates.map((date) => (
-            <button
+            <Button
               key={date}
-              type="button"
+              variant={date === selectedDate ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setSelectedDate(date)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                date === selectedDate
-                  ? 'border-brass bg-brass text-paper-white'
-                  : 'border-line bg-paper-white text-ink hover:bg-ink/5'
-              }`}
             >
               {formatDateLabel(date)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -97,12 +94,14 @@ export function DateTimeStep({
         {isLoadingSlots ? (
           <p className="text-slate">Loading available times…</p>
         ) : isError ? (
-          <p className="text-red-600">Could not load availability. Please refresh.</p>
+          <Card className="text-center">
+            <p className="text-red-600">Could not load availability. Please refresh.</p>
+          </Card>
         ) : data && data.slots.length === 0 ? (
-          <div className="ticket-plain text-center">
+          <Card className="text-center">
             <p className="text-ink-soft">This date is fully booked.</p>
             <p className="mt-1 text-sm text-slate">Try another date above.</p>
-          </div>
+          </Card>
         ) : (
           <>
             {data && (
@@ -116,18 +115,18 @@ export function DateTimeStep({
                   <p className="mb-2 font-display font-semibold text-ink">{staffName}</p>
                   <div className="flex flex-wrap gap-2">
                     {slots.map((slot) => (
-                      <button
+                      <Button
                         key={`${slot.staffId}-${slot.startUtc}`}
-                        type="button"
-                        onClick={() => handleSlot(slot)}
-                        className={`px-4 py-2 rounded-lg font-mono text-sm border transition-colors ${
+                        variant={
                           selectedSlot?.startUtc === slot.startUtc && selectedSlot?.staffId === slot.staffId
-                            ? 'border-brass bg-brass text-paper-white'
-                            : 'border-line bg-paper-white text-ink hover:border-brass hover:text-brass'
-                        }`}
+                            ? 'primary'
+                            : 'secondary'
+                        }
+                        size="sm"
+                        onClick={() => handleSlot(slot)}
                       >
                         {formatTime(slot.start)}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
