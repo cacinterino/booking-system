@@ -70,15 +70,6 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
     db.Database.Migrate();
-
-    // Seed demo data when --seed argument is passed
-    if (args.Contains("--seed"))
-    {
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-        await SeedData.SeedAsync(db, userManager, roleManager, config);
-    }
 }
 
 // Pipeline
