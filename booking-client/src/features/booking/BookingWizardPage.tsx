@@ -9,6 +9,7 @@ import { DateTimeStep } from './components/DateTimeStep';
 import { DetailsStep } from './components/DetailsStep';
 import { ConfirmationStep } from './components/ConfirmationStep';
 import { LoadingSkeleton, Card } from '../../shared/ui';
+import { formatDateTimeManila } from './format';
 import type { AvailableSlot, BookingResponse, PublicStaff } from './types';
 import type { Service as ServiceType } from '../services/types';
 
@@ -307,15 +308,7 @@ export function BookingWizardPage() {
                     <p className="mt-1 text-sm text-slate">with {staff?.fullName}</p>
                   </div>
                   <p className="font-mono text-sm font-medium text-ink">
-                    {new Date(slot.startUtc + 'Z').toLocaleString('en-PH', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                      timeZone: 'Asia/Manila',
-                    })}
+                    {formatDateTimeManila(slot.startUtc)}
                   </p>
                 </div>
               </Card>

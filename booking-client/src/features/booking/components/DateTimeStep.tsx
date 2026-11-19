@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { usePublicAvailability } from '../hooks';
 import type { AvailableSlot } from '../types';
+import { formatTimeManila } from '../format';
 import { Card, Button } from '../../../shared/ui';
 
 interface DateTimeStepProps {
@@ -13,14 +14,14 @@ interface DateTimeStepProps {
   onSelectSlot: (slot: AvailableSlot) => void;
 }
 
-function formatTime(localIso: string): string {
-  const date = new Date(localIso);
-  return date.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
-}
-
 function formatDateLabel(date: string): string {
-  const d = new Date(`${date}T00:00:00`);
-  return d.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric' });
+  const d = new Date(`${date}T00:00:00+08:00`);
+  return d.toLocaleDateString('en-PH', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'Asia/Manila',
+  });
 }
 
 function toLocalDateKey(date: Date): string {
@@ -125,7 +126,7 @@ export function DateTimeStep({
                         size="sm"
                         onClick={() => handleSlot(slot)}
                       >
-                        {formatTime(slot.start)}
+                        {formatTimeManila(slot.start)}
                       </Button>
                     ))}
                   </div>
