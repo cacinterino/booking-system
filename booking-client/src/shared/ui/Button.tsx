@@ -30,19 +30,26 @@ export interface ButtonProps
   variant?: ButtonVariant;
   size?: ButtonSize;
   className?: string;
-  asChild?: boolean;
+  /** Render an anchor instead of a button. Pass the link target here, not in `children`. */
+  href?: string;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', asChild, ...props }, ref) => {
-    const Comp = asChild ? (props as unknown as React.ElementType) : 'button';
+  ({ className, variant = 'primary', size = 'md', href, children, ...props }, ref) => {
+    const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className ?? ''}`;
+
+    if (href) {
+      return (
+        <a href={href} className={classes}>
+          {children}
+        </a>
+      );
+    }
+
     return (
-      <Comp
-        ref={ref}
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className ?? ''}`}
-        {...(asChild ? {} : { type: props.type ?? 'button' })}
-        {...props}
-      />
+      <button ref={ref} type={props.type ?? 'button'} className={classes} {...props}>
+        {children}
+      </button>
     );
   },
 );

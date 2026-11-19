@@ -64,6 +64,19 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
                 ClockSkew = TimeSpan.Zero
             };
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = context =>
+                {
+                    // Refresh tokens are signed with the same key, so reject them here.
+                    // Only tokens minted by GenerateAccessToken carry token_type=access.
+                    var tokenType = context.Principal?.FindFirst(JwtTokenService.TokenTypeClaim)?.Value;
+                    if (tokenType != JwtTokenService.AccessTokenType)
+                        context.Fail("A refresh token cannot be used as an access token.");
+
+                    return Task.CompletedTask;
+                }
+            };
         });
 
         // Authorization policies

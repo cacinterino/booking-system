@@ -1,271 +1,172 @@
 # Booked.
 
-> Real-time, conflict-free appointment booking for Philippine service businesses — clinics, salons, barbershops, and spas.
+An appointment booking app for service businesses (clinics, salons, barbershops, spas). Customers book a real open slot from a public page, and staff manage those bookings from a weekly calendar. Built as a portfolio project with ASP.NET Core 9, React, and PostgreSQL.
 
-[![CI](https://github.com/cacinterino/booking-system/actions/workflows/ci.yml/badge.svg)](https://github.com/cacinterino/booking-system/actions)
-[![ASP.NET Core 9](https://img.shields.io/badge/API-ASP.NET%20Core%209-512BD8?logo=dotnet)](https://dotnet.microsoft.com/)
-[![React 18](https://img.shields.io/badge/Client-React%2018-61DAFB?logo=react)](https://reactjs.org/)
-[![PostgreSQL 16](https://img.shields.io/badge/DB-PostgreSQL%2016-336791?logo=postgresql)](https://www.postgresql.org/)
-[![Tailwind CSS v4](https://img.shields.io/badge/Styling-Tailwind%20v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
+## Screenshots
 
-**Live Demo:** [Coming Soon — Render + Vercel]  
-**Repo:** [github.com/cacinterino/booking-system](https://github.com/cacinterino/booking-system)
+| Landing | Booking wizard | Staff calendar |
+|:-------:|:--------------:|:--------------:|
+| _(add a screenshot)_ | _(add a screenshot)_ | _(add a screenshot)_ |
 
----
+> **Demo recording & evaluation:** See [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) for a 3-minute timed video walkthrough and [`docs/demo-test-cases.csv`](docs/demo-test-cases.csv) for the manual QA test matrix.
 
-## 🎯 The Pitch
+## What it actually does
 
-Small service businesses in the Philippines still run on phone calls, walk-ins, and paper diaries. No-shows kill revenue. Double-bookings destroy trust.
+- **Public booking page** (`/book/:businessSlug`) — pick a service, a staff member, a date, and an open slot. No account needed.
+- **Availability engine** — combines weekly staff hours, date overrides, service duration, slot interval, and existing bookings into bookable slots per day (Asia/Manila).
+- **No double-bookings** — a PostgreSQL exclusion constraint on the staff member's time range rejects overlaps; the second request for the same slot returns `409 Conflict`, not a `500`.
+- **Idempotent creates** — `POST /api/bookings` honours an `Idempotency-Key` header, so a retried submit returns the existing booking.
+- **Access-code lookup** (`/my-bookings`) — guests get a code (`8F3K-2Q7X`) to view, reschedule, or cancel their appointment. Codes are stored in `localStorage` only if the guest ticks "remember".
+- **Business setup** (`/register-business`) — register a business, manage services (name, duration, price, active), manage staff, assign services, set weekly hours and date overrides.
+- **Staff calendar** (`/staff/calendar`) — one week at a time, filtered to a staff member or the whole business; confirm, complete, mark no-show, or cancel.
+- **Dashboard** (`/dashboard`) — this week's booking counts, pending confirmations, and the next appointment today, all read from the calendar API.
+- **Product notes & architecture highlights** (`/highlights`) — interactive walkthrough covering features, the 6-step request lifecycle, database tables, and key engineering decisions.
+- **Auth** — ASP.NET Core Identity with JWT access tokens (15 min) and signed refresh tokens (7 days). Refresh tokens are rejected by the bearer middleware; they only work at `POST /api/auth/refresh`.
 
-**Booked.** replaces all of that with a real-time booking platform where customers pick a real, available slot, pay a small deposit with GCash or Maya, and get automated reminders so they actually show up.
+Not implemented yet: online payments (GCash/Maya), email/SMS reminder scheduling, and live calendar push. The landing page and docs do not claim otherwise.
 
-Built as a portfolio-grade, production-ready full-stack application with Clean Architecture, CQRS, a tested availability engine, and database-level double-booking prevention.
+## Tech stack
 
----
+| Layer | Technology |
+|-------|------------|
+| API | ASP.NET Core 9, MediatR, FluentValidation, Clean Architecture (Domain has zero dependencies) |
+| Data | EF Core 9 + Npgsql, PostgreSQL 16 |
+| Auth | ASP.NET Core Identity, JWT bearer |
+| Client | React 19, TypeScript, Vite, Tailwind CSS v4, TanStack Query, React Hook Form + Zod, React Router 7 |
+| Tests | xUnit, Moq, FluentAssertions, Testcontainers, Respawn; Vitest + Testing Library |
+| Local stack | Docker Compose (Postgres, pgAdmin, API, client) |
 
-## 📸 Screenshots
+## Run it
 
-| Landing Page | Booking Wizard | Staff Dashboard |
-|--------------|---------------|-----------------|
-| _(add)_ | _(add)_ | _(add)_ |
+### Option A — Docker Compose (one command)
 
-> Record a 60-second demo GIF and drop it here before sharing the link with recruiters.
-
----
-
-## 🚀 Features
-
-### For Business Owners & Staff
-- **Service management** — Create, edit, deactivate services with pricing and duration
-- **Team management** — Invite staff, assign services, set weekly schedules
-- **Schedule overrides** — Date-specific time-off or extra hours
-- **Calendar view** — See today's and upcoming bookings at a glance
-- **Booking lifecycle** — Confirm, complete, mark no-show, cancel, reschedule
-- **Real-time updates** — SignalR pushes calendar changes live
-
-### For Customers (Guests + Registered)
-- **Public booking page** — Share a link (`/book/:businessSlug`), no app download
-- **Real-time availability** — Slots computed from staff schedules, overrides, and existing bookings
-- **GCash & Maya deposits** — PayMongo-powered deposits to hold slots and cut no-shows
-- **Access code management** — View, reschedule, or cancel bookings with a code
-- **Email/SMS reminders** — 24h and 1h before each appointment
-
-### Platform Guarantees
-- **No double-bookings** — Postgres exclusion constraint on `(StaffId, StartTime)`; exactly one winner, clean 409 for the loser
-- **Idempotent booking creates** — `Idempotency-Key` header prevents duplicate submissions
-- **Asia/Manila timezone** — All timestamps stored in UTC, converted at the API boundary
-- **Soft delete** — `IsDeleted` + global query filter on `Booking` and `Customer`
-
----
-
-## 🏗️ Architecture
-
-Clean Architecture with CQRS via MediatR. Domain has **zero dependencies** — no EF Core, no MediatR, no external packages.
-
-```
-booking-system/
-├── Booking.Api/                    # Controllers, Middleware, Program.cs, SignalR Hubs
-│   └── src/
-│       ├── Booking.Domain/         # Entities, Enums, Domain Events, Value Objects (ZERO deps)
-│       ├── Booking.Application/    # Commands, Queries, Handlers, DTOs, Interfaces
-│       ├── Booking.Infrastructure/ # EF Core, Repositories, Email/SMS, Auth, SignalR
-│       └── Booking.Api/            # ASP.NET Core 9 Web API
-└── booking-client/                 # React 18 + TypeScript + Vite + Tailwind CSS v4
-    ├── src/
-    │   ├── features/               # Feature-based modules (booking, auth, dashboard)
-    │   ├── shared/                 # UI components, hooks, utilities, API client
-    │   ├── pages/                  # Route-level components
-    │   └── main.tsx
-```
-
-**Key design decisions:**
-- **Exclusion constraint** instead of application-level locking for double-booking prevention (database is the final authority)
-- **UTC storage** + Asia/Manila conversion at DTO mapping boundary
-- **TanStack Query** for server state on the client
-- **React Hook Form + Zod** for form validation
-- **Impeccable design system** for UI consistency (audited against committed design tokens)
-
----
-
-## 🛠️ Local Setup
-
-### Prerequisites
-| Tool | Version |
-|------|---------|
-| .NET SDK | 9.0 |
-| Node.js | 20 LTS |
-| Docker Desktop | Latest |
-| GitHub CLI | Latest |
-
-### 1. Clone the repo
 ```bash
-git clone https://github.com/cacinterino/booking-system.git
-cd booking-system
+docker compose up --build
 ```
 
-### 2. Start the stack (API + Postgres + pgAdmin)
-```bash
-docker compose up -d
-```
+- Client: http://localhost:5173
+- API: http://localhost:5000 (health check: http://localhost:5000/api/health)
+- pgAdmin: http://localhost:5050 (login: `admin@local.dev` / `admin`)
 
-### 3. Run EF Core migrations
-```bash
-dotnet ef database update --project src/Booking.Infrastructure --startup-project src/Booking.Api
-```
+Migrations run automatically on API startup. Demo data seeds automatically because `Seed__Demo` defaults to `true` in `docker-compose.yml`. To start with an empty database, copy `.env.example` to `.env` and set `SEED_DEMO=false`.
 
-### 4. Seed demo data (optional but recommended for demos)
-```bash
-dotnet run --project src/Booking.Api -- --seed
-```
+### Option B — native dev servers
 
-### 5. Start the API
-```bash
-dotnet run --project src/Booking.Api
-# API: http://localhost:5000
-```
+Prerequisites: .NET 9 SDK, Node 20+, and PostgreSQL 16 (or just Postgres via `docker compose up -d postgres`).
 
-### 6. Start the client
 ```bash
+# 1. Database only
+docker compose up -d postgres
+
+# 2. API on http://localhost:5000, with demo data
+dotnet run --project src/Booking.Api --launch-profile http -- --seed
+
+# 3. Client on http://localhost:5173
 cd booking-client
 npm install
-npm run dev          # http://localhost:5173
+npm run dev
 ```
 
-### 7. Run tests
-```bash
-dotnet test Booking.sln
+The client reads `VITE_API_URL` and falls back to `http://localhost:5000`. CORS defaults to `http://localhost:5173`.
+
+### Demo login
+
+```
+email:    demo@booked.local
+password: Demo123!
 ```
 
----
+`--seed` (or `Seed__Demo=true`) is idempotent: it creates the demo business `booked-demo` only if it does not exist, along with three services, two staff members, Mon–Sat 09:00–18:00 hours, and three bookings. Seeded data uses fake contacts (`@example.com` addresses, `+63 900 000 000x` numbers). To reseed, delete the `booked-demo` business row or recreate the Postgres volume (`docker compose down -v`).
 
-## 🔐 Environment Variables
+Pre-seeded access codes for testing `/my-bookings`:
+- `DEMO-1001` (Maria Cruz — Signature Facial — Confirmed)
+- `DEMO-1002` (Paolo Reyes — Deep Tissue Massage — Pending)
+- `DEMO-1003` (Liza Fernandez — Gel Manicure — Confirmed)
 
-| Variable | Render (API) | Vercel (Client) | Description |
-|----------|-------------|-----------------|-------------|
-| `ConnectionStrings__DefaultConnection` | ✅ | | PostgreSQL connection string |
-| `Jwt__Key` | ✅ | | JWT signing key (min 32 chars) |
-| `Jwt__Issuer` | ✅ | | JWT issuer |
-| `Jwt__Audience` | ✅ | | JWT audience |
-| `Email__ApiKey` | ✅ | | Email provider API key |
-| `Email__From` | ✅ | | From address |
-| `Sms__Provider` | ✅ | | `semaphore` for PH |
-| `Sms__ApiKey` | ✅ | | SMS provider API key |
-| `Sms__From` | ✅ | | SMS sender ID |
-| `PayMongo__SecretKey` | ✅ | | PayMongo secret key (deposits) |
-| `AllowedOrigins` | ✅ | | CORS origins (client domain) |
-| `VITE_API_URL` | | ✅ | API base URL for client |
+Identity roles (`Admin`, `Staff`, `Customer`) are seeded on every startup, because `register-business` assigns the `Admin` role.
 
----
-
-## 📡 API Endpoints
-
-### Auth
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/api/auth/register` | Public | Customer self-register |
-| `POST` | `/api/auth/login` | Public | Returns access + refresh token |
-| `POST` | `/api/auth/refresh` | Auth | Rotate refresh token |
-| `POST` | `/api/auth/revoke` | Auth | Logout |
-| `GET` | `/api/auth/me` | Auth | Current user profile |
-
-### Services (Admin)
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `GET` | `/api/services` | Admin/Staff | List services |
-| `POST` | `/api/services` | Admin | Create service |
-| `PUT` | `/api/services/{id}` | Admin | Update service |
-| `DELETE` | `/api/services/{id}` | Admin | Delete service |
-
-### Staff & Schedules (Admin)
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `GET` | `/api/staff` | Admin | List staff |
-| `POST` | `/api/staff` | Admin | Create staff |
-| `GET` | `/api/staff/{id}/schedule` | Admin/Staff | Weekly schedule |
-| `PUT` | `/api/staff/{id}/schedule` | Admin | Update schedule |
-| `POST` | `/api/staff/{id}/overrides` | Admin | Add override |
-
-### Booking (Customer + Staff)
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `GET` | `/api/availability` | Public | Available slots |
-| `POST` | `/api/bookings` | Public/Auth | Create booking (idempotent) |
-| `GET` | `/api/bookings/my-bookings` | Customer | My bookings |
-| `POST` | `/api/bookings/{id}/cancel` | Customer/Owner | Cancel booking |
-| `POST` | `/api/bookings/{id}/reschedule` | Customer/Owner/Staff | Reschedule |
-| `GET` | `/api/bookings/calendar` | Staff/Admin | Calendar events |
-| `PUT` | `/api/bookings/{id}/status` | Staff | Confirm/Complete/NoShow |
-
----
-
-## 🧪 Testing
-
-| Suite | Framework | Count | Status |
-|-------|-----------|-------|--------|
-| Unit tests | xUnit + Moq + FluentAssertions | 45 passing | ✅ |
-| Integration tests | Testcontainers + Respawn | 7 passing | ✅ |
-
-**Key test coverage:** availability engine, concurrency race (two simultaneous bookings → one 201, one 409), booking lifecycle, auth flow.
+## Tests
 
 ```bash
+# Backend unit tests (83 fast unit tests, no external dependencies)
+dotnet test tests/Booking.UnitTests
+
+# Backend integration tests (7 tests, spins up PostgreSQL via Testcontainers — requires Docker)
+dotnet test tests/Booking.IntegrationTests
+
+# Run full backend test suite
 dotnet test Booking.sln
+
+# Client: 34 component tests (Vitest)
+cd booking-client
+npm test
+
+# Client type-check + production build
+npm run build
 ```
 
----
+Coverage worth highlighting:
 
-## 🇵🇭 Data Privacy (RA 10173)
+- `tests/Booking.UnitTests/Availability/AvailabilityEngineTests.cs` — slot generation, overrides, booked intervals, Manila timezone edges.
+- `tests/Booking.UnitTests/Domain/BookingLifecycleTests.cs` — legal and illegal status transitions.
+- `tests/Booking.IntegrationTests/Bookings/BookingConcurrencyTests.cs` — two simultaneous bookings for one slot: exactly one wins (409 Conflict for the loser).
+- `tests/Booking.IntegrationTests/Auth/RefreshTokenTests.cs` — a refresh token cannot be used as a bearer token, and an access token cannot be replayed at `/refresh`.
 
-Booked. collects customer personal information (name, email, phone) for the purpose of appointment booking and reminders.
+## API surface (the parts the UI uses)
 
-- **What we collect:** Name, email, phone (optional), booking details
-- **Why:** To confirm appointments, send reminders, and manage bookings
-- **How stored:** PostgreSQL 16, encrypted at rest via hosting provider, access-controlled
-- **Retention:** Booking records retained for business operations; soft-deleted records kept for audit trail
-- **Rights:** Customers may request access, correction, or deletion of their data
+| Method | Endpoint | Notes |
+|--------|----------|-------|
+| `GET` | `/api/health` | Liveness + database check |
+| `GET` | `/api/public/businesses/{slug}` | Public business profile |
+| `GET` | `/api/public/businesses/{slug}/services` | Active services for public booking |
+| `GET` | `/api/public/businesses/{slug}/staff?serviceId=…` | Staff members who can perform the service |
+| `GET` | `/api/public/businesses/{slug}/availability?serviceId=…&date=…&staffId=…` | Open slots for one Manila date |
+| `POST` | `/api/bookings` | Create a booking (anonymous, rate-limited, `Idempotency-Key`) |
+| `GET` | `/api/bookings/my-bookings?accessCode=…` | Guest lookup (or the signed-in customer's bookings) |
+| `POST` | `/api/bookings/{id}/cancel` | Cancel by access code or owner |
+| `POST` | `/api/bookings/{id}/reschedule` | Move to another open slot |
+| `GET` | `/api/bookings/calendar?from=…&to=…` | Staff week view |
+| `PUT` | `/api/bookings/{id}/status` | Confirm / complete / no-show |
+| `GET`, `POST`, `PUT`, `DELETE` | `/api/services` | Service catalog management (Admin) |
+| `GET`, `POST`, `PUT` | `/api/staff`, `/api/staff/{id}/schedule` | Staff roster, service assignments, schedules (Admin) |
+| `POST` | `/api/auth/register`, `/register-business`, `/login`, `/refresh`, `/revoke` | Auth & business onboarding |
+| `GET` | `/api/auth/me` | Current authenticated user profile |
 
-This system is designed with RA 10173 (Data Privacy Act of the Philippines) awareness.
+## Configuration
 
----
+Copy `.env.example` to `.env` for Docker Compose, or use `dotnet user-secrets` / `appsettings.Development.json` for the API. Never commit a filled-in `.env`.
 
-## 🚀 Deployment
+| Key (ASP.NET) | Docker Compose (.env) | Purpose |
+|---------------|----------------------|---------|
+| `ConnectionStrings__DefaultConnection` | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | PostgreSQL connection string |
+| `Jwt__Key`, `Jwt__Issuer`, `Jwt__Audience` | `JWT_KEY`, `JWT_ISSUER`, `JWT_AUDIENCE` | Token signing and validation |
+| `Jwt__AccessTokenExpiryMinutes`, `Jwt__RefreshTokenExpiryDays` | — | Token lifetimes (default: 15 min / 7 days) |
+| `AllowedOrigins` | `ALLOWED_ORIGINS` | CORS origin(s) for the client (default: `http://localhost:5173`) |
+| `Email__ApiKey`, `Email__From` | — | SendGrid key; when empty the reset link is written to the console |
+| `Seed__Demo` | `SEED_DEMO` | `true` seeds the demo business (`booked-demo`) at startup |
 
-| Layer | Provider | Tier |
-|-------|----------|------|
-| Database | Neon / Supabase | Free (permanent) |
-| API | Render | Paid (avoid cold starts for demos) |
-| Client | Vercel | Free |
+## Known limitations
 
-**CI/CD:** GitHub Actions → Render (API) + Vercel (Client)
+- The availability cache is in-memory with a 60-second TTL and no invalidation, so a schedule change can take up to a minute to show up.
+- Refresh tokens are signed JWTs, not rows in a table, so `/revoke` cannot invalidate a token that was already issued.
+- No payment, reminder-scheduling, or real-time features.
+- No CI workflow is committed yet, so there is no build badge.
 
-### Pre-deploy checklist
-- [ ] `GET /api/health` endpoint + PostgreSQL health check
-- [ ] Auto-run EF migrations on startup or Render release command
-- [ ] Seed script (`dotnet run --seed`) — so the calendar isn't empty
-- [ ] CORS `AllowedOrigins` points at the real Vercel domain
-- [ ] Rate limiting on `/api/auth/login` and `POST /api/bookings`
-- [ ] GitHub Actions secrets set: `RENDER_API_KEY`, `VERCEL_TOKEN`, etc.
+## Data privacy (RA 10173)
 
----
+The app stores a customer's name, email, optional phone number, and booking details so the business can deliver and manage the appointment. Bookings and customers are soft-deleted (`IsDeleted`) rather than hard-deleted, which keeps an audit trail. A business owner can see only their own business's records; guests must present the access code to see a booking. Both `Booking` and `Customer` are filtered by a global query filter.
 
-## 📚 Case Study
+## Project layout
 
-See `docs/CASE_STUDY.md` for the full portfolio write-up: problem statement, tech stack rationale, architecture decisions, challenges solved (double-booking, timezone edge cases), and what you'd improve.
+```
+src/Booking.Domain/             # Entities, enums, domain rules (no external packages)
+src/Booking.Application/        # Commands, queries, handlers, validators, DTOs
+src/Booking.Infrastructure/     # EF Core, repositories, Identity/JWT, email, seeder
+src/Booking.Api/                # Controllers, middleware, Program.cs
+tests/Booking.UnitTests/        # Fast domain + handler tests (xUnit)
+tests/Booking.IntegrationTests/ # WebApplicationFactory + real Postgres (Testcontainers)
+booking-client/                 # React 19 app (Vite + Tailwind CSS v4)
+docs/                           # Case study, demo script, test matrix
+```
 
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Commit with conventional messages: `git commit -m "feat: add ..."`
-4. Open a PR to `main` (never commit directly to `main`)
-
----
-
-## 📄 License
-
-MIT License. Built for the Philippines service market.
-
----
-
-**Booked.** — Appointments booked. No-shows cancelled.
+More context: [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md), [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md), and [`docs/demo-test-cases.csv`](docs/demo-test-cases.csv).

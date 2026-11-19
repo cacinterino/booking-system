@@ -46,6 +46,6 @@ internal static class BookingDtoMapper
         var chars = new char[8];
         for (var i = 0; i < chars.Length; i++)
             chars[i] = alphabet[bytes[i] % alphabet.Length];
-        return new string(chars);
+        return $"{new string(chars, 0, 4)}-{new string(chars, 4, 4)}";
     }
 }

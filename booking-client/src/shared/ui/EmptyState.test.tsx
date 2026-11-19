@@ -23,7 +23,7 @@ describe('EmptyState', () => {
 
   it('applies custom className', () => {
     render(<EmptyState title="Empty" className="my-empty" />);
-    const container = screen.getByText('Empty').parentElement!.parentElement!;
+    const container = screen.getByText('Empty').parentElement!;
     expect(container).toHaveClass('my-empty');
   });
 });

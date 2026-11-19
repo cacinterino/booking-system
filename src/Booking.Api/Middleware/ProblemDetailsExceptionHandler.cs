@@ -26,7 +26,7 @@ errorApp.Run(async context =>
                     KeyNotFoundException => (HttpStatusCode.NotFound, "Not Found", exception.Message),
                     InvalidOperationException => (HttpStatusCode.BadRequest, "Bad Request", exception.Message),
                     ValidationException => (HttpStatusCode.BadRequest, "Bad Request", exception.Message),
-                    UnauthorizedAccessException => (HttpStatusCode.Forbidden, "Forbidden", exception.Message),
+                    UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "Unauthorized", exception.Message),
                     _ => (HttpStatusCode.InternalServerError, "Internal Server Error", "An unexpected error occurred.")
                 };
 

@@ -77,7 +77,7 @@ public class RegisterBusinessCommandHandler : IRequestHandler<RegisterBusinessCo
 
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+        var refreshToken = _jwtTokenService.GenerateRefreshToken(user);
         var expiresAt = _jwtTokenService.GetAccessTokenExpiry();
 
         await _emailService.SendWelcomeEmailAsync(req.Email, req.FirstName);
@@ -207,7 +207,7 @@ public class AcceptInvitationCommandHandler : IRequestHandler<AcceptInvitationCo
 
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+        var refreshToken = _jwtTokenService.GenerateRefreshToken(user);
         var expiresAt = _jwtTokenService.GetAccessTokenExpiry();
 
         _logger.LogInformation("Invitation accepted by {Email} for business {BusinessId}", req.Email, invitation.BusinessId);

@@ -10,7 +10,7 @@ export function Footer() {
               Booked<span className="text-brass">.</span>
             </p>
             <p className="text-sm text-paper-white/60 mt-3 max-w-xs leading-relaxed">
-              Appointment booking, deposits, and reminders for Philippine service businesses.
+              Appointment booking for Philippine service businesses.
             </p>
           </div>
           <div>

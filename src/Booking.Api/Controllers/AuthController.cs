@@ -2,6 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Booking.Application.Auth.Commands;
 using Booking.Application.Auth.DTOs;
 using Booking.Application.Auth.Queries;
@@ -46,6 +47,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("authLogin")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
         var command = new LoginCommand(request);

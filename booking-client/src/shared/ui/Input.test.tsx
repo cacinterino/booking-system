@@ -22,7 +22,7 @@ describe('Input', () => {
 
   it('shows error message when error prop is set', () => {
     render(<Input label="Email" error="Invalid email" />);
-    expect(screen.getByRole('alert', { name: 'Invalid email' })).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Invalid email');
   });
 
   it('has red border when error prop is set', () => {

@@ -63,9 +63,9 @@ export function Hero() {
               custom={2}
               className="mt-6 text-lg sm:text-xl text-paper-white/80 leading-relaxed max-w-xl"
             >
-              Booked. is the all-in-one booking platform for clinics, salons,
-              barbershops, and spas across the Philippines — real-time schedules,
-              GCash & Maya deposits, and automated reminders in one place.
+              Booked. is a booking platform for clinics, salons, barbershops,
+              and spas. Publish your services, set your team's weekly hours, and
+              share one booking link that only offers slots you can actually take.
             </motion.p>
 
             <motion.div
@@ -113,8 +113,8 @@ export function Hero() {
 function StatStrip() {
   const stats = [
     {
-      title: 'Double-book proof',
-      desc: 'Real-time slot locking stops two customers taking the same slot.',
+      title: 'No double-bookings',
+      desc: 'A database constraint rejects overlapping bookings, so the same slot can never be sold twice.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 16v-4m0-4h.01m6.364-4.364a9 9 0 11-12.728 0L12 4.29l6.364-.654z" />
@@ -122,26 +122,26 @@ function StatStrip() {
       ),
     },
     {
-      title: 'Deposits via GCash & Maya',
-      desc: 'PayMongo-powered deposits to cut no-shows without a big setup.',
+      title: 'Public booking link',
+      desc: 'One page per business: pick a service, a staff member, and an open slot.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-4.4 0-8 1.8-8 4s3.6 4 8 4 8-1.8 8-4-3.6-4-8-4zm0 8v2" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 010 5.656l-4 4a4 4 0 01-5.656-5.656l1.172-1.172M10.172 13.828a4 4 0 010-5.656l4-4a4 4 0 015.656 5.656l-1.172 1.172" />
         </svg>
       ),
     },
     {
-      title: 'Auto reminders',
-      desc: 'SMS + email nudges 24h and 1h before each appointment.',
+      title: 'Staff schedules',
+      desc: 'Weekly hours and date overrides feed one availability engine per service and staff member.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
     },
     {
       title: 'Set up in minutes',
-      desc: 'A public booking link, no device installs, no card required to start.',
+      desc: 'Register a business, add services and staff, then open your booking link.',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -191,7 +191,7 @@ function HeroVisual() {
               <p className="text-xs font-medium text-slate uppercase tracking-widest">Upcoming</p>
               <p className="font-display text-2xl font-semibold text-ink mt-1">Manicure + Polish</p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-sage/15 text-sage text-xs font-semibold">Deposit paid</span>
+            <span className="px-2.5 py-1 rounded-full bg-sage/15 text-sage text-xs font-semibold">Confirmed</span>
           </div>
           <div className="mt-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-ink/5 flex items-center justify-center font-display font-bold text-brass-deep">
@@ -225,8 +225,8 @@ function HeroVisual() {
               </svg>
             </span>
             <div>
-              <p className="text-sm font-semibold text-ink">Reminder sent</p>
-              <p className="text-xs text-slate">24h before via SMS</p>
+              <p className="text-sm font-semibold text-ink">Access code ready</p>
+              <p className="text-xs text-slate">Look up or cancel later</p>
             </div>
           </div>
         </div>
@@ -235,7 +235,7 @@ function HeroVisual() {
             <span className="w-2 h-2 rounded-full bg-sage" />
             <p className="text-sm font-semibold text-ink">Slot confirmed</p>
           </div>
-          <p className="text-xs text-slate mt-1 font-mono">GCash · ₱150.00</p>
+          <p className="text-xs text-slate mt-1 font-mono">Signature Facial · ₱1,200</p>
         </div>
       </div>
     </motion.div>

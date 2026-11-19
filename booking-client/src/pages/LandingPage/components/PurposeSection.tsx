@@ -17,13 +17,13 @@ const steps = [
   },
   {
     n: '02',
-    title: 'Customers book & pay',
-    desc: 'They choose a service, a staff, and a real open slot — and secure it with a small GCash or Maya deposit.',
+    title: 'Customers book',
+    desc: 'They choose a service, a staff member, and an open slot that fits their day.',
   },
   {
     n: '03',
     title: 'You run the day',
-    desc: 'Your team sees everything live on one calendar. Reminders go out automatically. No-shows drop.',
+    desc: 'Your team sees every appointment on one calendar and updates each status as it happens.',
   },
 ];
 
@@ -46,10 +46,9 @@ export function PurposeSection() {
             Running a service business is hard. Filling your calendar shouldn't be.
           </h2>
           <p className="mt-6 text-lg text-slate leading-relaxed max-w-prose mx-auto">
-            Every day, clinics, salons, and studios lose money to no-shows, missed calls,
-            and double-bookings. Booked. puts your whole schedule online — customers pick
-            a real, available slot, pay a small deposit with GCash or Maya, and get a
-            reminder so they actually show up.
+            Every day, clinics, salons, and studios lose money to missed calls and
+            double-bookings. Booked. puts your schedule online — customers see the
+            slots you can actually work and book one in a few clicks.
           </p>
         </motion.div>
 

@@ -44,9 +44,9 @@ describe('Button', () => {
     expect(button).toHaveClass('my-custom-class');
   });
 
-  it('renders as anchor when asChild is true', () => {
+  it('renders as anchor when href is set', () => {
     render(
-      <Button asChild href="/test">
+      <Button href="/test">
         Link
       </Button>
     );
