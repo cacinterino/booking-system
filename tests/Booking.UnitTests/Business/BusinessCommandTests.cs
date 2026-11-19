@@ -74,7 +74,7 @@ public class RegisterBusinessCommandHandlerTests
         _userManager.Setup(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), "Admin")).ReturnsAsync(IdentityResult.Success);
         _userManager.Setup(u => u.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new[] { "Admin" });
         _jwt.Setup(j => j.GenerateAccessToken(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).Returns("token");
-        _jwt.Setup(j => j.GenerateRefreshToken()).Returns("refresh");
+        _jwt.Setup(j => j.GenerateRefreshToken(It.IsAny<ApplicationUser>())).Returns("refresh");
         _jwt.Setup(j => j.GetAccessTokenExpiry()).Returns(DateTime.UtcNow.AddMinutes(15));
 
         var handler = new RegisterBusinessCommandHandler(_userManager.Object, _jwt.Object, _repository.Object, _email.Object, _logger);
@@ -149,7 +149,7 @@ public class AcceptInvitationCommandHandlerTests
         _userManager.Setup(u => u.AddToRoleAsync(It.IsAny<ApplicationUser>(), "Staff")).ReturnsAsync(IdentityResult.Success);
         _userManager.Setup(u => u.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new[] { "Staff" });
         _jwt.Setup(j => j.GenerateAccessToken(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).Returns("token");
-        _jwt.Setup(j => j.GenerateRefreshToken()).Returns("refresh");
+        _jwt.Setup(j => j.GenerateRefreshToken(It.IsAny<ApplicationUser>())).Returns("refresh");
         _jwt.Setup(j => j.GetAccessTokenExpiry()).Returns(DateTime.UtcNow.AddMinutes(15));
 
         var handler = new AcceptInvitationCommandHandler(_userManager.Object, _jwt.Object, _repository.Object, _logger);

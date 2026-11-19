@@ -118,7 +118,8 @@ public class BookingStaffTests
             new(ClaimTypes.Email, "stella.staff@example.com"),
             new(ClaimTypes.Name, "Stella Staff"),
             new("businessId", businessId.ToString()),
-            new(ClaimTypes.Role, "Staff")
+            new(ClaimTypes.Role, "Staff"),
+            new("token_type", "access")
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("integration-test-secret-key-that-is-long-enough-for-hs256"));

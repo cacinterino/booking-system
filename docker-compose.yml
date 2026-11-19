@@ -1,18 +1,16 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: booking
-      POSTGRES_USER: booking
-      POSTGRES_PASSWORD: booking
+      POSTGRES_DB: ${POSTGRES_DB:-booking}
+      POSTGRES_USER: ${POSTGRES_USER:-booking}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-booking}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U booking -d booking"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-booking} -d ${POSTGRES_DB:-booking}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -36,11 +34,12 @@ services:
       dockerfile: src/Booking.Api/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Host=postgres;Database=booking;Username=booking;Password=booking"
-      Jwt__Key: "your-super-secret-key-at-least-32-chars-long"
-      Jwt__Issuer: "Booking.Api"
-      Jwt__Audience: "Booking.Client"
-      AllowedOrigins: "http://localhost:5173"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=${POSTGRES_DB:-booking};Username=${POSTGRES_USER:-booking};Password=${POSTGRES_PASSWORD:-booking}"
+      Jwt__Key: "${JWT_KEY:-local-dev-only-key-change-me-at-least-32-characters}"
+      Jwt__Issuer: "${JWT_ISSUER:-Booking.Api}"
+      Jwt__Audience: "${JWT_AUDIENCE:-Booking.Client}"
+      AllowedOrigins: "${ALLOWED_ORIGINS:-http://localhost:5173}"
+      Seed__Demo: "${SEED_DEMO:-true}"
     ports:
       - "5000:8080"
     depends_on:
@@ -57,7 +56,7 @@ services:
       - ./booking-client:/app
       - /app/node_modules
     environment:
-      VITE_API_URL: http://localhost:5000
+      VITE_API_URL: "${VITE_API_URL:-http://localhost:5000}"
     depends_on:
       - api
 

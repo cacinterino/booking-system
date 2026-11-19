@@ -1,9 +1,22 @@
-**/bin
-**/obj
-**/node_modules
-**/.git
-**/.vs
-**/.vscode
-docker-compose.override.yml
+# Build output
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Node
+node_modules/
+**/node_modules/
+booking-client/dist/
+
+# Local secrets and editor files
+.env
+*.user
+.vs/
+.vscode/
+.idea/
+
+# Docs and git metadata
+.git/
+.github/
 *.md
-!README.md

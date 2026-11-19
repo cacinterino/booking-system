@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { BookingResponse } from '../types';
-import { Ticket } from '../../../shared/ui';
+import { Ticket, Card } from '../../../shared/ui';
 
 interface ConfirmationStepProps {
   booking: BookingResponse;

@@ -4,6 +4,7 @@ import { BookingStatusLabel } from './types';
 import type { CalendarEvent } from './types';
 import { toManilaDate, formatTimeManila } from '../booking/format';
 import { extractApiDetail } from '../booking/errors';
+import { useAuth } from '../../shared/context/AuthContext';
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -39,15 +40,16 @@ function dayKey(date: Date): string {
 }
 
 export function StaffDashboardPage() {
+  const { user } = useAuth();
   const workspaceQuery = useMyWorkspace();
   const [anchor, setAnchor] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(() => todayKey());
   const [actionError, setActionError] = useState<string | null>(null);
 
   const isAdmin = useMemo(() => {
-    const roles = localStorage.getItem('roles');
-    return roles ? roles.includes('Admin') : false;
-  }, []);
+    const roles = user?.roles ?? [];
+    return roles.includes('Admin');
+  }, [user]);
 
   const workspace = workspaceQuery.data;
   const staffId = workspace?.staff.id;

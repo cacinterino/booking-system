@@ -11,6 +11,7 @@ import { RegisterBusinessPage } from './features/auth/pages/RegisterBusinessPage
 import { AcceptInvitationPage } from './features/auth/pages/AcceptInvitationPage';
 import { ProfilePage } from './features/auth/pages/ProfilePage';
 import { DashboardPage } from './pages/DashboardPage';
+import { HighlightsPage } from './pages/HighlightsPage';
 import { AdminServicesPage } from './features/services/AdminServicesPage';
 import { StaffDashboardPage } from './features/staff/StaffDashboardPage';
 import { AdminStaffPage } from './features/staff/AdminStaffPage';
@@ -34,6 +35,7 @@ function App() {
 
             {/* Public booking + invitation links — always reachable */}
             <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
+            <Route path="/highlights" element={<HighlightsPage />} />
 
             {/* Guest booking wizard — fully anonymous */}
             <Route path="/book/:businessSlug" element={<BookingWizardPage />} />

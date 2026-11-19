@@ -1,5 +1,5 @@
 import type { Service } from '../../services/types';
-import { Card, Button } from '../../../shared/ui';
+import { Card } from '../../../shared/ui';
 
 interface ServiceStepProps {
   services: Service[];

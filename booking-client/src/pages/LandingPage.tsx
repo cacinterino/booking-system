@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { PurposeSection } from './components/PurposeSection';
-import { FeaturesGrid } from './components/FeaturesGrid';
-import { Marquee } from './components/Marquee';
-import { Testimonials } from './components/Testimonials';
-import { CtaSection } from './components/CtaSection';
-import { Footer } from './components/Footer';
+import { Navbar } from './LandingPage/components/Navbar';
+import { Hero } from './LandingPage/components/Hero';
+import { PurposeSection } from './LandingPage/components/PurposeSection';
+import { FeaturesGrid } from './LandingPage/components/FeaturesGrid';
+import { Marquee } from './LandingPage/components/Marquee';
+import { Testimonials } from './LandingPage/components/Testimonials';
+import { CtaSection } from './LandingPage/components/CtaSection';
+import { Footer } from './LandingPage/components/Footer';
 
 export function LandingPage() {
   const [scrolled, setScrolled] = useState(false);

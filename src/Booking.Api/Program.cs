@@ -65,11 +65,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-run migrations on startup
+// Auto-run migrations on startup, then make sure the Identity roles exist.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
     db.Database.Migrate();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    await DatabaseSeeder.SeedRolesAsync(roleManager);
+
+    var seedDemo = args.Contains("--seed", StringComparer.OrdinalIgnoreCase)
+        || builder.Configuration.GetValue<bool>("Seed:Demo");
+    if (seedDemo)
+    {
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var seedLogger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseSeeder");
+        await DatabaseSeeder.SeedDemoAsync(db, userManager, roleManager, seedLogger);
+    }
 }
 
 // Pipeline

@@ -20,8 +20,8 @@ export function CtaSection() {
             Your calendar is waiting to be filled.
           </h2>
           <p className="mt-5 text-lg text-paper-white/75 max-w-xl mx-auto">
-            Join service businesses across the Philippines already booking, taking deposits,
-            and cutting their no-shows with Booked.
+            Built for Philippine service businesses. Create your booking page, add your
+            team, and share one link with your customers.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="/register" className="btn-on-dark text-lg w-full sm:w-auto px-8 py-4">
@@ -32,7 +32,7 @@ export function CtaSection() {
             </a>
           </div>
           <p className="mt-6 text-sm text-paper-white/50">
-            Free forever for small teams · GCash & Maya powered
+            Free while in beta · Payments not yet enabled
           </p>
         </motion.div>
       </div>

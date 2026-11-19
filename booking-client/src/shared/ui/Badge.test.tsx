@@ -10,7 +10,7 @@ describe('Badge', () => {
 
   it('has pill shape and brass styling', () => {
     render(<Badge>Active</Badge>);
-    const badge = screen.getByText('Active').parentElement!;
+    const badge = screen.getByText('Active');
     expect(badge).toHaveClass('rounded-full');
     expect(badge).toHaveClass('bg-brass/10');
     expect(badge).toHaveClass('text-brass-deep');
@@ -19,9 +19,15 @@ describe('Badge', () => {
     expect(badge).toHaveClass('uppercase');
   });
 
+  it('switches colour for the sage variant', () => {
+    render(<Badge variant="sage">Active</Badge>);
+    const badge = screen.getByText('Active');
+    expect(badge).toHaveClass('text-sage');
+  });
+
   it('applies custom className', () => {
     render(<Badge className="my-badge">Active</Badge>);
-    const badge = screen.getByText('Active').parentElement!;
+    const badge = screen.getByText('Active');
     expect(badge).toHaveClass('my-badge');
   });
 });

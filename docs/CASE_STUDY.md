@@ -1,106 +1,81 @@
-# Case Study: Booked. — Appointment Booking for Philippine Service Businesses
+# Case Study: Booked.
 
-## Problem Statement
+## Problem
 
-Small service businesses in the Philippines (clinics, salons, barbershops, spas) still rely on phone calls, walk-ins, and paper diaries to manage appointments. This leads to:
+Small service businesses in the Philippines — salons, clinics, barbershops, spas — usually take bookings through phone calls, DMs, and a paper diary. That produces three recurring problems:
 
-- **No-shows** — Customers forget appointments, leaving empty slots and lost revenue
-- **Double-bookings** — Two customers scheduled for the same slot, causing confusion and lost trust
-- **No online presence** — No way for customers to book 24/7 without calling
-- **No deposits** — No financial commitment from customers, increasing no-show rates
+- Customers cannot see which slots are actually open, so they call to ask.
+- Two customers can be given the same slot, especially when more than one staff member takes bookings.
+- Nobody can tell, at a glance, what the day looks like across the team.
 
-## Solution: Booked.
+## What I built
 
-Booked. is a full-stack appointment booking platform built specifically for the Philippine service market. It enables businesses to:
+A booking app with two sides:
 
-- Publish a public booking page (`/book/:businessSlug`) customers can share
-- View real-time availability computed from staff schedules, overrides, and existing bookings
-- Accept GCash/Maya deposits via PayMongo to hold slots and cut no-shows
-- Send automated reminders (24h and 1h before appointments)
-- Manage staff, services, and schedules from a staff dashboard
+**Customers** open a public page (`/book/:businessSlug`), choose a service and a staff member, pick a date, and select from real open slots computed for that day. Booking requires no account. The confirmation returns an access code (`8F3K-2Q7X`), which the guest uses at `/my-bookings` to review, reschedule, or cancel.
 
-## Tech Stack
+**Staff** sign in, see this week's booking counts and pending confirmations on `/dashboard`, and work the week from `/staff/calendar` — confirming, completing, marking no-shows, or cancelling. Admins manage services (duration, price, active flag, staff assignment) and staff (weekly hours, date overrides, service eligibility).
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| API | ASP.NET Core 9 Web API | Mature, performant, easy to explain in interviews |
-| Client | React 18 + TypeScript + Vite | Modern, type-safe, fast build times |
-| Styling | Tailwind CSS v4 | Utility-first, design system friendly |
-| Database | PostgreSQL 16 + EF Core 9 | Reliable, JSONB support, great .NET integration |
-| Auth | ASP.NET Core Identity + JWT | Industry standard, 15min access + 7-day refresh |
-| Real-time | SignalR | Live calendar updates for staff |
-| Payments | PayMongo (GCash/Maya) | Philippine market leader for digital payments |
-| Testing | xUnit, Moq, FluentAssertions, Testcontainers | Industry-standard .NET testing |
-| E2E | Playwright | Browser-based critical path testing |
+## Stack and why
 
-## Architecture Decisions
+| Layer | Choice | Reason |
+|-------|--------|--------|
+| API | ASP.NET Core 9 | Strong typing, first-class EF Core and Identity support, easy to test |
+| Structure | Clean Architecture + MediatR (CQRS) | Domain stays free of EF/MediatR, so domain rules are testable without a database |
+| Data | PostgreSQL 16 + EF Core 9 | Exclusion constraints do the double-booking guard properly; EF Core handles migrations and mapping |
+| Auth | ASP.NET Core Identity + JWT | Standard, and the refresh-token flow is a good thing to be able to explain |
+| Client | React 19 + TypeScript + Vite | Fast local feedback; types catch API-shape mistakes |
+| Server state | TanStack Query | Caching and refetching per query key without a hand-rolled store |
+| Styling | Tailwind CSS v4 | Design tokens in CSS variables; no component library to fight |
+| Tests | xUnit, Moq, FluentAssertions, Testcontainers, Vitest | Unit tests for the engine, real Postgres for the concurrency guarantee |
 
-### Clean Architecture with CQRS
+## Design decisions worth defending
 
-The solution follows 4-layer Clean Architecture:
+### 1. The database is the final word on double-booking
 
-```
-Booking.Domain      — Entities, value objects, domain events (ZERO dependencies)
-Booking.Application — Commands, queries, handlers, validators, DTOs
-Booking.Infrastructure — EF Core, repositories, email/SMS, auth, SignalR
-Booking.Api — Controllers, middleware, Program.cs, SignalR Hubs
-```
-
-**Domain has zero dependencies** — no EF Core, no MediatR, no external packages. This makes the core business logic trivial to unit test and easy to explain in interviews.
-
-### Double-Booking Prevention (Database-Level)
-
-Two customers cannot book the same slot. This is enforced at the database level using a PostgreSQL exclusion constraint:
+Two customers can view the same slot and submit at the same moment. Both can pass an application-level "is this free?" check before either row is written. So the last line of defence is a PostgreSQL exclusion constraint on the staff member's booked time range:
 
 ```sql
-EXCLUDE USING gist (StaffId WITH =, tstzrange("StartTime","EndTime",'[)') WITH &&)
-WHERE (Status IN (1,2))
+EXCLUDE USING gist ("StaffId" WITH =, tstzrange("StartTime", "EndTime", '[)') WITH &&)
+WHERE ("Status" IN (1, 2) AND NOT "IsDeleted")
 ```
 
-The half-open `[)` range means back-to-back bookings (e.g., 10:00-10:45 and 10:45-11:30) do not conflict. Exactly one of two simultaneous booking attempts wins; the other gets a clean HTTP 409, not a 500.
+The half-open `[)` range means 10:00–10:45 and 10:45–11:30 do not collide. The losing request gets a constraint violation, which the API maps to `409 Conflict` rather than a `500`. `BookingConcurrencyTests` fires two concurrent creates at one slot and asserts exactly one `201`.
 
-### Idempotent Booking Creates
+### 2. Availability is computed, never stored
 
-`POST /api/bookings` accepts an `Idempotency-Key` header. Retrying with the same key returns the existing booking (HTTP 200) instead of creating a duplicate.
+There is no `slots` table. `GetAvailabilityQuery` takes the requested Manila date, reads the staff member's weekly schedule and date overrides, subtracts existing non-cancelled bookings, then walks forward in `SlotIntervalMinutes` steps while the service still fits before closing time. This means a schedule change or a cancellation is reflected without any backfill job — the only staleness is a 60-second in-memory cache.
 
-### Timezone Strategy
+### 3. UTC in the database, Manila at the edges
 
-All timestamps stored in UTC. Asia/Manila conversion happens only at the API response boundary (DTO mapping). This prevents the #1 source of booking bugs — wrong-day bookings due to timezone confusion.
+Every timestamp is stored in UTC. Conversion to `Asia/Manila` happens in the DTO mapper (`BookingDtoMapper.ToManila`) and in the client formatters. The availability engine converts the requested local date into a UTC window before querying, which avoids the classic "booked the wrong day" bug near midnight.
 
-## Challenges & Solutions
+### 4. Guest access without accounts
 
-### Challenge: Double-Booking Race Condition
+Requiring registration to book would lose most customers. Instead, `POST /api/bookings` accepts an optional guest contact block and returns an access code. Lookup resolves the code to that customer record and returns only that customer's bookings. An invalid code returns `401`, and there is no endpoint that lists bookings by guessable identifiers.
 
-Two customers hitting "confirm" on the same slot simultaneously.
+## Challenges
 
-**Solution:** PostgreSQL exclusion constraint at the database level. Application code catches the violation and returns HTTP 409 with a clear message. Tested with concurrent booking tests — exactly one 201, one 409.
+**Concurrency** — solved as above; the interesting part was mapping the Postgres exception to a clean 409 in middleware instead of letting it surface as a 500.
 
-### Challenge: Timezone Edge Cases Near Midnight
+**Timezone edges** — availability for a Manila date spans two UTC days. Handled by converting the local day boundaries to UTC before the booked-interval query, with explicit handling for unusual `DateOnly` sentinels.
 
-Appointments spanning midnight in Asia/Manila (UTC+8).
+**Authorization boundaries** — a staff member may only read their own calendar; an admin may read any staff member's calendar in their business; a customer may only read bookings linked to their user id or access code. These are enforced in the handlers, not just hidden in the UI.
 
-**Solution:** All storage in UTC, conversion at boundary. Availability engine generates slots in Manila time and converts to UTC for storage. Tested with date-sensitive booking tests.
+**Roles were never seeded** — a fresh database failed on `register-business` because the `Admin` role did not exist. Startup now seeds `Admin`, `Staff`, and `Customer` idempotently.
 
-### Challenge: Empty Demo Data
+## What I would improve next
 
-A screener clicking the live demo should see data, not emptiness.
+1. **Invalidate the availability cache on write.** It currently expires after 60 seconds, so a schedule change can appear stale.
+2. **Persist refresh tokens.** They are signed JWTs today, so revoke cannot invalidate an issued token; a token table with rotation and reuse detection would fix that.
+3. **Payments and reminders.** There are `Payment` and `Notification` entities but no handler calls them. Deposits via PayMongo and reminder scheduling are the obvious next slice.
+4. **Live calendar updates.** Staff currently refresh to see new bookings.
+5. **Run tests in CI.** No workflow is committed yet, so nothing gates merges automatically.
 
-**Solution:** Seed script (`dotnet run --seed`) creates services, staff, schedules, demo bookings, and demo admin account. Anyone can clone the repo and see a populated calendar in under a minute.
+## Demo
 
-## What I'd Improve
+Runs locally: `docker compose up --build`, then http://localhost:5173. Demo login `demo@booked.local` / `Demo123!`, demo business at `/book/booked-demo`. See `README.md` and `docs/DEMO_SCRIPT.md`.
 
-1. **PayMongo integration** — Currently deferred (deposits optional). Would add payment intent creation and webhook handling for GCash/Maya deposits.
-2. **Notifications** — Email/SMS reminders via SendGrid/Resend and Semaphore PH. Currently deferred.
-3. **E2E tests** — Playwright for critical paths (Book → Confirm → Cancel). Currently deferred.
-4. **CI/CD** — GitHub Actions → Render + Vercel. Workflows exist but need secrets configured.
-5. **Caching** — In-memory cache for availability queries. Would add `IMemoryCache` with invalidation on booking writes.
+## Data privacy (RA 10173)
 
-## Live Demo
-
-- **API:** [Render deployment]
-- **Client:** [Vercel deployment]
-- **Repo:** https://github.com/cacinterino/booking-system
-
-## Data Privacy (RA 10173)
-
-Booked. collects customer personal information (name, email, phone) for appointment booking and reminders. Data is stored in PostgreSQL, access-controlled, and soft-deleted (never hard-deleted) to maintain audit trails. Customers may request access, correction, or deletion of their data.
+The app stores name, email, optional phone, and booking details to deliver the appointment. Bookings and customers are soft-deleted rather than hard-deleted to retain an audit trail, and global query filters keep deleted rows out of normal reads. A business sees only its own records; a guest needs the access code to see a booking. No third-party analytics receive booking data; the only outbound integration is SendGrid, and it is disabled when no API key is configured (the reset link is printed to the local console instead).

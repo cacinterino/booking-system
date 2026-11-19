@@ -1,49 +1,76 @@
-import { useAuth } from '../shared/context/AuthContext';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../shared/context/AuthContext';
+import { useCalendar, useMyWorkspace } from '../features/staff/hooks';
+import { formatTimeManila } from '../features/booking/format';
+import type { CalendarEvent } from '../features/staff/types';
+
+function todayKey(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+}
+
+function currentWeek(today: string): { from: string; to: string } {
+  const [year, month, day] = today.split('-').map(Number);
+  const base = new Date(Date.UTC(year, month - 1, day));
+  const mondayOffset = (base.getUTCDay() + 6) % 7;
+  const monday = new Date(base);
+  monday.setUTCDate(base.getUTCDate() - mondayOffset);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  return { from: monday.toISOString().slice(0, 10), to: sunday.toISOString().slice(0, 10) };
+}
+
+function Stat({ label, value, loading }: { label: string; value: number | string; loading: boolean }) {
+  return (
+    <div className="card">
+      <h2 className="text-sm font-medium text-slate">{label}</h2>
+      <p className="mt-3 text-3xl md:text-4xl font-bold text-ink font-display">
+        {loading ? '—' : value}
+      </p>
+    </div>
+  );
+}
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const roles = user?.roles ?? [];
+  const isAdmin = roles.includes('Admin');
+  const isStaff = isAdmin || roles.includes('Staff');
 
-  const stats = [
-    { label: 'Upcoming Bookings', value: '0', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    )},
-    { label: 'This Week', value: '0', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )},
-    { label: 'This Month', value: '0', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    )},
-  ];
+  const workspaceQuery = useMyWorkspace(isStaff);
+  const workspace = workspaceQuery.data;
 
-  const quickActions = [
-    { label: 'New Booking', desc: 'Create a new appointment', href: '/bookings/new', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-      </svg>
-    )},
-    { label: 'View Bookings', desc: 'Manage all appointments', href: '/bookings', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-      </svg>
-    )},
-    { label: 'Services', desc: 'Manage your services', href: '/services', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-      </svg>
-    )},
-    { label: 'Staff', desc: 'Manage team members', href: '/staff', icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    )},
-  ];
+  const today = todayKey();
+  const { from, to } = useMemo(() => currentWeek(today), [today]);
+
+  const calendarQuery = useCalendar(
+    from,
+    to,
+    isAdmin ? undefined : workspace?.staff.id,
+    isStaff && !!workspace,
+  );
+  const events = calendarQuery.data ?? [];
+
+  const stats = useMemo(() => {
+    const todays = events.filter((event: CalendarEvent) => event.start.slice(0, 10) === today);
+    const pending = events.filter((event: CalendarEvent) => event.status === 1);
+    return { todays: todays.length, week: events.length, pending: pending.length };
+  }, [events, today]);
+
+  const nextToday = [...events]
+    .filter((event) => event.start.slice(0, 10) === today && event.status !== 3)
+    .sort((a, b) => a.start.localeCompare(b.start))[0];
+
+  const quickActions = isStaff
+    ? [
+        { label: 'Staff calendar', desc: 'Confirm and complete bookings', href: '/staff/calendar' },
+        { label: 'Services', desc: 'Manage services and prices', href: '/admin/services' },
+        { label: 'Staff', desc: 'Team, schedules, and services', href: '/admin/staff' },
+        ...(workspace
+          ? [{ label: 'Booking page', desc: `Open /book/${workspace.businessSlug}`, href: `/book/${workspace.businessSlug}` }]
+          : []),
+      ]
+    : [{ label: 'My bookings', desc: 'View your upcoming appointments', href: '/my-bookings' }];
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
@@ -51,38 +78,53 @@ export function DashboardPage() {
         <div className="mb-10">
           <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Dashboard</p>
           <h1 className="text-3xl md:text-4xl font-bold text-ink font-display">Welcome, {user?.fullName}</h1>
-          <p className="text-slate mt-2">Here's what's happening with your bookings</p>
+          <p className="text-slate mt-2">
+            {isStaff
+              ? 'Bookings from the staff calendar, for the current week.'
+              : 'Your account overview.'}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {stats.map((stat, i) => (
-            <div key={i} className="card hover:shadow-lg transition-shadow group">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-slate">{stat.label}</h2>
-                <div className="p-2 bg-brass/10 rounded-lg text-brass group-hover:bg-brass/20 transition-colors">
-                  {stat.icon}
-                </div>
-              </div>
-              <p className="text-3xl md:text-4xl font-bold text-ink font-display">{stat.value}</p>
+        {isStaff && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <Stat label="Today's bookings" value={stats.todays} loading={calendarQuery.isLoading} />
+            <Stat label="This week" value={stats.week} loading={calendarQuery.isLoading} />
+            <Stat label="Pending confirmation" value={stats.pending} loading={calendarQuery.isLoading} />
+          </div>
+        )}
+
+        {isStaff && nextToday && (
+          <div className="card mb-10">
+            <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Next up today</p>
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="font-mono text-lg font-medium text-ink">{formatTimeManila(nextToday.start)}</span>
+              <span className="font-display font-semibold text-ink">{nextToday.customerName}</span>
+              <span className="text-sm text-slate">{nextToday.title}</span>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
+        {isStaff && !workspaceQuery.isLoading && !workspace && (
+          <div className="card mb-10">
+            <h2 className="font-display text-lg font-semibold text-ink">No staff workspace yet</h2>
+            <p className="mt-1 text-sm text-slate">
+              This account is not linked to a staff record, so there is no calendar to show.
+            </p>
+          </div>
+        )}
 
         <div className="card">
           <div className="mb-8">
             <p className="font-mono text-xs uppercase tracking-widest text-brass-deep mb-2">Quick Actions</p>
-            <h2 className="text-lg font-semibold text-ink font-display">Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-ink font-display">Where to next</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action, i) => (
+            {quickActions.map((action) => (
               <Link
-                key={i}
+                key={action.href}
                 to={action.href}
-                className="card hover:shadow-lg hover:border-brass transition-all text-center"
+                className="card hover:shadow-lg hover:border-brass transition-all"
               >
-                <div className="p-3 bg-brass/10 rounded-lg text-brass mx-auto mb-4 w-fit group-hover:bg-brass/20 transition-colors">
-                  {action.icon}
-                </div>
                 <h3 className="text-lg font-semibold text-ink font-display">{action.label}</h3>
                 <p className="text-slate text-sm mt-1">{action.desc}</p>
               </Link>

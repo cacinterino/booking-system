@@ -120,8 +120,8 @@ public class UserManagerService : IUserManager
         return new AppUser
         {
             Id = user.Id,
-            UserName = user.UserName,
-            Email = user.Email,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
             FullName = user.FullName,
             PhoneNumber = user.PhoneNumber,
             BusinessId = user.BusinessId,

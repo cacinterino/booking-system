@@ -46,7 +46,7 @@ public interface IUserManager
 public interface IJwtTokenService
 {
     string GenerateAccessToken(ApplicationUser user, IEnumerable<string> roles);
-    string GenerateRefreshToken();
+    string GenerateRefreshToken(ApplicationUser user);
     ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
     DateTime GetAccessTokenExpiry();
     DateTime GetRefreshTokenExpiry(bool rememberMe);

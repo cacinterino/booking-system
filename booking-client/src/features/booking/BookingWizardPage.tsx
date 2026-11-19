@@ -8,7 +8,7 @@ import { StaffStep } from './components/StaffStep';
 import { DateTimeStep } from './components/DateTimeStep';
 import { DetailsStep } from './components/DetailsStep';
 import { ConfirmationStep } from './components/ConfirmationStep';
-import { LoadingSkeleton } from '../../shared/ui';
+import { LoadingSkeleton, Card } from '../../shared/ui';
 import type { AvailableSlot, BookingResponse, PublicStaff } from './types';
 import type { Service as ServiceType } from '../services/types';
 
@@ -300,7 +300,7 @@ export function BookingWizardPage() {
         {step === 3 && business && (
           <>
             {slot && service && (
-              <div className="mb-6 Card">
+              <Card className="mb-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-display font-semibold text-ink">{service.name}</p>
@@ -318,7 +318,7 @@ export function BookingWizardPage() {
                     })}
                   </p>
                 </div>
-              </div>
+              </Card>
             )}
             <DetailsStep business={business} onConfirm={handleConfirm} submitting={submitting} error={submitError} />
             <div className="mt-6">

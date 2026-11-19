@@ -100,7 +100,7 @@ export function MyBookingsPage() {
               Lookup Your Appointments
             </h2>
             <p className="text-sm text-slate mb-4">
-              Enter the 8-character confirmation access code you received when booking your appointment.
+              Enter the access code you received when booking your appointment, in the form 8F3K-2Q7X.
             </p>
             <form className="flex flex-col sm:flex-row gap-3" onSubmit={handleSubmit}>
               <input

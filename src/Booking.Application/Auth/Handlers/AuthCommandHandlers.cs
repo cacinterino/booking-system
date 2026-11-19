@@ -54,7 +54,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
 
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+        var refreshToken = _jwtTokenService.GenerateRefreshToken(user);
         var expiresAt = _jwtTokenService.GetAccessTokenExpiry();
 
         await _emailService.SendWelcomeEmailAsync(req.Email, req.FirstName);
@@ -100,7 +100,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
 
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+        var refreshToken = _jwtTokenService.GenerateRefreshToken(user);
         var expiresAt = _jwtTokenService.GetAccessTokenExpiry();
 
         _logger.LogInformation("User logged in: {Email}", req.Email);
@@ -146,7 +146,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
 
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
+        var newRefreshToken = _jwtTokenService.GenerateRefreshToken(user);
         var expiresAt = _jwtTokenService.GetAccessTokenExpiry();
 
         _logger.LogInformation("Token refreshed for user: {UserId}", user.Id);
