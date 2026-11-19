@@ -101,7 +101,7 @@ dotnet test tests/Booking.IntegrationTests
 # Run full backend test suite
 dotnet test Booking.sln
 
-# Client: 34 component tests (Vitest)
+# Client: 38 component/unit tests (Vitest)
 cd booking-client
 npm test
 
