@@ -76,12 +76,16 @@ email:    demo@booked.local
 password: Demo123!
 ```
 
-`--seed` (or `Seed__Demo=true`) is idempotent: it creates the demo business `booked-demo` only if it does not exist, along with three services, two staff members, Mon–Sat 09:00–18:00 hours, and three bookings. Seeded data uses fake contacts (`@example.com` addresses, `+63 900 000 000x` numbers). To reseed, delete the `booked-demo` business row or recreate the Postgres volume (`docker compose down -v`).
+`--seed` (or `Seed__Demo=true`) is idempotent: it creates the business `booked-demo`, three services, two staff members, Mon–Sat 09:00–18:00 schedules, a staff training override, and realistic appointments across the current week. To reseed, delete the `booked-demo` business row or recreate the Postgres volume (`docker compose down -v`).
 
-Pre-seeded access codes for testing `/my-bookings`:
-- `DEMO-1001` (Maria Cruz — Signature Facial — Confirmed)
-- `DEMO-1002` (Paolo Reyes — Deep Tissue Massage — Pending)
-- `DEMO-1003` (Liza Fernandez — Gel Manicure — Confirmed)
+Pre-seeded guest access codes for testing `/my-bookings`:
+- `8F3K-2Q7X` (Maria Cruz — Signature Facial — Confirmed)
+- `5P2X-L9T4` (Paolo Reyes — Deep Tissue Massage — Pending)
+- `9T4E-K7W2` (Angelo David Reyes — Signature Facial — Confirmed)
+- `3W8K-P5M9` (Liza Fernandez — Gel Manicure — Confirmed)
+- `4L9V-C2K8` (Dave Austin Villanueva — Deep Tissue Massage — Pending)
+- `6V4L-P8X3` (Patricia Mae Ramos — Signature Facial — Completed)
+- `3M7C-N9K2` (Mark Christian Dizon — Deep Tissue Massage — Cancelled)
 
 Identity roles (`Admin`, `Staff`, `Customer`) are seeded on every startup, because `register-business` assigns the `Admin` role.
 
