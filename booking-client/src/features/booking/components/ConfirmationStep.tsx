@@ -1,21 +1,10 @@
 import { useState } from 'react';
 import type { BookingResponse } from '../types';
+import { formatDateTimeManila } from '../format';
 import { Ticket, Card } from '../../../shared/ui';
 
 interface ConfirmationStepProps {
   booking: BookingResponse;
-}
-
-function formatDateTime(localIso: string): string {
-  const date = new Date(localIso);
-  return date.toLocaleString('en-PH', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
 }
 
 export function ConfirmationStep({ booking }: ConfirmationStepProps) {
@@ -39,7 +28,7 @@ export function ConfirmationStep({ booking }: ConfirmationStepProps) {
         <h2 className="mt-2 font-display text-2xl font-semibold text-ink">See you there</h2>
         <p className="mt-3 text-ink-soft">{booking.serviceName}</p>
         <p className="mt-1 text-ink-soft">with {booking.staffName}</p>
-        <p className="mt-3 font-display text-xl font-semibold text-ink">{formatDateTime(booking.startTime)}</p>
+        <p className="mt-3 font-display text-xl font-semibold text-ink">{formatDateTimeManila(booking.startTime)}</p>
       </Ticket>
 
       <Card className="space-y-3">
